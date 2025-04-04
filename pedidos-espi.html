@@ -51,17 +51,29 @@
         button:hover {
             background-color: #0056b3;
         }
+        .volver {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #ccc;
+            color: black;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
     </style>
 </head>
 <body>
     <div class="form-box">
         <h2>Crear Pedido - Vicente Espi S.L.</h2>
-        <form>
+        <form id="pedidoForm">
             <label>Cliente</label>
-            <input type="text" placeholder="Nombre del cliente" required>
+            <input type="text" id="cliente" required>
 
             <label>Producto</label>
-            <select>
+            <select id="producto">
                 <option>R-20</option>
                 <option>R-23</option>
                 <option>R-19</option>
@@ -69,38 +81,56 @@
             </select>
 
             <label>Cantidad</label>
-            <input type="number" placeholder="Ej: 300" required>
+            <input type="number" id="cantidad" required>
 
             <label>Tipo de unidad</label>
-            <select>
+            <select id="unidad">
                 <option>Kg Crudo</option>
                 <option>Kg Encerado</option>
                 <option>Millares</option>
             </select>
 
             <label>Fecha de entrega</label>
-            <input type="date" required>
+            <input type="date" id="fecha" required>
 
             <div class="checkboxes">
-                <label><input type="checkbox"> Generar etiquetas</label>
-                <label><input type="checkbox"> Incluir certificado</label>
+                <label><input type="checkbox" id="etiquetas"> Generar etiquetas</label>
+                <label><input type="checkbox" id="certificado"> Incluir certificado</label>
             </div>
 
             <button type="submit">Generar Pedido</button>
         </form>
+        <p id="msg" style="margin-top: 20px; color: green; font-weight: bold;"></p>
     </div>
 
-    <a href="empresas.html" style="
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background-color: #ccc;
-        color: black;
-        padding: 10px 20px;
-        border-radius: 50px;
-        text-decoration: none;
-        font-weight: bold;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    ">⬅ Volver</a>
+    <a href="empresas.html" class="volver">⬅ Volver</a>
+
+    <script>
+        const form = document.getElementById("pedidoForm");
+        const msg = document.getElementById("msg");
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const pedido = {
+                cliente: document.getElementById("cliente").value,
+                producto: document.getElementById("producto").value,
+                cantidad: document.getElementById("cantidad").value,
+                unidad: document.getElementById("unidad").value,
+                fecha: document.getElementById("fecha").value,
+                etiquetas: document.getElementById("etiquetas").checked,
+                certificado: document.getElementById("certificado").checked,
+                timestamp: new Date().toISOString()
+            };
+
+            let pedidos = JSON.parse(localStorage.getItem("pedidos_espi")) || [];
+            pedidos.push(pedido);
+            localStorage.setItem("pedidos_espi", JSON.stringify(pedidos));
+
+            msg.textContent = "✅ Pedido guardado correctamente.";
+
+            form.reset();
+        });
+    </script>
 </body>
 </html>
