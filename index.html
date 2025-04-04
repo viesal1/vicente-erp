@@ -3,10 +3,31 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>ERP de Vicente</title>
+    <title>Login - ERP Vicente</title>
 </head>
 <body style="font-family:sans-serif; text-align:center; margin-top:100px;">
-    <h1>✅ ERP de Vicente – funcionando</h1>
-    <p>¡Esto ya carga bien, jefe!</p>
+    <h2>Login - ERP de Vicente</h2>
+    <form onsubmit="return validarLogin()" style="margin-top: 20px;">
+        <input type="email" id="email" placeholder="Correo" required><br><br>
+        <input type="password" id="password" placeholder="Contraseña" required><br><br>
+        <button type="submit">Entrar</button>
+    </form>
+    <p id="mensaje" style="color:red; margin-top:15px;"></p>
+
+    <script>
+        function validarLogin() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const msg = document.getElementById("mensaje");
+
+            if (email === "tino9846@gmail.com" && password === "vicente123") {
+                window.location.href = "empresas.html";
+            } else {
+                msg.textContent = "Correo o contraseña incorrectos";
+            }
+
+            return false;
+        }
+    </script>
 </body>
 </html>
