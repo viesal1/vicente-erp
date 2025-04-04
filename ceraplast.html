@@ -33,6 +33,8 @@
             font-weight: bold;
             transition: transform 0.2s ease;
             cursor: pointer;
+            text-decoration: none;
+            color: black;
         }
         .card:hover {
             transform: scale(1.05);
@@ -43,12 +45,12 @@
 <body>
     <h1>CERAPLAST S.L. - ERP</h1>
     <div class="grid">
-        <div class="card" onclick="alert('Producción')">Producción</div>
-        <div class="card" onclick="alert('Almacén')">Almacén</div>
-        <div class="card" onclick="alert('Pedidos')">Pedidos</div>
-        <div class="card" onclick="alert('Etiquetas')">Etiquetas</div>
-        <div class="card" onclick="alert('Certificados')">Certificados</div>
-        <div class="card" onclick="alert('Control de Entradas')">Control de Entradas</div>
+        <a class="card" href="produccion.html">Producción</a>
+        <a class="card" href="almacen.html">Almacén</a>
+        <a class="card" href="pedidos.html">Pedidos</a>
+        <a class="card" href="etiquetas.html">Etiquetas</a>
+        <a class="card" href="certificados.html">Certificados</a>
+        <a class="card" href="entradas.html">Control de Entradas</a>
     </div>
 </body>
 </html>
