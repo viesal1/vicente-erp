@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedido - Vicente Espi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f4f8;
+            padding: 40px;
+        }
+        .form-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        .checkboxes {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            margin-top: 25px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <h2>Crear Pedido - Vicente Espi S.L.</h2>
+        <form>
+            <label>Cliente</label>
+            <input type="text" placeholder="Nombre del cliente" required>
+
+            <label>Producto</label>
+            <select>
+                <option>R-20</option>
+                <option>R-23</option>
+                <option>R-19</option>
+                <option>Otros...</option>
+            </select>
+
+            <label>Cantidad</label>
+            <input type="number" placeholder="Ej: 300" required>
+
+            <label>Tipo de unidad</label>
+            <select>
+                <option>Kg Crudo</option>
+                <option>Kg Encerado</option>
+                <option>Millares</option>
+            </select>
+
+            <label>Fecha de entrega</label>
+            <input type="date" required>
+
+            <div class="checkboxes">
+                <label><input type="checkbox"> Generar etiquetas</label>
+                <label><input type="checkbox"> Incluir certificado</label>
+            </div>
+
+            <button type="submit">Generar Pedido</button>
+        </form>
+    </div>
+</body>
+</html>

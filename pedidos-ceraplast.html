@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedido - Ceraplast</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f4f8;
+            padding: 40px;
+        }
+        .form-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        button {
+            margin-top: 25px;
+            background-color: #43a047;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <h2>Crear Pedido - Ceraplast S.L.</h2>
+        <form>
+            <label>Cliente</label>
+            <input type="text" placeholder="Nombre del cliente" required>
+
+            <label>Producto</label>
+            <select>
+                <option>V-7</option>
+                <option>C-10</option>
+                <option>C-5</option>
+                <option>Otros...</option>
+            </select>
+
+            <label>Cantidad (en pallets)</label>
+            <input type="number" placeholder="Ej: 10" required>
+
+            <label>Color</label>
+            <select>
+                <option>Rojo</option>
+                <option>Blanco</option>
+                <option>Transparente</option>
+                <option>Verde</option>
+                <option>Amarillo</option>
+                <option>Azul</option>
+                <option>Violeta</option>
+                <option>Blanco leche</option>
+            </select>
+
+            <label>Fecha de entrega</label>
+            <input type="date" required>
+
+            <button type="submit">Generar Pedido</button>
+        </form>
+    </div>
+</body>
+</html>
