@@ -5,64 +5,31 @@
     <meta charset="UTF-8">
     <title>Pedido - Vicente Espi</title>
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f0f4f8;
-            padding: 40px;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8; padding: 40px; }
         .form-box {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 600px;
-            margin: auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background: white; padding: 30px; border-radius: 15px;
+            max-width: 600px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        h2 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: bold;
-        }
+        h2 { text-align: center; margin-bottom: 30px; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
         input, select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+            width: 100%; padding: 10px; margin-top: 5px;
+            border-radius: 8px; border: 1px solid #ccc;
         }
-        .checkboxes {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
+        .checkboxes { display: flex; gap: 10px; margin-top: 10px; }
         button {
-            margin-top: 25px;
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+            margin-top: 25px; background-color: #007bff; color: white;
+            padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;
         }
-        button:hover {
-            background-color: #0056b3;
-        }
+        button:hover { background-color: #0056b3; }
         .volver {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background-color: #ccc;
-            color: black;
-            padding: 10px 20px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
+            position: fixed; bottom: 30px; right: 30px;
+            background-color: #ccc; color: black;
+            padding: 10px 20px; border-radius: 50px;
+            text-decoration: none; font-weight: bold;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
+        .output { margin-top: 20px; background: #e0ffe0; padding: 10px; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -100,26 +67,28 @@
 
             <button type="submit">Generar Pedido</button>
         </form>
-        <p id="msg" style="margin-top: 20px; color: green; font-weight: bold;"></p>
+        <div class="output" id="output" style="display:none;"></div>
     </div>
 
     <a href="empresas.html" class="volver">⬅ Volver</a>
 
     <script>
         const form = document.getElementById("pedidoForm");
-        const msg = document.getElementById("msg");
+        const output = document.getElementById("output");
 
         form.addEventListener("submit", function(event) {
             event.preventDefault();
 
+            const cliente = document.getElementById("cliente").value;
+            const producto = document.getElementById("producto").value;
+            const cantidad = document.getElementById("cantidad").value;
+            const unidad = document.getElementById("unidad").value;
+            const fecha = document.getElementById("fecha").value;
+            const etiquetas = document.getElementById("etiquetas").checked;
+            const certificado = document.getElementById("certificado").checked;
+
             const pedido = {
-                cliente: document.getElementById("cliente").value,
-                producto: document.getElementById("producto").value,
-                cantidad: document.getElementById("cantidad").value,
-                unidad: document.getElementById("unidad").value,
-                fecha: document.getElementById("fecha").value,
-                etiquetas: document.getElementById("etiquetas").checked,
-                certificado: document.getElementById("certificado").checked,
+                cliente, producto, cantidad, unidad, fecha, etiquetas, certificado,
                 timestamp: new Date().toISOString()
             };
 
@@ -127,7 +96,16 @@
             pedidos.push(pedido);
             localStorage.setItem("pedidos_espi", JSON.stringify(pedidos));
 
-            msg.textContent = "✅ Pedido guardado correctamente.";
+            let links = "";
+            if (certificado) {
+                links += `<p>📄 <a download href="certificado_R-20_LUMAR.docx">Descargar Certificado</a></p>`;
+            }
+            if (etiquetas) {
+                links += `<p>🏷️ <a download href="etiquetas_R-20_LUMAR.txt">Descargar Etiquetas</a></p>`;
+            }
+
+            output.style.display = "block";
+            output.innerHTML = "✅ Pedido guardado correctamente." + links;
 
             form.reset();
         });
