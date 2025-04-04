@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CERAPLAST S.L. - ERP</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f6f8fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+        }
+        h1 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+            text-align: center;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: scale(1.05);
+            background-color: #edf2fa;
+        }
+    </style>
+</head>
+<body>
+    <h1>CERAPLAST S.L. - ERP</h1>
+    <div class="grid">
+        <div class="card" onclick="alert('Producción')">Producción</div>
+        <div class="card" onclick="alert('Almacén')">Almacén</div>
+        <div class="card" onclick="alert('Pedidos')">Pedidos</div>
+        <div class="card" onclick="alert('Etiquetas')">Etiquetas</div>
+        <div class="card" onclick="alert('Certificados')">Certificados</div>
+        <div class="card" onclick="alert('Control de Entradas')">Control de Entradas</div>
+    </div>
+</body>
+</html>
