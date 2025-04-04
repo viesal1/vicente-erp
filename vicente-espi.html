@@ -3,54 +3,49 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>VICENTE ESPI S.L. - ERP</title>
+    <title>Vicente Espi - Módulos</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: #f6f8fa;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: #eef2f5;
             padding: 40px;
         }
-        h1 {
-            margin-bottom: 30px;
-            color: #333;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 900px;
-        }
-        .card {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            padding: 30px;
+        h2 {
             text-align: center;
-            font-weight: bold;
-            transition: transform 0.2s ease;
-            cursor: pointer;
+            margin-bottom: 30px;
+        }
+        .modules {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .module {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            text-align: center;
             text-decoration: none;
             color: black;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            width: 200px;
         }
-        .card:hover {
+        .module:hover {
             transform: scale(1.05);
-            background-color: #edf2fa;
+            background-color: #ddeeff;
         }
     </style>
 </head>
 <body>
-    <h1>VICENTE ESPI S.L. - ERP</h1>
-    <div class="grid">
-        <a class="card" href="produccion.html">Producción</a>
-        <a class="card" href="almacen.html">Almacén</a>
-        <a class="card" href="pedidos.html">Pedidos</a>
-        <a class="card" href="etiquetas.html">Etiquetas</a>
-        <a class="card" href="certificados.html">Certificados</a>
-        <a class="card" href="entradas.html">Control de Entradas</a>
+    <h2>Vicente Espi S.L. – Módulos</h2>
+    <div class="modules">
+        <a class="module" href="pedidos-espi.html">📦 Pedidos</a>
+        <a class="module" href="almacen.html">🏬 Almacén</a>
+        <a class="module" href="produccion.html">🏭 Producción</a>
+        <a class="module" href="etiquetas.html">🏷️ Etiquetas</a>
+        <a class="module" href="certificados.html">📄 Certificados</a>
+        <a class="module" href="entradas.html">📥 Control Entradas</a>
     </div>
 </body>
 </html>
