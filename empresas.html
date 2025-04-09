@@ -10,22 +10,26 @@
     h1 {
       text-align: center;
       text-transform: uppercase;
-      color: #4e79a7; /* Azul suave para Vicente Espi */
+      color: #007bff;
+      margin-bottom: 30px;
     }
     .empresa-card {
       background-color: #f0f4f8;
       padding: 20px;
-      border-radius: 10px;
       margin: 10px;
+      border-radius: 10px;
+      text-align: center;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      width: 250px;
     }
     .empresa-card:hover {
       background-color: #007bff;
       color: white;
+      transform: scale(1.05);
     }
     .empresa-card.ceraplast:hover {
-      background-color: #dc3545; /* Rojo suave para Ceraplast */
+      background-color: #dc3545;
     }
   </style>
 </head>
@@ -34,9 +38,11 @@
   <div class="empresas-container">
     <div class="empresa-card" onclick="location.href='inicio-vicente.html'">
       <h3>VICENTE ESPI</h3>
+      <p>🔵</p>
     </div>
     <div class="empresa-card ceraplast" onclick="location.href='inicio-ceraplast.html'">
       <h3>CERAPLAST SL</h3>
+      <p>🔴</p>
     </div>
   </div>
 </body>
