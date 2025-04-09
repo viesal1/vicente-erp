@@ -1,1 +1,26 @@
-<!-- LOGIN ACTUALIZADO -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Etiquetas</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <!-- Incluir código de Firebase y funciones -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script>
+    // Aquí se coloca el código Firebase de integración
+    ${firebase_integration_code}
+  </script>
+</head>
+<body>
+  <h1>Editor de Etiquetas</h1>
+  <!-- Formulario de ejemplo para crear etiquetas -->
+  <div>
+    <label for="nombreEtiqueta">Nombre de la etiqueta:</label>
+    <input type="text" id="nombreEtiqueta">
+  </div>
+  <button onclick="saveLabelToFirebase({ nombre: document.getElementById('nombreEtiqueta').value }, 'vicente-espi')">Guardar Etiqueta</button>
+</body>
+</html>
