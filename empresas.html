@@ -2,82 +2,26 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SELECCIÓN DE EMPRESA</title>
-  <link rel="stylesheet" href="css/estilos.css" />
+  <link rel="stylesheet" href="css/estilos.css">
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f2f2f2;
-      margin: 0;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
     h1 {
-      text-transform: uppercase;
-      margin-bottom: 2rem;
-      color: #333;
-    }
-
-    .empresas-container {
-      display: flex;
-      gap: 2rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .empresa-card {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      padding: 2rem;
       text-align: center;
-      width: 250px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .empresa-card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-    }
-
-    .empresa-card img {
-      width: 80px;
-      margin-bottom: 1rem;
-    }
-
-    .empresa-nombre {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #222;
-    }
-
-    .vicente {
-      border-top: 5px solid #007bff;
-    }
-
-    .ceraplast {
-      border-top: 5px solid #dc3545;
+      text-transform: uppercase;
+      color: #007bff;
     }
   </style>
 </head>
 <body>
-  <h1>SELECCIÓN DE EMPRESA</h1>
-
+  <h1>SELECCIONA UNA EMPRESA</h1>
   <div class="empresas-container">
-    <div class="empresa-card vicente" onclick="location.href='inicio-vicente.html'">
-      <img src="logo.jpg" alt="Vicente Espi" />
-      <div class="empresa-nombre">VICENTE ESPI</div>
+    <div class="empresa-card" onclick="location.href='inicio-vicente.html'">
+      <h3>VICENTE ESPI</h3>
     </div>
-
-    <div class="empresa-card ceraplast" onclick="location.href='inicio-ceraplast.html'">
-      <img src="logo.jpg" alt="Ceraplast" />
-      <div class="empresa-nombre">CERAPLAST</div>
+    <div class="empresa-card" onclick="location.href='inicio-ceraplast.html'">
+      <h3>CERAPLAST SL</h3>
     </div>
   </div>
 </body>
