@@ -5,8 +5,6 @@
   --background-color: #f4f7fa;
   --card-background-color: #ffffff;
   --text-color: #3c3c3c;
-  --button-color: #1e2a44;
-  --button-hover-color: #00a9e0;
   --shadow-color: rgba(0, 0, 0, 0.1);
 }
 body {
@@ -15,66 +13,29 @@ body {
   padding: 20px;
   background-color: var(--background-color);
   color: var(--text-color);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
 }
 .container {
-  width: 100%;
   max-width: 1000px;
-}
-h1, h3 {
-  text-align: center;
-  color: var(--primary-color);
-}
-button {
-  padding: 10px 20px;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-button:hover {
-  background-color: var(--button-hover-color);
-}
-.login-container {
-  background: white;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px var(--shadow-color);
-  text-align: center;
-  max-width: 400px;
-  width: 100%;
-  margin-top: 100px;
-}
-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  margin: auto;
 }
 .modulos-container {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 20px;
-  margin-top: 40px;
+  gap: 30px;
+  flex-wrap: wrap;
 }
 .modulo {
-  background-color: white;
-  border-radius: 10px;
+  background-color: var(--card-background-color);
   padding: 20px;
-  width: 180px;
-  box-shadow: 0 4px 8px var(--shadow-color);
+  width: 200px;
   text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px var(--shadow-color);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease;
 }
 .modulo:hover {
+  transform: scale(1.05);
   background-color: var(--primary-color);
   color: white;
-  transform: scale(1.05);
 }
