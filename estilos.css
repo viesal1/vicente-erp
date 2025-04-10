@@ -221,3 +221,35 @@ select {
   margin-top: 10px;
   margin-bottom: 20px;
 }
+
+/* Estilo para página de inicio (empresas) */
+.modulos-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.modulo {
+  background-color: #ffffff;
+  width: 200px;
+  padding: 20px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.modulo:hover {
+  background-color: #00a9e0;
+  color: white;
+  transform: scale(1.05);
+}
+
+.modulo h3 {
+  font-size: 1.5em;
+}
+
+.modulo p {
+  font-size: 2em;
+}
