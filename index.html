@@ -5,10 +5,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LOGIN</title>
-  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+  
 </head>
 <body>
   <div class="login-container">
+    <div class="icon">🔒</div>
     <h1>Iniciar sesión</h1>
     <form id="loginForm">
       <input type="text" id="username" placeholder="Usuario" required>
@@ -24,7 +26,7 @@
       const password = document.getElementById('password').value;
 
       if (username === 'admin' && password === '1234') {
-        window.location.href = 'empresas.html'; 
+        window.location.href = 'empresas.html'; // Redirige a la selección de empresas
       } else {
         alert('Credenciales incorrectas');
       }

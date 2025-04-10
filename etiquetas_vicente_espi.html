@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestión de Etiquetas - VICENTE ESPI</title>
-  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="css/estilos_odoo.css">
 </head>
 <body>
   <div class="container">
@@ -49,7 +49,7 @@
       if (nombreCarpeta) {
         let ul = document.getElementById("lista-carpetas");
         let li = document.createElement("li");
-        li.className = 'carpeta-item'; li.innerHTML = nombreCarpeta + ' <span class=\"trash-icon\" onclick=\"eliminarCarpeta(this)\">🗑️</span>';
+        li.textContent = nombreCarpeta;
         li.innerHTML += ' <button onclick="eliminarCarpeta(this)">Eliminar</button>';
         ul.appendChild(li);
       }
@@ -75,7 +75,7 @@
       let formato = document.getElementById("formatoSeleccionado").value;
       let ul = document.getElementById("lista-etiquetas");
       let li = document.createElement("li");
-      li.className = 'etiqueta-item'; li.innerHTML = li.textContent = "Etiqueta con formato " + formato + " por hoja\" + ' por hoja <span class=\"trash-icon\" onclick=\"eliminarEtiqueta(this)\">🗑️</span>';
+      li.textContent = "Etiqueta con formato " + formato + " por hoja";
       li.innerHTML += ' <button onclick="eliminarEtiqueta(this)">Eliminar</button>';
       ul.appendChild(li);
       cerrarModal();
