@@ -1,1 +1,81 @@
-/* CSS GENERAL */
+
+/* CSS Mejorado con nuevo estilo y formato */
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f7f7f7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+h1 {
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+}
+
+.modulo {
+    background-color: #f0f4f8;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 200px;
+}
+
+.modulo:hover {
+    background-color: #007bff;
+    color: white;
+    transform: scale(1.05);
+}
+
+.empresa-card {
+    background-color: #f0f4f8;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 250px;
+}
+
+.empresa-card:hover {
+    background-color: #007bff;
+    color: white;
+    transform: scale(1.05);
+}
+
+.modulo.icon {
+    font-size: 30px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
