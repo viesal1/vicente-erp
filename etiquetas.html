@@ -6,13 +6,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestión de Etiquetas</title>
   <link rel="stylesheet" href="css/estilos.css">
+  <style>
+    /* Estilo Odoo para la gestión de etiquetas */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f7fa; /* Fondo claro */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      color: #1e2a44;  /* Color oscuro para el texto */
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      text-align: center;
+    }
+
+    #carpetas, #etiquetas {
+      margin-bottom: 30px;
+    }
+
+    button {
+      padding: 15px;
+      background-color: #00a9e0; /* Azul brillante para los botones */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #007bff; /* Cambio de color en hover */
+    }
+
+    #carpetas ul, #etiquetas ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    #carpetas li, #etiquetas li {
+      background-color: #ffffff;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #carpetas li:hover, #etiquetas li:hover {
+      background-color: #00a9e0;
+      color: white;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>Gestión de Etiquetas</h1>
     <div id="carpetas">
       <h3>Carpetas</h3>
-      <button onclick="crearCarpeta()">Nueva Carpeta</button>
+      <button onclick="crearCarpeta()">Crear Carpeta</button>
       <ul id="lista-carpetas"></ul>
     </div>
     <div id="etiquetas">
@@ -32,13 +97,8 @@
         let ul = document.getElementById("lista-carpetas");
         let li = document.createElement("li");
         li.textContent = nombreCarpeta;
-        li.innerHTML += ' <span class="trash-icon" onclick="eliminarCarpeta(this)">🗑️</span>';
         ul.appendChild(li);
       }
-    }
-
-    function eliminarCarpeta(button) {
-      button.parentElement.remove();
     }
 
     function crearEtiqueta() {

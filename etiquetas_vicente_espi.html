@@ -6,71 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestión de Etiquetas - VICENTE ESPI</title>
   <link rel="stylesheet" href="css/estilos.css">
-  <style>
-    /* Estilo Odoo para la página de gestión de etiquetas - VICENTE ESPI */
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f7fa; /* Fondo claro */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      flex-direction: column;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
-    h1 {
-      color: #1e2a44;  /* Color oscuro para el texto */
-      margin-bottom: 30px;
-      font-size: 2.5em;
-      text-align: center;
-    }
-
-    #carpetas, #etiquetas {
-      margin-bottom: 30px;
-    }
-
-    button {
-      padding: 15px;
-      background-color: #00a9e0; /* Azul brillante para los botones */
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #007bff; /* Cambio de color en hover */
-    }
-
-    #carpetas ul, #etiquetas ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    #carpetas li, #etiquetas li {
-      background-color: #ffffff;
-      padding: 12px;
-      margin: 5px 0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    #carpetas li:hover, #etiquetas li:hover {
-      background-color: #00a9e0;
-      color: white;
-    }
-  </style>
 </head>
 <body>
   <div class="container">
@@ -82,8 +17,25 @@
     </div>
     <div id="etiquetas">
       <h3>Etiquetas</h3>
-      <button onclick="crearEtiqueta()">Nueva Etiqueta</button>
+      <button onclick="mostrarModal()">Nueva Etiqueta</button>
       <ul id="lista-etiquetas"></ul>
+    </div>
+  </div>
+
+  <!-- Modal de selección de formato -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <h3>Selecciona el formato de la etiqueta</h3>
+      <select id="formatoSeleccionado">
+        <option value="2">2 por hoja</option>
+        <option value="4">4 por hoja</option>
+        <option value="14">14 por hoja</option>
+        <option value="20">20 por hoja</option>
+        <option value="24">24 por hoja</option>
+        <option value="40">40 por hoja</option>
+      </select>
+      <button onclick="crearEtiqueta()">Crear Etiqueta</button>
     </div>
   </div>
 
@@ -91,24 +43,47 @@
     let idCarpeta = 1;
     let idEtiqueta = 1;
 
+    // Función para crear carpeta
     function crearCarpeta() {
       let nombreCarpeta = prompt("Nombre de la carpeta:");
       if (nombreCarpeta) {
         let ul = document.getElementById("lista-carpetas");
         let li = document.createElement("li");
         li.textContent = nombreCarpeta;
+        li.innerHTML += ' <button onclick="eliminarCarpeta(this)">Eliminar</button>';
         ul.appendChild(li);
       }
     }
 
+    // Función para eliminar carpeta
+    function eliminarCarpeta(button) {
+      button.parentElement.remove();
+    }
+
+    // Mostrar modal para seleccionar formato
+    function mostrarModal() {
+      document.getElementById("myModal").style.display = "block";
+    }
+
+    // Cerrar modal
+    function cerrarModal() {
+      document.getElementById("myModal").style.display = "none";
+    }
+
+    // Crear etiqueta según formato seleccionado
     function crearEtiqueta() {
-      let formato = prompt("Selecciona el formato de la etiqueta (2, 4, 14, 20, 24, 40 por hoja):");
-      if (formato) {
-        let ul = document.getElementById("lista-etiquetas");
-        let li = document.createElement("li");
-        li.textContent = "Etiqueta con formato " + formato + " por hoja";
-        ul.appendChild(li);
-      }
+      let formato = document.getElementById("formatoSeleccionado").value;
+      let ul = document.getElementById("lista-etiquetas");
+      let li = document.createElement("li");
+      li.textContent = "Etiqueta con formato " + formato + " por hoja";
+      li.innerHTML += ' <button onclick="eliminarEtiqueta(this)">Eliminar</button>';
+      ul.appendChild(li);
+      cerrarModal();
+    }
+
+    // Eliminar etiqueta
+    function eliminarEtiqueta(button) {
+      button.parentElement.remove();
     }
   </script>
 </body>
