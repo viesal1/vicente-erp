@@ -9,7 +9,6 @@
 </head>
 <body>
   <div class="login-container">
-    <div class="icon">🔒</div>
     <h1>Iniciar sesión</h1>
     <form id="loginForm">
       <input type="text" id="username" placeholder="Usuario" required>
@@ -31,7 +30,6 @@
       }
     });
 
-    // Permitir "ENTER" para iniciar sesión
     document.getElementById('password').addEventListener('keypress', function(event) {
       if (event.key === 'Enter') {
         document.getElementById('loginForm').submit();
