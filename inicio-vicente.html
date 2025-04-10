@@ -1,10 +1,69 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>VICENTE ESPI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/estilos_odoo.css">
+  <title>VICENTE ESPI</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <style>
+    /* Estilo Odoo para la página de inicio de Vicente Espi */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f7fa; /* Fondo claro */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      color: #1e2a44;  /* Color oscuro para el texto */
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      text-align: center;
+    }
+
+    .modulos-container {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+    }
+
+    .modulo {
+      background-color: #ffffff;
+      width: 200px;
+      padding: 20px;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .modulo:hover {
+      background-color: #00a9e0; /* Color de hover */
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .modulo h3 {
+      font-size: 1.5em;
+    }
+
+    .modulo p {
+      font-size: 2em;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -18,7 +77,7 @@
         <h3>ALMACÉN</h3>
         <p>🏢</p>
       </div>
-      <div class="modulo" onclick="location.href='etiquetas_vicente_espi_v2.html'">
+      <div class="modulo" onclick="location.href='etiquetas_vicente_espi.html'">
         <h3>ETIQUETAS</h3>
         <p>🏷️</p>
       </div>

@@ -18,24 +18,60 @@ body {
   max-width: 1000px;
   margin: auto;
 }
-.modulos-container {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  flex-wrap: wrap;
-}
-.modulo {
-  background-color: var(--card-background-color);
-  padding: 20px;
-  width: 200px;
-  text-align: center;
+.login-container {
+  background-color: white;
+  padding: 30px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px var(--shadow-color);
-  cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  text-align: center;
+  max-width: 400px;
+  margin-top: 100px;
 }
-.modulo:hover {
-  transform: scale(1.05);
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+button {
+  padding: 10px 20px;
   background-color: var(--primary-color);
   color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: var(--secondary-color);
+}
+.modulos-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+.modulo {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  width: 180px;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.modulo:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: scale(1.05);
+}
+.carpeta, .etiqueta {
+  background-color: white;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px var(--shadow-color);
+  display: flex;
+  justify-content: space-between;
 }
