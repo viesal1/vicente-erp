@@ -6,15 +6,61 @@ body {
     background-color: #f7f7f7;
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    align-items: flex-start;
+    min-height: 100vh;
     margin: 0;
+    flex-direction: column;
 }
 
 h1 {
     text-align: center;
     text-transform: uppercase;
     margin-bottom: 30px;
+    color: #007bff;
+}
+
+h3 {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    text-transform: uppercase;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#carpetas, #etiquetas {
+    margin-bottom: 30px;
+}
+
+#carpetas ul, #etiquetas ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#carpetas li, #etiquetas li {
+    background-color: #f0f4f8;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#carpetas li:hover, #etiquetas li:hover {
+    background-color: #007bff;
+    color: white;
 }
 
 .modulo {
@@ -32,50 +78,4 @@ h1 {
     background-color: #007bff;
     color: white;
     transform: scale(1.05);
-}
-
-.empresa-card {
-    background-color: #f0f4f8;
-    padding: 20px;
-    margin: 10px;
-    border-radius: 10px;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    width: 250px;
-}
-
-.empresa-card:hover {
-    background-color: #007bff;
-    color: white;
-    transform: scale(1.05);
-}
-
-.modulo.icon {
-    font-size: 30px;
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    text-transform: uppercase;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-input, select {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 16px;
 }
