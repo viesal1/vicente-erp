@@ -1,42 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LOGIN</title>
+  <title>Login principal</title>
   <link rel="stylesheet" href="css/estilos_odoo.css">
-  
 </head>
 <body>
-  <div class="login-container">
-    <div class="icon">🔒</div>
-    <h1>Iniciar sesión</h1>
-    <form id="loginForm">
-      <input type="text" id="username" placeholder="Usuario" required>
-      <input type="password" id="password" placeholder="Contraseña" required>
-      <button type="submit">Iniciar sesión</button>
-    </form>
+  <div class="container">
+    <h1>Login principal</h1>
+    <p>Página funcional estilo Odoo.</p>
   </div>
-
-  <script>
-    document.getElementById('loginForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-
-      if (username === 'admin' && password === '1234') {
-        window.location.href = 'empresas.html'; // Redirige a la selección de empresas
-      } else {
-        alert('Credenciales incorrectas');
-      }
-    });
-
-    document.getElementById('password').addEventListener('keypress', function(event) {
-      if (event.key === 'Enter') {
-        document.getElementById('loginForm').submit();
-      }
-    });
-  </script>
 </body>
 </html>
