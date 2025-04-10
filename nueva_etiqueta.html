@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seleccionar Formato de Etiquetas</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Selecciona el Formato de Etiqueta</h1>
+    <div class="formatos-container">
+      <div class="formato-bloque" onclick="crearEtiqueta(2)">
+        <h3>2 por hoja</h3>
+        <p>📄</p>
+      </div>
+      <div class="formato-bloque" onclick="crearEtiqueta(4)">
+        <h3>4 por hoja</h3>
+        <p>📄📄</p>
+      </div>
+      <div class="formato-bloque" onclick="crearEtiqueta(14)">
+        <h3>14 por hoja</h3>
+        <p>📄📄📄</p>
+      </div>
+      <div class="formato-bloque" onclick="crearEtiqueta(20)">
+        <h3>20 por hoja</h3>
+        <p>📄📄📄📄</p>
+      </div>
+      <div class="formato-bloque" onclick="crearEtiqueta(24)">
+        <h3>24 por hoja</h3>
+        <p>📄📄📄📄📄</p>
+      </div>
+      <div class="formato-bloque" onclick="crearEtiqueta(40)">
+        <h3>40 por hoja</h3>
+        <p>📄📄📄📄📄📄</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function crearEtiqueta(formato) {
+      let ul = document.getElementById("lista-etiquetas");
+      let li = document.createElement("li");
+      li.textContent = "Etiqueta con formato " + formato + " por hoja";
+      ul.appendChild(li);
+      // Redirigir a una página o realizar alguna acción al seleccionar el formato
+    }
+  </script>
+</body>
+</html>
