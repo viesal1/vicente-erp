@@ -6,81 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LOGIN</title>
   <link rel="stylesheet" href="css/estilos.css">
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f7f7f7;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .login-container {
-      background: #ffffff;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 350px;
-      text-align: center;
-    }
-    h1 {
-      font-size: 28px;
-      margin-bottom: 30px;
-      color: #007bff;
-      text-transform: uppercase;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      text-transform: uppercase;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .icon {
-      font-size: 30px;
-      margin-bottom: 10px;
-    }
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 24px;
-      }
-      .login-container {
-        padding: 30px;
-      }
-    }
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 20px;
-      }
-      .login-container {
-        padding: 20px;
-      }
-      input {
-        padding: 10px;
-        font-size: 14px;
-      }
-      button {
-        font-size: 14px;
-      }
-    }
-  </style>
 </head>
 <body>
   <div class="login-container">
@@ -92,6 +17,7 @@
       <button type="submit">Iniciar sesión</button>
     </form>
   </div>
+
   <script>
     document.getElementById('loginForm').addEventListener('submit', function(event) {
       event.preventDefault();
