@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestión de Etiquetas</title>
-  <link rel="stylesheet" href="css/estilos.css">  <!-- Aseguramos que el enlace CSS esté correcto -->
+  <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
   <div class="container">
@@ -23,7 +23,9 @@
   </div>
 
   <script>
-    // Función para crear una nueva carpeta
+    let idCarpeta = 1;
+    let idEtiqueta = 1;
+
     function crearCarpeta() {
       let nombreCarpeta = prompt("Nombre de la carpeta:");
       if (nombreCarpeta) {
@@ -34,7 +36,6 @@
       }
     }
 
-    // Función para crear una nueva etiqueta con selección de formato
     function crearEtiqueta() {
       let formato = prompt("Selecciona el formato de la etiqueta (2, 4, 14, 20, 24, 40 por hoja):");
       if (formato) {
