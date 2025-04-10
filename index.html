@@ -5,10 +5,71 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LOGIN</title>
-  <link rel="stylesheet" href="css/estilos.css">  <!-- Aseguramos que el enlace CSS esté correcto -->
+  <link rel="stylesheet" href="css/estilos.css">
+  <style>
+    /* Estilo inspirado en Odoo para la página de login */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f7fa; /* Fondo claro */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+    }
+
+    .login-container {
+      background-color: #ffffff;  /* Fondo blanco para el formulario */
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #1e2a44;  /* Color oscuro para el texto */
+      margin-bottom: 30px;
+      font-size: 2em;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background-color: #00a9e0;  /* Color azul brillante para el botón */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #007bff;  /* Cambio a un azul más oscuro al hacer hover */
+    }
+
+    .icon {
+      font-size: 40px;
+      margin-bottom: 20px;
+      color: #007bff;  /* Color de la imagen del candado */
+    }
+  </style>
 </head>
 <body>
   <div class="login-container">
+    <div class="icon">🔒</div>
     <h1>Iniciar sesión</h1>
     <form id="loginForm">
       <input type="text" id="username" placeholder="Usuario" required>
