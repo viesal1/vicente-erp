@@ -10,7 +10,7 @@
     /* Estilo Odoo para la gestión de etiquetas */
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f7fa; /* Fondo claro */
+      background-color: #f4f7fa;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -168,7 +168,6 @@
     let idCarpeta = 1;
     let idEtiqueta = 1;
 
-    // Función para crear una carpeta
     function crearCarpeta() {
       let nombreCarpeta = prompt("Nombre de la carpeta:");
       if (nombreCarpeta) {
@@ -180,22 +179,18 @@
       }
     }
 
-    // Función para eliminar carpeta
     function eliminarCarpeta(button) {
       button.parentElement.remove();
     }
 
-    // Función para mostrar el modal de Nueva Etiqueta
     function mostrarModal() {
       document.getElementById("myModal").style.display = "block";
     }
 
-    // Función para cerrar el modal
     function cerrarModal() {
       document.getElementById("myModal").style.display = "none";
     }
 
-    // Función para crear una etiqueta
     function crearEtiqueta() {
       let formato = document.getElementById("formatoSeleccionado").value;
       let ul = document.getElementById("lista-etiquetas");
