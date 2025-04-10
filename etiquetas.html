@@ -23,7 +23,10 @@
   </div>
 
   <script>
-    // Función para crear una nueva carpeta
+    let idCarpeta = 1;
+    let idEtiqueta = 1;
+
+    // Crear carpeta
     function crearCarpeta() {
       let nombreCarpeta = prompt("Nombre de la carpeta:");
       if (nombreCarpeta) {
@@ -34,7 +37,7 @@
       }
     }
 
-    // Función para crear una nueva etiqueta con selección de formato
+    // Crear etiqueta con selección de formato
     function crearEtiqueta() {
       let formato = prompt("Selecciona el formato de la etiqueta (2, 4, 14, 20, 24, 40 por hoja):");
       if (formato) {
