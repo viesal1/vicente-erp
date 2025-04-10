@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Etiquetas - VICENTE ESPI</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <h1>Gestión de Etiquetas - VICENTE ESPI</h1>
+  <div id="carpetas">
+    <h3>Carpetas</h3>
+    <button onclick="crearCarpeta()">Crear Carpeta</button>
+    <ul id="lista-carpetas"></ul>
+  </div>
+  <div id="etiquetas">
+    <h3>Etiquetas</h3>
+    <button onclick="crearEtiqueta()">Nueva Etiqueta</button>
+    <ul id="lista-etiquetas"></ul>
+  </div>
+
+  <script>
+    // Función para crear una nueva carpeta para VICENTE ESPI
+    function crearCarpeta() {
+      let nombreCarpeta = prompt("Nombre de la carpeta para VICENTE ESPI:");
+      if (nombreCarpeta) {
+        let ul = document.getElementById("lista-carpetas");
+        let li = document.createElement("li");
+        li.textContent = nombreCarpeta;
+        ul.appendChild(li);
+      }
+    }
+
+    // Función para crear una nueva etiqueta con selección de formato para VICENTE ESPI
+    function crearEtiqueta() {
+      let formato = prompt("Selecciona el formato de la etiqueta (2, 4, 14, 20, 24, 40 por hoja):");
+      if (formato) {
+        let ul = document.getElementById("lista-etiquetas");
+        let li = document.createElement("li");
+        li.textContent = "Etiqueta con formato " + formato + " por hoja";
+        ul.appendChild(li);
+      }
+    }
+  </script>
+</body>
+</html>
