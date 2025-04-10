@@ -1,19 +1,19 @@
 
-/* Estilo mejorado para toda la aplicación */
+/* Estilo inspirado en Odoo */
 
-/* Definir una paleta de colores moderna */
 :root {
-  --primary-color: #007bff;
-  --secondary-color: #dc3545;
-  --background-color: #f4f7fc;
-  --card-background-color: #ffffff;
-  --text-color: #444;
-  --button-hover-color: #0056b3;
-  --shadow-color: rgba(0, 0, 0, 0.1);
+  --primary-color: #1e2a44;  /* Color principal, similar al azul oscuro de Odoo */
+  --secondary-color: #00a9e0;  /* Color secundario, azul más brillante */
+  --background-color: #f4f7fa;  /* Fondo suave, muy claro */
+  --card-background-color: #ffffff;  /* Fondo blanco para las tarjetas */
+  --text-color: #3c3c3c;  /* Color de texto oscuro */
+  --button-color: #1e2a44;  /* Color de los botones */
+  --button-hover-color: #00a9e0;  /* Color de hover para botones */
+  --shadow-color: rgba(0, 0, 0, 0.1);  /* Sombra suave */
 }
 
 body {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 0;
   background-color: var(--background-color);
@@ -48,7 +48,7 @@ h3 {
   box-sizing: border-box;
 }
 
-.login-container, .empresa-container, .modulos-container {
+.login-container, .empresa-container, .modulos-container, .formatos-container {
   background-color: var(--card-background-color);
   padding: 40px;
   border-radius: 8px;
@@ -60,7 +60,7 @@ h3 {
 button {
   width: 100%;
   padding: 15px;
-  background-color: var(--primary-color);
+  background-color: var(--button-color);
   color: white;
   border: none;
   border-radius: 8px;
@@ -75,8 +75,8 @@ button:hover {
 }
 
 /* Estilo para las tarjetas de las empresas y modulos */
-.empresa-card, .modulo {
-  background-color: #ffffff;
+.empresa-card, .modulo, .formato-bloque {
+  background-color: var(--card-background-color);
   padding: 20px;
   margin: 10px;
   border-radius: 10px;
@@ -87,10 +87,29 @@ button:hover {
   margin-bottom: 30px;
 }
 
-.empresa-card:hover, .modulo:hover {
+.empresa-card:hover, .modulo:hover, .formato-bloque:hover {
   background-color: var(--primary-color);
   color: white;
   transform: scale(1.05);
+}
+
+/* Estilo para la gestión de carpetas y etiquetas */
+#carpetas, #etiquetas {
+  margin-bottom: 30px;
+}
+
+#carpetas li, #etiquetas li {
+  background-color: #f4f7fa;
+  padding: 12px;
+  margin: 5px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#carpetas li:hover, #etiquetas li:hover {
+  background-color: var(--primary-color);
+  color: white;
 }
 
 /* Estilo para los bloques de formatos de etiqueta */
@@ -114,4 +133,56 @@ button:hover {
 .formato-bloque:hover {
   background-color: var(--primary-color);
   color: white;
+}
+
+/* Modal para selección de formato de etiqueta */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding-top: 60px;
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 400px;
+  box-shadow: 0 4px 10px var(--shadow-color);
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.modal button:hover {
+  background-color: var(--button-hover-color);
 }
