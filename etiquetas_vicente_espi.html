@@ -8,39 +8,52 @@
   <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
-  <h1>Gestión de Etiquetas - VICENTE ESPI</h1>
-  <div id="carpetas">
-    <h3>Carpetas</h3>
-    <button onclick="crearCarpeta()">Crear Carpeta</button>
-    <ul id="lista-carpetas"></ul>
-  </div>
-  <div id="etiquetas">
-    <h3>Etiquetas</h3>
-    <button onclick="crearEtiqueta()">Nueva Etiqueta</button>
-    <ul id="lista-etiquetas"></ul>
+  <div class="container">
+    <h1>Gestión de Etiquetas - VICENTE ESPI</h1>
+    <div id="carpetas">
+      <h3>Carpetas</h3>
+      <button onclick="crearCarpeta()">Crear Carpeta</button>
+      <ul id="lista-carpetas"></ul>
+    </div>
+    <div id="etiquetas">
+      <h3>Etiquetas</h3>
+      <button onclick="crearEtiqueta()">Nueva Etiqueta</button>
+      <ul id="lista-etiquetas"></ul>
+    </div>
   </div>
 
   <script>
-    // Función para crear una nueva carpeta para VICENTE ESPI
+    let idCarpeta = 1; // Para identificar carpetas
+    let idEtiqueta = 1; // Para identificar etiquetas
+
     function crearCarpeta() {
-      let nombreCarpeta = prompt("Nombre de la carpeta para VICENTE ESPI:");
+      let nombreCarpeta = prompt("Nombre de la carpeta:");
       if (nombreCarpeta) {
         let ul = document.getElementById("lista-carpetas");
         let li = document.createElement("li");
         li.textContent = nombreCarpeta;
+        li.innerHTML += ' <button onclick="eliminarCarpeta(this)">Eliminar</button>';
         ul.appendChild(li);
       }
     }
 
-    // Función para crear una nueva etiqueta con selección de formato para VICENTE ESPI
+    function eliminarCarpeta(button) {
+      button.parentElement.remove();
+    }
+
     function crearEtiqueta() {
       let formato = prompt("Selecciona el formato de la etiqueta (2, 4, 14, 20, 24, 40 por hoja):");
       if (formato) {
         let ul = document.getElementById("lista-etiquetas");
         let li = document.createElement("li");
         li.textContent = "Etiqueta con formato " + formato + " por hoja";
+        li.innerHTML += ' <button onclick="eliminarEtiqueta(this)">Eliminar</button>';
         ul.appendChild(li);
       }
+    }
+
+    function eliminarEtiqueta(button) {
+      button.parentElement.remove();
     }
   </script>
 </body>
