@@ -1,1 +1,133 @@
-Contenido temporal, regenerando...
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Etiquetas - CERAPLAST</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Gestión de Etiquetas - CERAPLAST</h1>
+    <div class="modulos-container" id="bloques-acciones">
+      <div class="modulo" onclick="abrirModal('carpeta')">
+        <h3>NUEVA CARPETA</h3>
+        <p>📂</p>
+      </div>
+      <div class="modulo" onclick="abrirModal('etiqueta')">
+        <h3>NUEVA ETIQUETA</h3>
+        <p>🏷️</p>
+      </div>
+    </div>
+    <div><button onclick="volver()" style="margin-bottom: 15px;">↩ Volver</button></div>
+    <div id="estructura-etiquetas"></div>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="cerrarModal()"></div>
+  <div id="modal">
+    <h3 id="modal-titulo">Nueva Entrada</h3>
+    <input id="nombre" placeholder="Nombre" />
+    <div id="formato-campo" style="display: none;">
+      <select id="formato">
+        <option value="2">2 por hoja</option>
+        <option value="4">4 por hoja</option>
+        <option value="14">14 por hoja</option>
+        <option value="20">20 por hoja</option>
+        <option value="24">24 por hoja</option>
+        <option value="40">40 por hoja</option>
+      </select>
+    </div>
+    <button onclick="guardarEntrada()">Guardar</button>
+  </div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_PROYECTO.firebaseapp.com",
+  projectId: "TU_PROYECTO",
+  storageBucket: "TU_PROYECTO.appspot.com",
+  messagingSenderId: "TU_ID",
+  appId: "TU_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const coleccion = "ceraplast_etiquetas";
+let tipoActual = "";
+let parentStack = [];
+let parentActual = null;
+
+function abrirModal(tipo) {
+  tipoActual = tipo;
+  document.getElementById("nombre").value = "";
+  document.getElementById("formato-campo").style.display = tipo === 'etiqueta' ? 'block' : 'none';
+  document.getElementById("modal-titulo").innerText = tipo === 'etiqueta' ? "Nueva Etiqueta" : "Nueva Carpeta";
+  document.getElementById("overlay").style.display = "block";
+  document.getElementById("modal").style.display = "block";
+}
+
+function cerrarModal() {
+  document.getElementById("overlay").style.display = "none";
+  document.getElementById("modal").style.display = "none";
+}
+
+function guardarEntrada() {
+  const nombre = document.getElementById("nombre").value;
+  if (!nombre) return;
+  const data = {
+    tipo: tipoActual,
+    nombre: nombre,
+    parent: parentActual || null,
+    creado: new Date()
+  };
+  if (tipoActual === "etiqueta") {
+    data.formato = document.getElementById("formato").value;
+    data.campos = { producto: "", lote: "", fecha: "" };
+  }
+  db.collection(coleccion).add(data).then(() => {
+    cerrarModal();
+    renderEstructura();
+  });
+}
+
+function entrarEnCarpeta(id) {
+  parentStack.push(parentActual);
+  parentActual = id;
+  renderEstructura();
+}
+
+function volver() {
+  if (parentStack.length > 0) {
+    parentActual = parentStack.pop();
+    renderEstructura();
+  }
+}
+
+function renderEstructura() {
+  const cont = document.getElementById("estructura-etiquetas");
+  cont.innerHTML = "";
+  db.collection(coleccion)
+    .where("parent", "==", parentActual || null)
+    .orderBy("tipo")
+    .get().then(snapshot => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const div = document.createElement("div");
+        div.className = data.tipo;
+        if (data.tipo === "carpeta") {
+          div.textContent = "📁 " + data.nombre;
+          div.onclick = () => entrarEnCarpeta(doc.id);
+        } else {
+          div.textContent = "🏷️ " + data.nombre + " - Formato: " + data.formato;
+        }
+        cont.appendChild(div);
+      });
+    });
+}
+
+renderEstructura();
+</script>
+</body>
+</html>
