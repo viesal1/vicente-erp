@@ -12,17 +12,19 @@
 <body>
   <div class="container">
     <h1>Gestión de Etiquetas - VICENTE ESPI</h1>
-    <div class="modulos-container" id="bloques-acciones">
-      <div class="modulo" onclick="abrirModal('carpeta')">
-        <h3>NUEVA CARPETA</h3>
-        <p>📂</p>
+    <div id="bloques">
+      <div class="modulos-container">
+        <div class="modulo" onclick="abrirModal('carpeta')">
+          <h3>NUEVA CARPETA</h3>
+          <p>📂</p>
+        </div>
+        <div class="modulo" onclick="abrirModal('etiqueta')">
+          <h3>NUEVA ETIQUETA</h3>
+          <p>🏷️</p>
+        </div>
       </div>
-      <div class="modulo" onclick="abrirModal('etiqueta')">
-        <h3>NUEVA ETIQUETA</h3>
-        <p>🏷️</p>
-      </div>
+      <div><button onclick="volver()" id="btn-volver" style="display:none; margin: 15px 0;">↩ Volver</button></div>
     </div>
-    <div><button onclick="volver()" style="margin-bottom: 15px;">↩ Volver</button></div>
     <div id="estructura-etiquetas"></div>
   </div>
 
@@ -55,6 +57,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const coleccion = "vicente_espi_etiquetas";
+
 let tipoActual = "";
 let parentStack = [];
 let parentActual = null;
@@ -76,13 +79,14 @@ function cerrarModal() {
 function guardarEntrada() {
   const nombre = document.getElementById("nombre").value;
   if (!nombre) return;
+  const tipo = tipoActual;
   const data = {
-    tipo: tipoActual,
+    tipo: tipo,
     nombre: nombre,
     parent: parentActual || null,
     creado: new Date()
   };
-  if (tipoActual === "etiqueta") {
+  if (tipo === "etiqueta") {
     data.formato = document.getElementById("formato").value;
     data.campos = { producto: "", lote: "", fecha: "" };
   }
@@ -95,12 +99,16 @@ function guardarEntrada() {
 function entrarEnCarpeta(id) {
   parentStack.push(parentActual);
   parentActual = id;
+  document.getElementById("btn-volver").style.display = "inline-block";
   renderEstructura();
 }
 
 function volver() {
   if (parentStack.length > 0) {
     parentActual = parentStack.pop();
+    if (parentStack.length === 0) {
+      document.getElementById("btn-volver").style.display = "none";
+    }
     renderEstructura();
   }
 }
