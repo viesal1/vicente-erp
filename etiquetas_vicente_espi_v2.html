@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,92 +6,95 @@
   <title>Etiquetas - VICENTE ESPI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/estilos_odoo.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <div class="container">
     <h1>Gestión de Etiquetas - VICENTE ESPI</h1>
-    <div class="actions">
-      <button onclick="nuevaCarpeta()">➕ Nueva Carpeta</button>
+    <div class="modulos-container">
+      <div class="modulo" onclick="crearNuevaCarpeta()">
+        <h3>NUEVA CARPETA</h3>
+        <p>📂</p>
+      </div>
+      <div class="modulo" onclick="crearNuevaEtiqueta()">
+        <h3>NUEVA ETIQUETA</h3>
+        <p>🏷️</p>
+      </div>
     </div>
-    <div id="estructura"></div>
+
+    <div id="estructura-etiquetas"></div>
   </div>
+
   <script>
-    let estructura = JSON.parse(localStorage.getItem("estructura_vicente")) || {};
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_PROYECTO.firebaseapp.com",
+      projectId: "TU_PROYECTO",
+      storageBucket: "TU_PROYECTO.appspot.com",
+      messagingSenderId: "TU_ID",
+      appId: "TU_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    function guardar() {
-      localStorage.setItem("estructura_vicente", JSON.stringify(estructura));
-      render();
-    }
-
-    function nuevaCarpeta(path = []) {
+    function crearNuevaCarpeta() {
       const nombre = prompt("Nombre de la carpeta:");
       if (!nombre) return;
-      let actual = estructura;
-      for (const p of path) actual = actual[p].sub;
-      actual[nombre] = { etiquetas: [], sub: {} };
-      guardar();
-    }
-
-    function nuevaEtiqueta(path) {
-      const nombre = prompt("Nombre de la etiqueta:");
-      if (!nombre) return;
-      let actual = estructura;
-      for (const p of path) actual = actual[p].sub;
-      actual[path[path.length - 1]].etiquetas.push(nombre);
-      guardar();
-    }
-
-    function eliminarCarpeta(path) {
-      if (!confirm("¿Eliminar carpeta y su contenido?")) return;
-      let actual = estructura;
-      for (let i = 0; i < path.length - 1; i++) actual = actual[path[i]].sub;
-      delete actual[path[path.length - 1]];
-      guardar();
-    }
-
-    function eliminarEtiqueta(path, i) {
-      let actual = estructura;
-      for (const p of path) actual = actual[p].sub;
-      actual[path[path.length - 1]].etiquetas.splice(i, 1);
-      guardar();
-    }
-
-    function render() {
-      const cont = document.getElementById("estructura");
-      cont.innerHTML = "";
-      renderFolders(cont, estructura, []);
-    }
-
-    function renderFolders(elem, obj, path) {
-      Object.keys(obj).forEach(function(key) {
-        const p = [...path, key];
-        const folder = document.createElement("div");
-        folder.className = "carpeta";
-        folder.innerHTML = "<span>📁 " + key + "</span>" +
-          "<span>" +
-            "<button onclick='nuevaCarpeta(" + JSON.stringify(p) + ")'>+ Sub</button>" +
-            "<button onclick='nuevaEtiqueta(" + JSON.stringify(p) + ")'>+ Etiqueta</button>" +
-            "<button onclick='eliminarCarpeta(" + JSON.stringify(p) + ")'>❌</button>" +
-          "</span>";
-        elem.appendChild(folder);
-
-        const etiquetas = obj[key].etiquetas || [];
-        etiquetas.forEach(function(etiqueta, i) {
-          const e = document.createElement("div");
-          e.className = "etiqueta";
-          e.innerHTML = "<span>🏷️ " + etiqueta + "</span>" +
-            "<button onclick='eliminarEtiqueta(" + JSON.stringify(p) + ", " + i + ")'>❌</button>";
-          elem.appendChild(e);
-        });
-
-        const subCont = document.createElement("div");
-        subCont.style.marginLeft = "20px";
-        elem.appendChild(subCont);
-        renderFolders(subCont, obj[key].sub || {}, p);
+      db.collection("vicente_espi_etiquetas").add({
+        tipo: "carpeta",
+        nombre: nombre,
+        parent: null,
+        creado: new Date()
+      }).then(() => {
+        alert("Carpeta creada.");
+        renderEstructura();
       });
     }
 
-    render();
+    function crearNuevaEtiqueta() {
+      const nombre = prompt("Nombre de la etiqueta:");
+      const formato = prompt("Formato (ej. 4x, 2x):");
+      if (!nombre || !formato) return;
+      db.collection("vicente_espi_etiquetas").add({
+        tipo: "etiqueta",
+        nombre: nombre,
+        formato: formato,
+        parent: null,
+        campos: {
+          producto: "",
+          lote: "",
+          fecha: ""
+        },
+        creado: new Date()
+      }).then(() => {
+        alert("Etiqueta creada.");
+        renderEstructura();
+      });
+    }
+
+    function renderEstructura() {
+      const cont = document.getElementById("estructura-etiquetas");
+      cont.innerHTML = "<h3>Contenido:</h3>";
+      db.collection("vicente_espi_etiquetas")
+        .where("parent", "==", null)
+        .orderBy("tipo")
+        .get().then(snapshot => {
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const div = document.createElement("div");
+            div.className = "carpeta";
+            if (data.tipo === "carpeta") {
+              div.innerHTML = "📁 " + data.nombre;
+            } else {
+              div.innerHTML = `🏷️ ${data.nombre} - Formato: ${data.formato}`;
+            }
+            cont.appendChild(div);
+          });
+        });
+    }
+
+    renderEstructura();
   </script>
 </body>
 </html>
