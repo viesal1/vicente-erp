@@ -6,11 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/estilos_odoo.css">
   <style>
-    body, html {
+    html, body {
       height: 100%%;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--background-color);
+    }
+    .login-wrapper {
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      height: 100%%;
     }
     form {
       background: var(--card-background-color);
@@ -18,7 +24,8 @@
       border-radius: 15px;
       box-shadow: 0 4px 12px var(--shadow-color);
       text-align: center;
-      width: 300px;
+      width: 90%%;
+      max-width: 350px;
     }
     input {
       width: 100%%;
@@ -26,13 +33,16 @@
       margin: 10px 0;
       border: 1px solid #ccc;
       border-radius: 8px;
+      font-size: 16px;
     }
     button {
-      padding: 10px 20px;
+      width: 100%%;
+      padding: 12px;
       background-color: var(--secondary-color);
       color: white;
       border: none;
       border-radius: 8px;
+      font-size: 16px;
       cursor: pointer;
       transition: background-color 0.3s;
     }
@@ -46,13 +56,15 @@
   </style>
 </head>
 <body>
-  <form id="loginForm">
-    <h2>🔐 Acceso ERP</h2>
-    <input type="text" id="usuario" placeholder="Usuario" required>
-    <input type="password" id="contrasena" placeholder="Contraseña" required>
-    <button type="submit">Ingresar</button>
-    <p id="mensaje"></p>
-  </form>
+  <div class="login-wrapper">
+    <form id="loginForm">
+      <h2>🔐 Acceso ERP</h2>
+      <input type="text" id="usuario" placeholder="Usuario" required>
+      <input type="password" id="contrasena" placeholder="Contraseña" required>
+      <button type="submit">Ingresar</button>
+      <p id="mensaje"></p>
+    </form>
+  </div>
   <script>
     const form = document.getElementById('loginForm');
     const mensaje = document.getElementById('mensaje');
