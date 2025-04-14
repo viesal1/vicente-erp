@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Etiquetas - CERAPLAST</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Gestión de Etiquetas - CERAPLAST</h1>
+    <div class="modulos-container">
+      <div class="modulo" onclick="crear('carpeta')">
+        <h3>NUEVA CARPETA</h3>
+        <p>📂</p>
+      </div>
+      <div class="modulo" onclick="crear('etiqueta')">
+        <h3>NUEVA ETIQUETA</h3>
+        <p>🏷️</p>
+      </div>
+    </div>
+    <button onclick="volver()" id="volverBtn" style="display:none; margin: 10px 0;">↩ Volver</button>
+    <div id="contenido"></div>
+  </div>
+<script>
+  const firebaseConfig = {{
+    apiKey: "TU_API_KEY",
+    authDomain: "TU_PROYECTO.firebaseapp.com",
+    projectId: "TU_PROYECTO",
+    storageBucket: "TU_PROYECTO.appspot.com",
+    messagingSenderId: "TU_ID",
+    appId: "TU_APP_ID"
+  }};
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const coleccion = "ceraplast_etiquetas";
+
+  let parentActual = null;
+  let parentStack = [];
+
+  function crear(tipo) {{
+    const nombre = prompt("Nombre:");
+    if (!nombre) return;
+    let doc = {{
+      tipo,
+      nombre,
+      parent: parentActual || null,
+      creado: new Date()
+    }};
+    if (tipo === "etiqueta") {{
+      doc.formato = prompt("Formato (ej. 4, 14, 40):");
+      doc.campos = {{ producto: "", lote: "", fecha: "" }};
+    }}
+    db.collection(coleccion).add(doc).then(render);
+  }}
+
+  function render() {{
+    const cont = document.getElementById("contenido");
+    cont.innerHTML = "";
+    document.getElementById("volverBtn").style.display = parentStack.length > 0 ? "inline-block" : "none";
+
+    db.collection(coleccion)
+      .where("parent", "==", parentActual || null)
+      .orderBy("tipo")
+      .get().then(snapshot => {{
+        snapshot.forEach(doc => {{
+          const d = doc.data();
+          const div = document.createElement("div");
+          div.className = d.tipo;
+          if (d.tipo === "carpeta") {{
+            div.textContent = "📁 " + d.nombre;
+            div.onclick = () => {{
+              parentStack.push(parentActual);
+              parentActual = doc.id;
+              render();
+            }};
+          }} else {{
+            div.textContent = "🏷️ " + d.nombre + " - Formato: " + (d.formato || "-");
+          }}
+          cont.appendChild(div);
+        }});
+      }});
+  }}
+
+  function volver() {{
+    if (parentStack.length > 0) {{
+      parentActual = parentStack.pop();
+      render();
+    }}
+  }}
+
+  render();
+</script>
+</body>
+</html>
