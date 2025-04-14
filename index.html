@@ -9,34 +9,36 @@
     html, body {
       height: 100%%;
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
       background-color: var(--background-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .login-wrapper {
+      width: 100%%;
       display: flex;
-      justify-content: center;
       align-items: center;
-      height: 100%%;
+      justify-content: center;
     }
     form {
       background: var(--card-background-color);
-      padding: 40px;
+      padding: 40px 30px;
       border-radius: 15px;
       box-shadow: 0 4px 12px var(--shadow-color);
       text-align: center;
-      width: 90%%;
+      width: 100%%;
       max-width: 350px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
     input {
-      width: 100%%;
-      padding: 10px;
-      margin: 10px 0;
+      padding: 12px;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
     }
     button {
-      width: 100%%;
       padding: 12px;
       background-color: var(--secondary-color);
       color: white;
@@ -50,8 +52,8 @@
       background-color: var(--primary-color);
     }
     #mensaje {
-      margin-top: 10px;
       color: red;
+      font-size: 14px;
     }
   </style>
 </head>
