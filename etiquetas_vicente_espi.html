@@ -1,1 +1,115 @@
-<!DOCTYPE html><html><body><h1>Etiquetas Vicente Espi</h1></body></html>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Etiquetas - VICENTE ESPI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Gestión de Etiquetas - VICENTE ESPI</h1>
+    <div class="modulos-container">
+      <div class="modulo" onclick="crearCarpeta()">📂 NUEVA CARPETA</div>
+      <div class="modulo" onclick="abrirModal()">🏷️ NUEVA ETIQUETA</div>
+    </div>
+    <button onclick="volver()" id="volverBtn" style="display:none;">↩ Volver</button>
+    <div id="contenido" class="modulos-container"></div>
+  </div>
+
+  <div class="modal" id="modalEtiqueta" style="display:none;">
+    <div class="modal-content">
+      <h3 id="modalTitulo">Crear Etiqueta</h3>
+      <input type="text" id="pabilo" placeholder="Pabilo">
+      <input type="text" id="lote" placeholder="Lote">
+      <input type="text" id="mezcla" placeholder="Mezcla">
+      <input type="text" id="grosor" placeholder="Grosor">
+      <input type="text" id="color" placeholder="Color">
+      <input type="text" id="maquina" placeholder="Máquina">
+      <input type="text" id="encerado" placeholder="Encerado para">
+      <button onclick="guardarEtiqueta()">Guardar</button>
+      <button onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
+  authDomain: "etiquetadora-vespi.firebaseapp.com",
+  projectId: "etiquetadora-vespi",
+  storageBucket: "etiquetadora-vespi.appspot.com",
+  messagingSenderId: "714344837885",
+  appId: "1:714344837885:web:d80abbd7a0898e1d1ec494"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const coleccion = "vicente_espi_etiquetas";
+let parentActual = null, parentStack = [], editandoId = null;
+
+function crearCarpeta() {
+  const nombre = prompt("Nombre de carpeta:");
+  if (!nombre) return;
+  db.collection(coleccion).add({tipo:"carpeta",nombre,parent:parentActual||null,creado:new Date()})
+    .then(() => render()).catch(e => console.error("ERROR al guardar carpeta:", e));
+}
+
+function abrirModal(etiqueta=null,id=null) {
+  document.getElementById("modalEtiqueta").style.display = "flex";
+  document.getElementById("modalTitulo").textContent = etiqueta ? "Editar Etiqueta" : "Crear Etiqueta";
+  editandoId = id;
+  ["pabilo","lote","mezcla","grosor","color","maquina","encerado"].forEach(c => {
+    document.getElementById(c).value = etiqueta?.campos?.[c] || "";
+  });
+}
+
+function cerrarModal() {
+  document.getElementById("modalEtiqueta").style.display = "none";
+  editandoId = null;
+}
+
+function guardarEtiqueta() {
+  const campos = {};
+  ["pabilo","lote","mezcla","grosor","color","maquina","encerado"].forEach(c => {
+    campos[c] = document.getElementById(c).value;
+  });
+  const doc = {
+    tipo: "etiqueta", formato: "14", nombre: campos.pabilo,
+    parent: parentActual || null, creado: new Date(), campos
+  };
+  const ref = editandoId ? db.collection(coleccion).doc(editandoId).update(doc)
+                          : db.collection(coleccion).add(doc);
+  ref.then(() => { cerrarModal(); render(); }).catch(e => console.error("ERROR guardando etiqueta:", e));
+}
+
+function render() {
+  const cont = document.getElementById("contenido");
+  cont.innerHTML = "";
+  document.getElementById("volverBtn").style.display = parentStack.length ? "inline-block" : "none";
+  db.collection(coleccion).where("parent", "==", parentActual || null)
+    .orderBy("tipo").get().then(snapshot => {
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        const div = document.createElement("div");
+        div.className = "modulo";
+        if (d.tipo === "carpeta") {
+          div.textContent = "📁 " + d.nombre;
+          div.onclick = () => { parentStack.push(parentActual); parentActual = doc.id; render(); };
+        } else {
+          div.innerHTML = `<strong>${d.campos.pabilo}</strong><br>Lote: ${d.campos.lote}<br>
+            <button onclick='abrirModal(${JSON.stringify(d)}, "${doc.id}")'>Editar</button>`;
+        }
+        cont.appendChild(div);
+      });
+    }).catch(e => console.error("ERROR renderizando:", e));
+}
+function volver() {
+  parentActual = parentStack.pop();
+  render();
+}
+render();
+</script>
+</body>
+</html>
