@@ -4,24 +4,55 @@
 <head>
   <meta charset="UTF-8">
   <title>CERAPLAST - Etiquetas</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/estilos_odoo.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .print-preview {
+      display: none;
+      width: 210mm;
+      height: 297mm;
+    }
+    .etiqueta {
+      width: 210mm;
+      height: 148mm;
+      padding: 10mm 20mm;
+      box-sizing: border-box;
+      position: relative;
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+    }
+    @media print {
+      @page { margin: 0; }
+      body * {
+        visibility: hidden;
+      }
+      .print-preview, .print-preview * {
+        visibility: visible;
+      }
+      .print-preview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>Etiquetas CERAPLAST</h1>
     <div class="modulos-container">
       <div class="modulo" onclick="imprimir()">
-        <h3>🖨️ Imprimir Formato 2</h3>
+        <h3>🖨️ Imprimir Etiqueta</h3>
         <p>2 etiquetas por hoja</p>
       </div>
     </div>
-    <div id="printPreview" style="display:none;"></div>
+    <div id="printPreview" class="print-preview"></div>
   </div>
   <script>
     function imprimir() {
       const etiqueta = `
-        <div style='width:210mm;height:148mm;padding:10mm;box-sizing:border-box;font-size:16pt;border:1px solid #000;'>
+        <div class="etiqueta">
           <strong>MODELO:</strong> __________<br><br>
           <strong>COLOR:</strong> __________<br><br>
           <strong>MEDIDAS:</strong> __________<br>
