@@ -65,7 +65,8 @@
   function crearCarpeta() {
     const nombre = prompt("Nombre de la carpeta:");
     if (!nombre) return;
-    db.collection(coleccion).add({
+    console.log('Guardando documento en Firebase...');
+db.collection(coleccion).add({
       tipo: "carpeta",
       nombre,
       parent: parentActual || null,
@@ -112,7 +113,7 @@
         render();
       });
     } else {
-      db.collection(coleccion).add(doc).then(() => {
+      db.collection(coleccion).add(doc).then(() => { console.log('Etiqueta guardada');
         cerrarModal();
         render();
       });
