@@ -44,23 +44,32 @@ const firebaseConfig = {
   messagingSenderId: "714344837885",
   appId: "1:714344837885:web:d80abbd7a0898e1d1ec494"
 };
-firebase.initializeApp(firebaseConfig);
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 const db = firebase.firestore();
 const coleccion = "vicente_espi_etiquetas";
-let parentActual = null, parentStack = [], editandoId = null;
+let parentActual = null;
+let parentStack = [];
+let editandoId = null;
 
 function crearCarpeta() {
   const nombre = prompt("Nombre de carpeta:");
   if (!nombre) return;
-  db.collection(coleccion).add({tipo:"carpeta",nombre,parent:parentActual||null,creado:new Date()})
-    .then(() => render()).catch(e => console.error("ERROR al guardar carpeta:", e));
+  db.collection(coleccion).add({ tipo: "carpeta", nombre, parent: parentActual || null, creado: new Date() })
+    .then(() => {
+      console.log("Carpeta guardada correctamente");
+      render();
+    })
+    .catch(e => console.error("Error al guardar carpeta:", e));
 }
 
-function abrirModal(etiqueta=null,id=null) {
+function abrirModal(etiqueta = null, id = null) {
   document.getElementById("modalEtiqueta").style.display = "flex";
   document.getElementById("modalTitulo").textContent = etiqueta ? "Editar Etiqueta" : "Crear Etiqueta";
   editandoId = id;
-  ["pabilo","lote","mezcla","grosor","color","maquina","encerado"].forEach(c => {
+  ["pabilo", "lote", "mezcla", "grosor", "color", "maquina", "encerado"].forEach(c => {
     document.getElementById(c).value = etiqueta?.campos?.[c] || "";
   });
 }
@@ -72,43 +81,71 @@ function cerrarModal() {
 
 function guardarEtiqueta() {
   const campos = {};
-  ["pabilo","lote","mezcla","grosor","color","maquina","encerado"].forEach(c => {
+  ["pabilo", "lote", "mezcla", "grosor", "color", "maquina", "encerado"].forEach(c => {
     campos[c] = document.getElementById(c).value;
   });
   const doc = {
-    tipo: "etiqueta", formato: "14", nombre: campos.pabilo,
-    parent: parentActual || null, creado: new Date(), campos
+    tipo: "etiqueta",
+    formato: "14",
+    nombre: campos.pabilo,
+    parent: parentActual || null,
+    creado: new Date(),
+    campos
   };
-  const ref = editandoId ? db.collection(coleccion).doc(editandoId).update(doc)
-                          : db.collection(coleccion).add(doc);
-  ref.then(() => { cerrarModal(); render(); }).catch(e => console.error("ERROR guardando etiqueta:", e));
+  const op = editandoId
+    ? db.collection(coleccion).doc(editandoId).update(doc)
+    : db.collection(coleccion).add(doc);
+  op.then(() => {
+    console.log("Etiqueta guardada/actualizada correctamente");
+    cerrarModal();
+    render();
+  }).catch(e => console.error("Error guardando etiqueta:", e));
 }
 
 function render() {
+  console.log("Ejecutando render...");
   const cont = document.getElementById("contenido");
   cont.innerHTML = "";
-  document.getElementById("volverBtn").style.display = parentStack.length ? "inline-block" : "none";
-  db.collection(coleccion).where("parent", "==", parentActual || null)
-    .orderBy("tipo").get().then(snapshot => {
+  document.getElementById("volverBtn").style.display = parentStack.length > 0 ? "inline-block" : "none";
+  db.collection(coleccion)
+    .where("parent", "==", parentActual || null)
+    .orderBy("tipo")
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        console.log("No hay datos en esta carpeta.");
+        cont.innerHTML = "<p style='text-align:center;'>📭 No hay etiquetas ni carpetas aquí.</p>";
+        return;
+      }
       snapshot.forEach(doc => {
         const d = doc.data();
         const div = document.createElement("div");
         div.className = "modulo";
         if (d.tipo === "carpeta") {
           div.textContent = "📁 " + d.nombre;
-          div.onclick = () => { parentStack.push(parentActual); parentActual = doc.id; render(); };
+          div.onclick = () => {
+            parentStack.push(parentActual);
+            parentActual = doc.id;
+            render();
+          };
         } else {
           div.innerHTML = `<strong>${d.campos.pabilo}</strong><br>Lote: ${d.campos.lote}<br>
             <button onclick='abrirModal(${JSON.stringify(d)}, "${doc.id}")'>Editar</button>`;
         }
         cont.appendChild(div);
       });
-    }).catch(e => console.error("ERROR renderizando:", e));
+    })
+    .catch(e => {
+      console.error("ERROR EN RENDER:", e);
+      cont.innerHTML = "<p style='color:red;'>❌ Error al cargar datos. Revisa la consola.</p>";
+    });
 }
+
 function volver() {
   parentActual = parentStack.pop();
   render();
 }
+
 render();
 </script>
 </body>
