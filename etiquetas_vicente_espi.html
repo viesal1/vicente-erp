@@ -26,7 +26,7 @@
     <div id="contenido" class="modulos-container"></div>
   </div>
 
-  <div class="modal" id="modalEtiqueta" style="display:flex; align-items:center; justify-content:center;">
+  <div class="modal" id="modalEtiqueta" style="display:flex;align-items:center;justify-content:center;">
     <div class="modal-content">
       <h3 id="modalTitulo">Crear Etiqueta</h3>
       <input type="text" id="pabilo" placeholder="Pabilo">
@@ -107,12 +107,12 @@
       campos
     };
     if (editandoId) {
-      db.collection(coleccion).doc(editandoId).update(doc).then(() => {
+      db.collection(coleccion).doc(editandoId).update(doc).then(() => { console.log("Actualización OK");
         cerrarModal();
         render();
       });
     } else {
-      db.collection(coleccion).add(doc).then(() => { console.log("Etiqueta guardada correctamente");
+      db.collection(coleccion).add(doc).then(() => { console.log("Guardado OK");
         cerrarModal();
         render();
       });
