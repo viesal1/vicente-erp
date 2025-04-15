@@ -7,11 +7,12 @@
   --text-color: #3c3c3c;
   --shadow-color: rgba(0, 0, 0, 0.1);
 }
-body {
+body, html {
   font-family: 'Segoe UI', sans-serif;
   background-color: var(--background-color);
   margin: 0;
   padding: 0;
+  height: 100%;
 }
 .container {
   max-width: 1200px;
