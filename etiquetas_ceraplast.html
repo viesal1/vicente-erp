@@ -11,23 +11,29 @@
       display: none;
       width: 210mm;
       height: 297mm;
-      padding: 0;
       margin: 0;
-      box-sizing: border-box;
+      padding: 0;
     }
     .etiqueta-a4-2 {
       width: 210mm;
       height: 148mm;
       box-sizing: border-box;
-      padding: 20mm;
+      padding: 10mm 15mm;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: center;
-      font-size: 18px;
-      border-bottom: 1px dashed #ccc;
+      align-items: flex-start;
+      font-size: 16px;
+      position: relative;
+    }
+    .etiqueta-a4-2 img {
+      position: absolute;
+      bottom: 20mm;
+      right: 20mm;
+      width: 50mm;
     }
     @media print {
+      @page { margin: 0; }
       body * {
         visibility: hidden;
       }
@@ -45,7 +51,6 @@
 </head>
 <body>
   <div class="container">
-    <h1>Impresión de Etiquetas - CERAPLAST</h1>
     <div class="modulos-container">
       <div class="modulo" onclick="imprimirEtiqueta()">
         <h3>🖨️ Imprimir Etiqueta Formato 2</h3>
@@ -59,20 +64,22 @@
   function imprimirEtiqueta() {
     const contenido = `
       <div class="etiqueta-a4-2">
-        <strong>Modelo: ANÓNIMO</strong><br>
+        <strong style="font-size:22px;">Modelo: ANÓNIMO</strong><br><br>
         Color: Blanco<br>
         Medidas: 15x15x15 cm<br>
         Uni x Caja: 24<br>
         Fecha: ${new Date().toLocaleDateString()}<br>
-        Operarios: ________<br>
+        Operarios: ______________________<br>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Ceraplast_logo_demo.png" alt="Logo">
       </div>
       <div class="etiqueta-a4-2">
-        <strong>Modelo: ANÓNIMO</strong><br>
+        <strong style="font-size:22px;">Modelo: ANÓNIMO</strong><br><br>
         Color: Blanco<br>
         Medidas: 15x15x15 cm<br>
         Uni x Caja: 24<br>
         Fecha: ${new Date().toLocaleDateString()}<br>
-        Operarios: ________<br>
+        Operarios: ______________________<br>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Ceraplast_logo_demo.png" alt="Logo">
       </div>`;
     const preview = document.getElementById("printPreview");
     preview.innerHTML = contenido;

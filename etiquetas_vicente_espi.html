@@ -26,7 +26,7 @@
     <div id="contenido" class="modulos-container"></div>
   </div>
 
-  <div class="modal" id="modalEtiqueta">
+  <div class="modal" id="modalEtiqueta" style="display:flex; align-items:center; justify-content:center;">
     <div class="modal-content">
       <h3 id="modalTitulo">Crear Etiqueta</h3>
       <input type="text" id="pabilo" placeholder="Pabilo">
@@ -65,8 +65,7 @@
   function crearCarpeta() {
     const nombre = prompt("Nombre de la carpeta:");
     if (!nombre) return;
-    console.log('Guardando documento en Firebase...');
-db.collection(coleccion).add({
+    db.collection(coleccion).add({
       tipo: "carpeta",
       nombre,
       parent: parentActual || null,
@@ -113,7 +112,7 @@ db.collection(coleccion).add({
         render();
       });
     } else {
-      db.collection(coleccion).add(doc).then(() => { console.log('Etiqueta guardada');
+      db.collection(coleccion).add(doc).then(() => { console.log("Etiqueta guardada correctamente");
         cerrarModal();
         render();
       });
