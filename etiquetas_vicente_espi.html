@@ -18,6 +18,11 @@
       align-items: center;
     }
     .modal-content {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--card-background-color);
+      box-shadow: 0 4px 8px var(--shadow-color);
+      border: 1px solid #ddd;
+
       background: white;
       padding: 20px;
       border-radius: 10px;
@@ -64,6 +69,49 @@
   </style>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+    <style>
+      .print-preview {
+        display: none;
+        flex-wrap: wrap;
+        width: 210mm;
+        height: 297mm;
+        padding: 10mm;
+        box-sizing: border-box;
+      }
+      .etiqueta-imprimible {
+        width: 50%%;
+        height: 42.4mm;
+        box-sizing: border-box;
+        padding: 5mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px dashed #ccc;
+        page-break-inside: avoid;
+      }
+      .etiqueta-celda {
+        width: 100%%;
+        font-size: 12px;
+        line-height: 1.2;
+        text-align: left;
+      }
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        .print-preview, .print-preview * {
+          visibility: visible;
+        }
+        .print-preview {
+          position: absolute;
+          left: 0;
+          top: 0;
+          display: flex !important;
+        }
+      }
+    </style>
+
 </head>
 <body>
   <div class="container">
@@ -161,36 +209,40 @@
       campos
     };
     if (editandoId) {
-      db.collection(coleccion).doc(editandoId).update(doc).then(() => {
+      db.collection(coleccion).doc(editandoId).update(doc).then(() => { render();
         cerrarModal();
         render();
       });
     } else {
-      db.collection(coleccion).add(doc).then(() => {
+      db.collection(coleccion).add(doc).then(() => { render();
         cerrarModal();
         render();
       });
     }
   }
 
+  
   function imprimirEtiqueta(etiqueta) {
-    const vista = `
-      <div style="padding: 40px; font-size: 18px;">
-        <h2>Etiqueta - Formato 14</h2>
-        <p><strong>Pabilo:</strong> ${etiqueta.campos.pabilo}</p>
-        <p><strong>Lote:</strong> ${etiqueta.campos.lote}</p>
-        <p><strong>Mezcla:</strong> ${etiqueta.campos.mezcla}</p>
-        <p><strong>Grosor:</strong> ${etiqueta.campos.grosor}</p>
-        <p><strong>Color:</strong> ${etiqueta.campos.color}</p>
-        <p><strong>Máquina:</strong> ${etiqueta.campos.maquina}</p>
-        <p><strong>Encerado para:</strong> ${etiqueta.campos.encerado}</p>
-      </div>
-    `;
+    let etiquetasHTML = "";
+    for (let i = 0; i < 14; i++) {
+      etiquetasHTML += `
+        <div class="etiqueta-imprimible">
+          <div class="etiqueta-celda">
+            <strong style="font-size: 18px;">${etiqueta.campos.pabilo}</strong><br>
+            <span>Lote: ${etiqueta.campos.lote}</span><br>
+            <span>Mezcla: ${etiqueta.campos.mezcla}</span><br>
+            <span>Grosor: ${etiqueta.campos.grosor}</span><br>
+            <span>Color: ${etiqueta.campos.color}</span><br>
+            <span>Máquina: ${etiqueta.campos.maquina}</span><br>
+            <span>Encerado para: ${etiqueta.campos.encerado}</span>
+          </div>
+        </div>
+      `;
+    }
     const preview = document.getElementById("printPreview");
-    preview.innerHTML = vista;
+    preview.innerHTML = etiquetasHTML;
     preview.style.display = "block";
-    window.print();
-    preview.style.display = "none";
+    setTimeout(() => window.print(), 300);
   }
 
   function render() {
