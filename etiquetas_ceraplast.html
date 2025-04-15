@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,51 +13,132 @@
   <div class="container">
     <h1>Gestión de Etiquetas - CERAPLAST</h1>
     <div class="modulos-container">
-      <div class="modulo" onclick="crear('carpeta')">
+      <div class="modulo" onclick="crearCarpeta()">
         <h3>NUEVA CARPETA</h3>
         <p>📂</p>
       </div>
-      <div class="modulo" onclick="crear('etiqueta')">
+      <div class="modulo" onclick="abrirModal()">
         <h3>NUEVA ETIQUETA</h3>
         <p>🏷️</p>
       </div>
     </div>
     <button onclick="volver()" id="volverBtn" style="display:none; margin: 10px 0;">↩ Volver</button>
-    <div id="contenido"></div>
+    <div id="contenido" class="modulos-container"></div>
   </div>
+
+  <div class="modal" id="modalEtiqueta">
+    <div class="modal-content">
+      <h3 id="modalTitulo">Crear Etiqueta</h3>
+      <input type="text" id="pabilo" placeholder="Pabilo">
+      <input type="text" id="lote" placeholder="Lote">
+      <input type="text" id="mezcla" placeholder="Mezcla">
+      <input type="text" id="grosor" placeholder="Grosor">
+      <input type="text" id="color" placeholder="Color">
+      <input type="text" id="maquina" placeholder="Máquina">
+      <input type="text" id="encerado" placeholder="Encerado para">
+      <button onclick="guardarEtiqueta()">Guardar</button>
+      <button onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+
+  <div class="print-preview" id="printPreview" style="display: none;"></div>
+
 <script>
-  const firebaseConfig = {{
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_PROYECTO.firebaseapp.com",
-    projectId: "TU_PROYECTO",
-    storageBucket: "TU_PROYECTO.appspot.com",
-    messagingSenderId: "TU_ID",
-    appId: "TU_APP_ID"
-  }};
-  firebase.initializeApp(firebaseConfig);
+  const firebaseConfig = {
+    apiKey: "AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
+    authDomain: "etiquetadora-vespi.firebaseapp.com",
+    projectId: "etiquetadora-vespi",
+    storageBucket: "etiquetadora-vespi.appspot.com",
+    messagingSenderId: "714344837885",
+    appId: "1:714344837885:web:d80abbd7a0898e1d1ec494"
+  };
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
   const db = firebase.firestore();
   const coleccion = "ceraplast_etiquetas";
 
   let parentActual = null;
   let parentStack = [];
+  let editandoId = null;
 
-  function crear(tipo) {{
-    const nombre = prompt("Nombre:");
+  function crearCarpeta() {
+    const nombre = prompt("Nombre de la carpeta:");
     if (!nombre) return;
-    let doc = {{
-      tipo,
+    db.collection(coleccion).add({
+      tipo: "carpeta",
       nombre,
       parent: parentActual || null,
       creado: new Date()
-    }};
-    if (tipo === "etiqueta") {{
-      doc.formato = prompt("Formato (ej. 4, 14, 40):");
-      doc.campos = {{ producto: "", lote: "", fecha: "" }};
-    }}
-    db.collection(coleccion).add(doc).then(render);
-  }}
+    }).then(() => render());
+  }
 
-  function render() {{
+  function abrirModal(etiqueta = null, id = null) {
+    document.getElementById("modalEtiqueta").style.display = "flex";
+    document.getElementById("modalTitulo").textContent = etiqueta ? "Editar Etiqueta" : "Crear Etiqueta";
+    editandoId = id;
+    const campos = ["pabilo", "lote", "mezcla", "grosor", "color", "maquina", "encerado"];
+    campos.forEach(c => {
+      document.getElementById(c).value = etiqueta?.campos[c] || "";
+    });
+  }
+
+  function cerrarModal() {
+    document.getElementById("modalEtiqueta").style.display = "none";
+    editandoId = null;
+  }
+
+  function guardarEtiqueta() {
+    const campos = {
+      pabilo: document.getElementById("pabilo").value,
+      lote: document.getElementById("lote").value,
+      mezcla: document.getElementById("mezcla").value,
+      grosor: document.getElementById("grosor").value,
+      color: document.getElementById("color").value,
+      maquina: document.getElementById("maquina").value,
+      encerado: document.getElementById("encerado").value
+    };
+    const doc = {
+      tipo: "etiqueta",
+      formato: "14",
+      nombre: campos.pabilo,
+      parent: parentActual || null,
+      creado: new Date(),
+      campos
+    };
+    if (editandoId) {
+      db.collection(coleccion).doc(editandoId).update(doc).then(() => {
+        cerrarModal();
+        render();
+      });
+    } else {
+      db.collection(coleccion).add(doc).then(() => {
+        cerrarModal();
+        render();
+      });
+    }
+  }
+
+  function imprimirEtiqueta(etiqueta) {
+    let html = '';
+    for (let i = 0; i < 14; i++) {
+      html += `<div style="width: 50%; height: 42.4mm; box-sizing: border-box; padding: 5mm; float: left;">
+        <strong style="font-size: 16px;">${etiqueta.campos.pabilo}</strong><br>
+        Lote: ${etiqueta.campos.lote}<br>
+        Mezcla: ${etiqueta.campos.mezcla}<br>
+        Grosor: ${etiqueta.campos.grosor}<br>
+        Color: ${etiqueta.campos.color}<br>
+        Máquina: ${etiqueta.campos.maquina}<br>
+        Encerado para: ${etiqueta.campos.encerado}
+      </div>`;
+    }
+    const preview = document.getElementById("printPreview");
+    preview.innerHTML = html;
+    preview.style.display = "block";
+    setTimeout(() => window.print(), 300);
+  }
+
+  function render() {
     const cont = document.getElementById("contenido");
     cont.innerHTML = "";
     document.getElementById("volverBtn").style.display = parentStack.length > 0 ? "inline-block" : "none";
@@ -64,32 +146,34 @@
     db.collection(coleccion)
       .where("parent", "==", parentActual || null)
       .orderBy("tipo")
-      .get().then(snapshot => {{
-        snapshot.forEach(doc => {{
+      .get().then(snapshot => {
+        snapshot.forEach(doc => {
           const d = doc.data();
           const div = document.createElement("div");
-          div.className = d.tipo;
-          if (d.tipo === "carpeta") {{
+          div.className = d.tipo === "carpeta" ? "modulo" : "etiqueta";
+          if (d.tipo === "carpeta") {
             div.textContent = "📁 " + d.nombre;
-            div.onclick = () => {{
+            div.onclick = () => {
               parentStack.push(parentActual);
               parentActual = doc.id;
               render();
-            }};
-          }} else {{
-            div.textContent = "🏷️ " + d.nombre + " - Formato: " + (d.formato || "-");
-          }}
+            };
+          } else {
+            div.innerHTML = `<strong>${d.campos.pabilo}</strong><br>Lote: ${d.campos.lote}<br>
+            <button onclick="abrirModal(${JSON.stringify(d).replace(/"/g, '&quot;')}, '${doc.id}')">Editar</button>
+            <button onclick='imprimirEtiqueta(${JSON.stringify(d).replace(/"/g, '&quot;')})'>🖨️ Imprimir</button>`;
+          }
           cont.appendChild(div);
-        }});
-      }});
-  }}
+        });
+      });
+  }
 
-  function volver() {{
-    if (parentStack.length > 0) {{
+  function volver() {
+    if (parentStack.length > 0) {
       parentActual = parentStack.pop();
       render();
-    }}
-  }}
+    }
+  }
 
   render();
 </script>
