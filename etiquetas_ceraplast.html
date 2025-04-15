@@ -1,1 +1,103 @@
-<html><body><h1>CERAPLAST FUNCIONA</h1></body></html>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Impresión - Ceraplast</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+  <style>
+    .print-preview {
+      display: none;
+      width: 210mm;
+      height: 297mm;
+    }
+    .etiqueta {
+      width: 210mm;
+      height: 148mm;
+      padding: 10mm 15mm;
+      box-sizing: border-box;
+      position: relative;
+      font-family: Arial, sans-serif;
+    }
+    .modelo-color {
+      border: 1px solid black;
+      height: 40mm;
+      margin-bottom: 10mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 10px;
+      font-size: 16pt;
+    }
+    .datos {
+      display: flex;
+      justify-content: space-between;
+      font-size: 16pt;
+      line-height: 1.5;
+    }
+    .logo {
+      position: absolute;
+      bottom: 15mm;
+      right: 15mm;
+      width: 60mm;
+    }
+    @media print {
+      @page { margin: 0; }
+      body * {
+        visibility: hidden;
+      }
+      .print-preview, .print-preview * {
+        visibility: visible;
+      }
+      .print-preview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="modulos-container">
+      <div class="modulo" onclick="imprimir()">
+        <h3>🖨️ Imprimir Etiqueta Formato 2</h3>
+        <p>Diseño original Ceraplast</p>
+      </div>
+    </div>
+    <div id="printPreview" class="print-preview"></div>
+  </div>
+
+<script>
+  function plantillaEtiqueta() {
+    return \`
+      <div class="etiqueta">
+        <div class="modelo-color">
+          <div><strong>MODELO:</strong><br><br>_______________________</div>
+          <div><strong>COLOR:</strong><br><br>_______________________</div>
+        </div>
+        <div class="datos">
+          <div>
+            <div><strong>Medidas :</strong> ______________</div>
+            <div><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</div>
+            <div><strong>Operarios:</strong> ______________</div>
+          </div>
+          <div>
+            <div><strong>Uni x Caja :</strong><br><br><div style="border:1px solid black; width:70px; height:50px;"></div></div>
+          </div>
+        </div>
+        <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/8/87/Ceraplast_logo_demo.png" alt="Logo">
+      </div>\`;
+  }
+
+  function imprimir() {
+    const preview = document.getElementById("printPreview");
+    preview.innerHTML = plantillaEtiqueta() + plantillaEtiqueta();
+    preview.style.display = "block";
+    setTimeout(() => window.print(), 300);
+  }
+</script>
+</body>
+</html>
