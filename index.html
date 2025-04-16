@@ -1,1 +1,35 @@
-<!-- Login con validación para vicente / ceraplast / admin -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Login ERP</title>
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+</head>
+<body>
+  <div class="login-wrapper" style="display:flex;justify-content:center;align-items:center;height:100vh;">
+    <form id="loginForm" class="modal-content">
+      <h2>🔐 Acceso al sistema</h2>
+      <input type="text" id="usuario" placeholder="Usuario" required>
+      <input type="password" id="contrasena" placeholder="Contraseña" required>
+      <button type="submit">Ingresar</button>
+      <p id="mensaje" style="color:red;"></p>
+    </form>
+  </div>
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const usuario = document.getElementById("usuario").value;
+      const contrasena = document.getElementById("contrasena").value;
+      if (usuario === "admin" && contrasena === "1234") {
+        location.href = "empresas.html";
+      } else if (usuario === "vicente" && contrasena === "1234") {
+        location.href = "inicio-vicente.html";
+      } else if (usuario === "ceraplast" && contrasena === "1234") {
+        location.href = "inicio-ceraplast.html";
+      } else {
+        document.getElementById("mensaje").textContent = "❌ Usuario o contraseña incorrectos.";
+      }
+    });
+  </script>
+</body>
+</html>
