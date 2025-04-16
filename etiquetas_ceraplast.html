@@ -7,25 +7,54 @@
   <link rel="stylesheet" href="css/estilos_odoo.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
     .print-preview {
       display: none;
     }
     .etiqueta {
       width: 210mm;
       height: 148mm;
-      padding: 15mm;
+      padding: 20mm;
       box-sizing: border-box;
       font-size: 18px;
       font-family: Arial, sans-serif;
       position: relative;
       page-break-after: always;
-      border: 1px dashed #ccc;
+      border: 1px solid #ccc;
     }
-    .etiqueta img {
+    .fila-superior {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .campo-ancho {
+      height: 50px;
+      border: 1px solid #000;
+      margin-top: 5px;
+    }
+    .fila-doble {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
+    .campo-etiqueta {
+      flex: 1;
+      margin-right: 10px;
+    }
+    .campo-etiqueta:last-child {
+      margin-right: 0;
+    }
+    .logo {
       position: absolute;
       bottom: 10mm;
       right: 20mm;
-      width: 120px;
+      width: 140px;
+      background-color: transparent;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     @media print {
       body * {
@@ -57,13 +86,30 @@
     function imprimirEtiqueta() {
       const etiquetaHTML = `
         <div class="etiqueta">
-          <p><strong>MODELO:</strong> ______________________</p>
-          <p><strong>COLOR:</strong> _______________________</p>
-          <p><strong>MEDIDAS:</strong> _____________________</p>
-          <p><strong>Uni x Caja:</strong> __________________</p>
-          <p><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</p>
-          <p><strong>Operarios:</strong> __________________</p>
-          <img src="logo-ceraplast.png" alt="Logo Ceraplast" />
+          <div class="fila-superior">
+            <div><strong>MODELO:</strong></div>
+            <div><strong>COLOR:</strong></div>
+          </div>
+          <div class="campo-ancho"></div>
+
+          <div class="fila-doble">
+            <div class="campo-etiqueta">
+              <p><strong>Medidas :</strong></p>
+              <div class="campo-ancho"></div>
+            </div>
+            <div class="campo-etiqueta">
+              <p><strong>Uni x Caja :</strong></p>
+              <div class="campo-ancho"></div>
+            </div>
+          </div>
+
+          <p><strong>Fecha:</strong></p>
+          <div class="campo-ancho"></div>
+
+          <p><strong>Operarios:</strong></p>
+          <div class="campo-ancho"></div>
+
+          <img src="logo-ceraplast.png" class="logo" alt="Logo Ceraplast">
         </div>`;
 
       document.getElementById("preview").innerHTML = etiquetaHTML + etiquetaHTML;
