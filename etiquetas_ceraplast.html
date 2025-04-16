@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,7 +10,6 @@
     .print-preview {
       display: none;
     }
-
     .etiqueta {
       width: 210mm;
       height: 148mm;
@@ -21,14 +21,12 @@
       border: 1px dashed #ccc;
       page-break-after: always;
     }
-
     .etiqueta img {
       position: absolute;
       bottom: 10mm;
       right: 20mm;
       width: 120px;
     }
-
     @media print {
       body * {
         visibility: hidden;
@@ -41,6 +39,7 @@
         position: absolute;
         top: 0;
         left: 0;
+        width: 100%;
       }
     }
   </style>
@@ -56,18 +55,18 @@
 
   <script>
     function imprimirEtiqueta() {
-      const etiqueta = `
-      <div class="etiqueta">
-        <p><strong>MODELO:</strong> ______________________</p>
-        <p><strong>COLOR:</strong> _______________________</p>
-        <p><strong>MEDIDAS:</strong> _____________________</p>
-        <p><strong>Uni x Caja:</strong> __________________</p>
-        <p><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</p>
-        <p><strong>Operarios:</strong> __________________</p>
-        <img src="CERAPLAST ORIGINAL JUANSA.png" alt="Logo Ceraplast" />
-      </div>`;
+      const etiquetaHTML = `
+        <div class="etiqueta">
+          <p><strong>MODELO:</strong> ______________________</p>
+          <p><strong>COLOR:</strong> _______________________</p>
+          <p><strong>MEDIDAS:</strong> _____________________</p>
+          <p><strong>Uni x Caja:</strong> __________________</p>
+          <p><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</p>
+          <p><strong>Operarios:</strong> __________________</p>
+          <img src="logo-ceraplast.png" alt="Logo Ceraplast" />
+        </div>`;
 
-      document.getElementById("preview").innerHTML = etiqueta + etiqueta;
+      document.getElementById("preview").innerHTML = etiquetaHTML + etiquetaHTML;
       window.print();
     }
   </script>
