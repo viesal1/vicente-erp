@@ -1,4 +1,5 @@
-/:root {
+
+:root {
   --primary-color: #1e2a44;
   --secondary-color: #00a9e0;
   --background-color: #f4f7fa;
@@ -40,14 +41,20 @@ h1 {
   padding: 20px;
   width: 220px;
   text-align: center;
-  transition: 0.3s ease;
+  transition: all 0.3s ease;
   cursor: pointer;
+  color: var(--text-color);
 }
 
 .modulo:hover {
-  background-color: var(--primary-color);
-  color: white;
   transform: scale(1.05);
+  box-shadow: 0 6px 12px var(--shadow-color);
+  border: 1px solid var(--secondary-color);
+}
+
+.modulo h3, .modulo p {
+  margin: 0;
+  color: inherit;
 }
 
 .disabled {
@@ -93,6 +100,7 @@ h1 {
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .modal-content button:hover {
