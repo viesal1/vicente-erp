@@ -1,1 +1,75 @@
-<!-- Módulo impresión formato 2 -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Etiquetas CERAPLAST</title>
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .print-preview {
+      display: none;
+    }
+
+    .etiqueta {
+      width: 210mm;
+      height: 148mm;
+      padding: 20mm;
+      box-sizing: border-box;
+      font-size: 18px;
+      font-family: Arial, sans-serif;
+      position: relative;
+      border: 1px dashed #ccc;
+      page-break-after: always;
+    }
+
+    .etiqueta img {
+      position: absolute;
+      bottom: 10mm;
+      right: 20mm;
+      width: 120px;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .print-preview, .print-preview * {
+        visibility: visible;
+      }
+      .print-preview {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🖨️ Impresión de Etiquetas CERAPLAST</h1>
+    <div class="modulos-container">
+      <div class="modulo" onclick="imprimirEtiqueta()">Imprimir Formato 2</div>
+    </div>
+    <div id="preview" class="print-preview"></div>
+  </div>
+
+  <script>
+    function imprimirEtiqueta() {
+      const etiqueta = `
+      <div class="etiqueta">
+        <p><strong>MODELO:</strong> ______________________</p>
+        <p><strong>COLOR:</strong> _______________________</p>
+        <p><strong>MEDIDAS:</strong> _____________________</p>
+        <p><strong>Uni x Caja:</strong> __________________</p>
+        <p><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</p>
+        <p><strong>Operarios:</strong> __________________</p>
+        <img src="CERAPLAST ORIGINAL JUANSA.png" alt="Logo Ceraplast" />
+      </div>`;
+
+      document.getElementById("preview").innerHTML = etiqueta + etiqueta;
+      window.print();
+    }
+  </script>
+</body>
+</html>
