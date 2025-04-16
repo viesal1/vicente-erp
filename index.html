@@ -4,31 +4,63 @@
   <meta charset="UTF-8">
   <title>Login ERP</title>
   <link rel="stylesheet" href="css/estilos_odoo.css">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+  <script>
+    // Tu configuración Firebase EXACTA
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
+      authDomain: "etiquetadora-vespi.firebaseapp.com",
+      projectId: "etiquetadora-vespi",
+      storageBucket: "etiquetadora-vespi.firebasestorage.app",
+      messagingSenderId: "714344837885",
+      appId: "1:714344837885:web:d80abbd7a0898e1d1ec494"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
 </head>
 <body>
   <div class="login-wrapper" style="display:flex;justify-content:center;align-items:center;height:100vh;">
     <form id="loginForm" class="modal-content">
       <h2>🔐 Acceso al sistema</h2>
-      <input type="text" id="usuario" placeholder="Usuario" required>
+      <input type="email" id="usuario" placeholder="Correo electrónico" required>
       <input type="password" id="contrasena" placeholder="Contraseña" required>
       <button type="submit">Ingresar</button>
       <p id="mensaje" style="color:red;"></p>
     </form>
   </div>
+
   <script>
-    document.getElementById("loginForm").addEventListener("submit", function (e) {
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
       e.preventDefault();
-      const usuario = document.getElementById("usuario").value;
-      const contrasena = document.getElementById("contrasena").value;
-      if (usuario === "admin" && contrasena === "1234") {
-        location.href = "empresas.html";
-      } else if (usuario === "vicente" && contrasena === "1234") {
-        location.href = "inicio-vicente.html";
-      } else if (usuario === "ceraplast" && contrasena === "1234") {
-        location.href = "inicio-ceraplast.html";
-      } else {
-        document.getElementById("mensaje").textContent = "❌ Usuario o contraseña incorrectos.";
-      }
+      const email = document.getElementById("usuario").value;
+      const password = document.getElementById("contrasena").value;
+
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // Redirecciona según el correo electrónico del usuario
+          switch (email) {
+            case "admin@erp.com":
+              location.href = "empresas.html";
+              break;
+            case "vicente@erp.com":
+              location.href = "inicio-vicente.html";
+              break;
+            case "ceraplast@erp.com":
+              location.href = "inicio-ceraplast.html";
+              break;
+            default:
+              document.getElementById("mensaje").textContent = "❌ Usuario sin módulo asignado.";
+          }
+        })
+        .catch((error) => {
+          document.getElementById("mensaje").textContent = "❌ Usuario o contraseña incorrectos.";
+        });
     });
   </script>
 </body>
