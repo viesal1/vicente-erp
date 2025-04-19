@@ -2,153 +2,151 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Etiquetas - V.ESPI</title>
+  <title>Etiquetas Vicente Espi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/estilos_odoo.css">
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   <style>
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      #printArea, #printArea * {
-        visibility: visible;
-      }
-      #printArea {
-        position: absolute;
-        left: 0;
-        top: 0;
-      }
+    @page { margin: 0; size: A4; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    .formulario {
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #f8f8f8;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .formulario input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    .formulario button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+    .preview-area {
+      margin: 30px auto;
+      width: 105mm;
+      height: 42.4mm;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      padding: 5mm;
+      gap: 10px;
+    }
+    .preview-area img {
+      height: 100%;
+      transform: rotate(-90deg);
+      transform-origin: center center;
+    }
+    .contenido {
+      flex: 1;
+    }
+    .titulo {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .descripcion {
+      font-size: 14px;
+      white-space: pre-wrap;
     }
     .etiqueta {
       width: 105mm;
       height: 42.4mm;
       box-sizing: border-box;
-      padding: 4mm 6mm;
+      padding: 5mm;
       font-size: 14px;
       border: 1px solid #ccc;
       float: left;
-      margin: 2mm;
       display: flex;
       align-items: center;
       gap: 10px;
       font-family: Arial, sans-serif;
+      margin: 2mm;
     }
-    .etiqueta-logo {
+    .etiqueta img {
       height: 100%;
-      display: flex;
-      align-items: center;
+      transform: rotate(-90deg);
+      transform-origin: center center;
     }
-    .etiqueta-logo img {
-      height: 100%;
-    }
-    .etiqueta-contenido {
+    .etiqueta .contenido {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
     }
-    .etiqueta-titulo {
-      font-size: 28px;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 5px;
+    .impresion {
+      page-break-before: always;
+      clear: both;
     }
-    .etiqueta-desc {
-      font-size: 14px;
-      white-space: pre-wrap;
+    @media print {
+      .no-print { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🏷️ Gestión de Etiquetas - V.ESPI</h1>
-    <button onclick="mostrarModal()">➕ Nueva Etiqueta</button>
-    <div id="contenedorEtiquetas"></div>
-    <button onclick="window.print()">🖨️ Imprimir</button>
+  <div class="formulario no-print">
+    <h2>Etiqueta Vicente Espi - Rollos</h2>
+    <input id="modelo" placeholder="Modelo">
+    <input id="lote" placeholder="Lote">
+    <input id="mezcla" placeholder="Mezcla">
+    <input id="grosor" placeholder="Grosor">
+    <input id="color" placeholder="Color">
+    <input id="maquina" placeholder="Máquina">
+    <input id="encerado" placeholder="Encerado para">
+    <button onclick="renderPreview()">Previsualizar</button>
+    <button onclick="imprimir()">🖨️ Imprimir 14 etiquetas</button>
   </div>
 
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <h3>Nueva Etiqueta</h3>
-      <input type="text" id="titulo" placeholder="Título de la etiqueta">
-      <input type="text" id="descripcion" placeholder="Descripción">
-      <button onclick="guardarEtiqueta()">Guardar</button>
-      <button onclick="cerrarModal()">Cancelar</button>
-    </div>
-  </div>
-
-  <div id="printArea" style="display:none;"></div>
+  <div id="previewEtiqueta" class="preview-area no-print"></div>
+  <div id="printArea" class="impresion"></div>
 
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
-      authDomain: "etiquetadora-vespi.firebaseapp.com",
-      projectId: "etiquetadora-vespi",
-      storageBucket: "etiquetadora-vespi.firebasestorage.app",
-      messagingSenderId: "714344837885",
-      appId: "1:714344837885:web:d80abbd7a0898e1d1ec494"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    function mostrarModal() {
-      document.getElementById('modal').style.display = 'flex';
+    function buildEtiquetaHTML(titulo, descripcion) {
+      return \`
+        <div class="etiqueta">
+          <img src="logo-vespi.jpg" alt="Logo V.Espi">
+          <div class="contenido">
+            <div class="titulo">\${titulo}</div>
+            <div class="descripcion">\${descripcion}</div>
+          </div>
+        </div>\`;
     }
 
-    function cerrarModal() {
-      document.getElementById('modal').style.display = 'none';
+    function renderPreview() {
+      const modelo = document.getElementById("modelo").value.trim();
+      const lote = document.getElementById("lote").value.trim();
+      const mezcla = document.getElementById("mezcla").value.trim();
+      const grosor = document.getElementById("grosor").value.trim();
+      const color = document.getElementById("color").value.trim();
+      const maquina = document.getElementById("maquina").value.trim();
+      const encerado = document.getElementById("encerado").value.trim();
+
+      const titulo = modelo || "(modelo)";
+      const descripcion =
+        "Lote: " + lote + "\n" +
+        "Mezcla: " + mezcla + " | Grosor: " + grosor + "\n" +
+        "Color: " + color + " | Máquina: " + maquina + "\n" +
+        "Encerado para: " + encerado;
+
+      document.getElementById("previewEtiqueta").innerHTML = buildEtiquetaHTML(titulo, descripcion);
+      document.getElementById("printArea").innerHTML = buildEtiquetaHTML(titulo, descripcion).repeat(14);
     }
 
-    function guardarEtiqueta() {
-      const titulo = document.getElementById('titulo').value.trim();
-      const descripcion = document.getElementById('descripcion').value.trim();
-      if (!titulo || !descripcion) {
-        alert("Todos los campos son obligatorios");
-        return;
+    function imprimir() {
+      if (document.getElementById("printArea").innerHTML.trim() === "") {
+        renderPreview();
       }
-      db.collection("etiquetas_vespi").add({
-        titulo,
-        descripcion,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        cerrarModal();
-        document.getElementById('titulo').value = '';
-        document.getElementById('descripcion').value = '';
-        cargarEtiquetas();
-      });
+      window.print();
     }
 
-    function cargarEtiquetas() {
-      const contenedor = document.getElementById("contenedorEtiquetas");
-      const printArea = document.getElementById("printArea");
-      contenedor.innerHTML = "";
-      printArea.innerHTML = "";
-
-      db.collection("etiquetas_vespi").orderBy("timestamp", "desc").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-
-          const div = document.createElement("div");
-          div.className = "etiqueta";
-          div.innerHTML = `
-            <div class="etiqueta-logo">
-              <img src="logo-vespi.jpg" alt="Logo V.Espi" />
-            </div>
-            <div class="etiqueta-contenido">
-              <div class="etiqueta-titulo">${data.titulo}</div>
-              <div class="etiqueta-desc">${data.descripcion}</div>
-            </div>`;
-          contenedor.appendChild(div);
-
-          const copia = div.cloneNode(true);
-          printArea.appendChild(copia);
-        });
-      });
-    }
-
-    window.onload = cargarEtiquetas;
+    window.onload = renderPreview;
   </script>
 </body>
 </html>
