@@ -25,7 +25,7 @@
       width: 210mm;
       height: 148.5mm;
       box-sizing: border-box;
-      padding: 15mm;
+      padding: 20mm;
       font-size: 18px;
       font-family: Arial, sans-serif;
       position: relative;
@@ -46,6 +46,7 @@
       display: block;
       font-weight: bold;
       margin-bottom: 5px;
+      font-size: 32px;
     }
     .cuadro {
       border: 1px solid #000;
@@ -63,6 +64,9 @@
       flex-direction: column;
       gap: 20px;
     }
+    .izquierda div {
+      font-size: 36px;
+    }
     .derecha {
       flex: 1;
     }
@@ -70,12 +74,21 @@
       font-weight: bold;
       display: block;
       margin-bottom: 5px;
+      font-size: 32px;
     }
-    .logo {
+    .cuadro-uni {
+      border: 1px solid #000;
+      width: 80px;
+      height: 40px;
+    }
+    .logo-container {
       position: absolute;
       bottom: 5mm;
       right: 5mm;
-      width: 80px; height: 40px;
+    }
+    .logo-container img {
+      max-width: 160px;
+      height: auto;
     }
     @media print {
       body * {
@@ -120,17 +133,19 @@
 
           <div class="fila-doble">
             <div class="izquierda">
-              <div style="font-size:36px;"><strong>Medidas:</strong></div>
-              <div style="font-size:36px;"><strong>Fecha:</strong></div>
-              <div style="font-size:36px;"><strong>Operarios:</strong></div>
+              <div><strong>Medidas:</strong></div>
+              <div><strong>Fecha:</strong></div>
+              <div><strong>Operarios:</strong></div>
             </div>
             <div class="derecha">
               <label>Uni x Caja:</label>
-              <div class="cuadro"></div>
+              <div class="cuadro-uni"></div>
             </div>
           </div>
 
-          <img src="logo-ceraplast.png" class="logo" alt="Logo Ceraplast">
+          <div class="logo-container">
+            <img src="logo-ceraplast.png" alt="Logo Ceraplast">
+          </div>
         </div>`;
     }
 
