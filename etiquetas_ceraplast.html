@@ -10,10 +10,31 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
+      background: #f4f4f4;
     }
+    .selector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      text-align: center;
+      font-size: 24px;
+      transition: transform 0.2s ease;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+
     .hoja {
-      width: 210mm;
-      height: 297mm;
+      width: 794px;
+      height: 1123px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -84,63 +105,90 @@
       max-width: 160px;
       height: auto;
     }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .hoja, .hoja * {
+        visibility: visible;
+      }
+      .hoja {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    }
   </style>
 </head>
-<body onload="window.print()">
-  
-  <div class="hoja">
-    <div class="etiqueta">
-      <div class="fila-superior">
-        <div class="campo-rect">
-          <label>MODELO:</label>
-          <div class="cuadro"></div>
+<body>
+  <div id="selector" class="selector">
+    <div class="card" onclick="mostrarEtiquetas()">🏷️ Etiquetas Anónimas</div>
+  </div>
+
+  <div id="contenido" style="display: none;">
+    <div class="hoja">
+      <div class="etiqueta">
+        <div class="fila-superior">
+          <div class="campo-rect">
+            <label>MODELO:</label>
+            <div class="cuadro"></div>
+          </div>
+          <div class="campo-rect">
+            <label>COLOR:</label>
+            <div class="cuadro"></div>
+          </div>
         </div>
-        <div class="campo-rect">
-          <label>COLOR:</label>
-          <div class="cuadro"></div>
+        <div class="fila-doble">
+          <div class="izquierda">
+            <div><strong>Medidas:</strong></div>
+            <div><strong>Fecha:</strong></div>
+            <div><strong>Operarios:</strong></div>
+          </div>
+          <div class="derecha">
+            <label>Uni x Caja:</label>
+            <div class="cuadro-uni"></div>
+          </div>
         </div>
-      </div>
-      <div class="fila-doble">
-        <div class="izquierda">
-          <div><strong>Medidas:</strong></div>
-          <div><strong>Fecha:</strong></div>
-          <div><strong>Operarios:</strong></div>
-        </div>
-        <div class="derecha">
-          <label>Uni x Caja:</label>
-          <div class="cuadro-uni"></div>
-        </div>
-      </div>
-      <div class="logo-container">
-        <img src="logo-ceraplast.png" alt="Logo Ceraplast">
-      </div>
-    </div>
-    <div class="etiqueta">
-      <div class="fila-superior">
-        <div class="campo-rect">
-          <label>MODELO:</label>
-          <div class="cuadro"></div>
-        </div>
-        <div class="campo-rect">
-          <label>COLOR:</label>
-          <div class="cuadro"></div>
+        <div class="logo-container">
+          <img src="logo-ceraplast.png" alt="Logo Ceraplast">
         </div>
       </div>
-      <div class="fila-doble">
-        <div class="izquierda">
-          <div><strong>Medidas:</strong></div>
-          <div><strong>Fecha:</strong></div>
-          <div><strong>Operarios:</strong></div>
+      <div class="etiqueta">
+        <div class="fila-superior">
+          <div class="campo-rect">
+            <label>MODELO:</label>
+            <div class="cuadro"></div>
+          </div>
+          <div class="campo-rect">
+            <label>COLOR:</label>
+            <div class="cuadro"></div>
+          </div>
         </div>
-        <div class="derecha">
-          <label>Uni x Caja:</label>
-          <div class="cuadro-uni"></div>
+        <div class="fila-doble">
+          <div class="izquierda">
+            <div><strong>Medidas:</strong></div>
+            <div><strong>Fecha:</strong></div>
+            <div><strong>Operarios:</strong></div>
+          </div>
+          <div class="derecha">
+            <label>Uni x Caja:</label>
+            <div class="cuadro-uni"></div>
+          </div>
         </div>
-      </div>
-      <div class="logo-container">
-        <img src="logo-ceraplast.png" alt="Logo Ceraplast">
+        <div class="logo-container">
+          <img src="logo-ceraplast.png" alt="Logo Ceraplast">
+        </div>
       </div>
     </div>
   </div>
+
+  <script>
+    function mostrarEtiquetas() {
+      document.getElementById("selector").style.display = "none";
+      document.getElementById("contenido").style.display = "block";
+      setTimeout(() => window.print(), 300);
+    }
+  </script>
 </body>
 </html>
