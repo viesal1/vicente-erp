@@ -13,24 +13,31 @@
     .print-preview {
       display: none;
     }
-    .etiqueta {
+    .hoja {
       width: 210mm;
       height: 297mm;
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      page-break-after: always;
+    }
+    .etiqueta {
+      width: 210mm;
+      height: 148.5mm;
       padding: 20mm;
       box-sizing: border-box;
       font-size: 18px;
       font-family: Arial, sans-serif;
       position: relative;
-      page-break-after: always;
       border: 1px solid #ccc;
     }
     .fila-superior {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
     .campo-ancho {
-      height: 60px;
+      height: 80px;
       border: 1px solid #000;
       margin-top: 5px;
     }
@@ -76,14 +83,14 @@
   <div class="container">
     <h1>🖨️ Impresión de Etiquetas CERAPLAST</h1>
     <div class="modulos-container">
-      <div class="modulo" onclick="imprimirEtiqueta()">Imprimir Formato A4</div>
+      <div class="modulo" onclick="imprimirEtiqueta()">Imprimir 2 por hoja (A4)</div>
     </div>
     <div id="preview" class="print-preview"></div>
   </div>
 
   <script>
-    function imprimirEtiqueta() {
-      const etiquetaHTML = `
+    function generarEtiqueta() {
+      return `
         <div class="etiqueta">
           <div class="fila-superior">
             <div><strong>MODELO:</strong></div>
@@ -110,8 +117,16 @@
 
           <img src="logo-ceraplast.png" class="logo" alt="Logo Ceraplast">
         </div>`;
+    }
 
-      document.getElementById("preview").innerHTML = etiquetaHTML;
+    function imprimirEtiqueta() {
+      const hojaHTML = `
+        <div class="hoja">
+          ${generarEtiqueta()}
+          ${generarEtiqueta()}
+        </div>`;
+
+      document.getElementById("preview").innerHTML = hojaHTML;
       window.print();
     }
   </script>
