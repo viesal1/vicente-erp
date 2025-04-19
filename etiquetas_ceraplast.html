@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Etiquetas CERAPLAST</title>
-  <link rel="stylesheet" href="css/estilos_odoo.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    @page {
+      margin: 0;
+    }
     body {
       margin: 0;
       padding: 0;
@@ -16,57 +18,54 @@
     .hoja {
       width: 210mm;
       height: 297mm;
-      padding: 0;
-      margin: 0;
       box-sizing: border-box;
       page-break-after: always;
+      padding: 0;
     }
     .etiqueta {
       width: 210mm;
       height: 148.5mm;
-      padding: 20mm;
       box-sizing: border-box;
+      padding: 20mm;
       font-size: 18px;
       font-family: Arial, sans-serif;
       position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     .fila-superior {
       display: flex;
       justify-content: space-between;
       margin-bottom: 20px;
+      gap: 20px;
     }
-    .campo {
-      width: 48%;
-    }
-    .campo label {
-      display: block;
-      margin-bottom: 5px;
-    }
-    .campo span {
-      display: block;
-      height: 40px;
+    .campo-rect {
+      flex: 1;
       border: 1px solid #000;
+      padding: 10px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      font-weight: bold;
     }
     .fila-doble {
       display: flex;
       justify-content: space-between;
       margin: 20px 0;
     }
-    .campo-etiqueta {
+    .campo-simple {
       flex: 1;
-      margin-right: 10px;
+      padding-right: 20px;
     }
-    .campo-etiqueta:last-child {
-      margin-right: 0;
+    .campo-simple:last-child {
+      padding-right: 0;
     }
     .logo {
       position: absolute;
       bottom: 10mm;
       right: 20mm;
-      width: 140px;
-      background-color: transparent;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 120px;
     }
     @media print {
       body * {
@@ -99,110 +98,17 @@
       return `
         <div class="etiqueta">
           <div class="fila-superior">
-            <div class="campo">
-              <label><strong>MODELO:</strong></label>
-              <span></span>
-            </div>
-            <div class="campo">
-              <label><strong>COLOR:</strong></label>
-              <span></span>
-            </div>
+            <div class="campo-rect">MODELO: __________________</div>
+            <div class="campo-rect">COLOR: __________________</div>
           </div>
 
           <div class="fila-doble">
-            <div class="campo-etiqueta">
-              <p><strong>Medidas :</strong> _____________________</p>
-            </div>
-            <div class="campo-etiqueta">
-              <p><strong>Uni x Caja :</strong> __________________</p>
-            </div>
+            <div class="campo-simple"><strong>Medidas:</strong> _____________________</div>
+            <div class="campo-simple"><strong>Uni x Caja:</strong> __________________</div>
           </div>
 
-          <p><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</p>
-          <p><strong>Operarios:</strong> __________________</p>
-
-          <img src="logo-ceraplast.png" class="logo" alt="Logo Ceraplast">
-        </div>`;
-    }
-
-    function imprimirEtiqueta() {
-      const hojaHTML = `
-        <div class="hoja">
-          ${generarEtiqueta()}
-          ${generarEtiqueta()}
-        </div>`;
-
-      document.getElementById("preview").innerHTML = hojaHTML;
-      window.print();
-    }
-  </script>
-</body>
-</html>
-
-    .campo-etiqueta:last-child {
-      margin-right: 0;
-    }
-    .logo {
-      position: absolute;
-      bottom: 10mm;
-      right: 20mm;
-      width: 140px;
-      background-color: transparent;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      .print-preview, .print-preview * {
-        visibility: visible;
-      }
-      .print-preview {
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>🖨️ Impresión de Etiquetas CERAPLAST</h1>
-    <div class="modulos-container">
-      <div class="modulo" onclick="imprimirEtiqueta()">Imprimir 2 por hoja (A4)</div>
-    </div>
-    <div id="preview" class="print-preview"></div>
-  </div>
-
-  <script>
-    function generarEtiqueta() {
-      return `
-        <div class="etiqueta">
-          <div class="fila-superior">
-            <div><strong>MODELO:</strong></div>
-            <div><strong>COLOR:</strong></div>
-          </div>
-          <div class="campo-ancho"></div>
-
-          <div class="fila-doble">
-            <div class="campo-etiqueta">
-              <p><strong>Medidas :</strong></p>
-              <div class="campo-ancho"></div>
-            </div>
-            <div class="campo-etiqueta">
-              <p><strong>Uni x Caja :</strong></p>
-              <div class="campo-ancho"></div>
-            </div>
-          </div>
-
-          <p><strong>Fecha:</strong></p>
-          <div class="campo-ancho"></div>
-
-          <p><strong>Operarios:</strong></p>
-          <div class="campo-ancho"></div>
+          <div><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</div>
+          <div><strong>Operarios:</strong> __________________</div>
 
           <img src="logo-ceraplast.png" class="logo" alt="Logo Ceraplast">
         </div>`;
