@@ -20,7 +20,6 @@
       height: 297mm;
       box-sizing: border-box;
       page-break-after: always;
-      padding: 0;
     }
     .etiqueta {
       width: 210mm;
@@ -32,34 +31,45 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
+      gap: 20px;
     }
     .fila-superior {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 20px;
       gap: 20px;
     }
     .campo-rect {
       flex: 1;
-      border: 1px solid #000;
-      padding: 10px;
-      height: 60px;
-      display: flex;
-      align-items: center;
+    }
+    .campo-rect label {
+      display: block;
       font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .cuadro {
+      border: 1px solid #000;
+      height: 60px;
     }
     .fila-doble {
       display: flex;
       justify-content: space-between;
-      margin: 20px 0;
+      margin-top: 20px;
+      gap: 20px;
     }
-    .campo-simple {
+    .izquierda {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .derecha {
       flex: 1;
-      padding-right: 20px;
     }
-    .campo-simple:last-child {
-      padding-right: 0;
+    .derecha label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
     }
     .logo {
       position: absolute;
@@ -98,17 +108,27 @@
       return `
         <div class="etiqueta">
           <div class="fila-superior">
-            <div class="campo-rect">MODELO: __________________</div>
-            <div class="campo-rect">COLOR: __________________</div>
+            <div class="campo-rect">
+              <label>MODELO:</label>
+              <div class="cuadro"></div>
+            </div>
+            <div class="campo-rect">
+              <label>COLOR:</label>
+              <div class="cuadro"></div>
+            </div>
           </div>
 
           <div class="fila-doble">
-            <div class="campo-simple"><strong>Medidas:</strong> _____________________</div>
-            <div class="campo-simple"><strong>Uni x Caja:</strong> __________________</div>
+            <div class="izquierda">
+              <div><strong>Medidas:</strong></div>
+              <div><strong>Fecha:</strong></div>
+              <div><strong>Operarios:</strong></div>
+            </div>
+            <div class="derecha">
+              <label>Uni x Caja:</label>
+              <div class="cuadro"></div>
+            </div>
           </div>
-
-          <div><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</div>
-          <div><strong>Operarios:</strong> __________________</div>
 
           <img src="logo-ceraplast.png" class="logo" alt="Logo Ceraplast">
         </div>`;
