@@ -29,17 +29,23 @@
       font-size: 18px;
       font-family: Arial, sans-serif;
       position: relative;
-      border: 1px solid #ccc;
     }
     .fila-superior {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
-    .campo-ancho {
-      height: 80px;
+    .campo {
+      width: 48%;
+    }
+    .campo label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .campo span {
+      display: block;
+      height: 40px;
       border: 1px solid #000;
-      margin-top: 5px;
     }
     .fila-doble {
       display: flex;
@@ -50,6 +56,89 @@
       flex: 1;
       margin-right: 10px;
     }
+    .campo-etiqueta:last-child {
+      margin-right: 0;
+    }
+    .logo {
+      position: absolute;
+      bottom: 10mm;
+      right: 20mm;
+      width: 140px;
+      background-color: transparent;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .print-preview, .print-preview * {
+        visibility: visible;
+      }
+      .print-preview {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🖨️ Impresión de Etiquetas CERAPLAST</h1>
+    <div class="modulos-container">
+      <div class="modulo" onclick="imprimirEtiqueta()">Imprimir 2 por hoja (A4)</div>
+    </div>
+    <div id="preview" class="print-preview"></div>
+  </div>
+
+  <script>
+    function generarEtiqueta() {
+      return `
+        <div class="etiqueta">
+          <div class="fila-superior">
+            <div class="campo">
+              <label><strong>MODELO:</strong></label>
+              <span></span>
+            </div>
+            <div class="campo">
+              <label><strong>COLOR:</strong></label>
+              <span></span>
+            </div>
+          </div>
+
+          <div class="fila-doble">
+            <div class="campo-etiqueta">
+              <p><strong>Medidas :</strong> _____________________</p>
+            </div>
+            <div class="campo-etiqueta">
+              <p><strong>Uni x Caja :</strong> __________________</p>
+            </div>
+          </div>
+
+          <p><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</p>
+          <p><strong>Operarios:</strong> __________________</p>
+
+          <img src="logo-ceraplast.png" class="logo" alt="Logo Ceraplast">
+        </div>`;
+    }
+
+    function imprimirEtiqueta() {
+      const hojaHTML = `
+        <div class="hoja">
+          ${generarEtiqueta()}
+          ${generarEtiqueta()}
+        </div>`;
+
+      document.getElementById("preview").innerHTML = hojaHTML;
+      window.print();
+    }
+  </script>
+</body>
+</html>
+
     .campo-etiqueta:last-child {
       margin-right: 0;
     }
