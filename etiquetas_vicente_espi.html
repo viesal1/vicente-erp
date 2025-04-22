@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,18 +6,24 @@
   <title>Etiquetas Vicente Espi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    @page { margin: 0; size: A4; }
+    @page {
+      margin: 0;
+      size: A4;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
     }
+
     .selector {
       display: flex;
       gap: 30px;
       justify-content: center;
       margin-top: 100px;
     }
+
     .card {
       background: #fff;
       border-radius: 12px;
@@ -27,9 +34,11 @@
       cursor: pointer;
       transition: transform 0.2s ease;
     }
+
     .card:hover {
       transform: scale(1.05);
     }
+
     .formulario {
       max-width: 400px;
       margin: 20px auto;
@@ -38,6 +47,7 @@
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
+
     .formulario input {
       width: 100%;
       padding: 10px;
@@ -46,66 +56,88 @@
       border: 1px solid #ccc;
       font-size: 16px;
     }
+
     .formulario button {
       padding: 10px 20px;
       font-size: 16px;
       margin-right: 10px;
     }
+
     .preview-area {
       margin: 30px auto;
       width: 105mm;
       height: 42.4mm;
       border: 1px solid #ccc;
-      display: flex;
+      display: none;
       align-items: center;
       padding: 5mm;
       gap: 10px;
     }
+
+    .preview-area.active {
+      display: flex;
+    }
+
     .preview-area img {
       height: 100%;
       transform: rotate(-90deg);
       transform-origin: center center;
     }
+
     .contenido {
       flex: 1;
     }
+
     .titulo {
-      font-size: 20px;
+      font-size: 48px;
       font-weight: bold;
       margin-bottom: 5px;
     }
+
     .descripcion {
-      font-size: 14px;
+      font-size: 20px;
       white-space: pre-wrap;
     }
+
+    .etiqueta-sheet {
+      display: grid;
+      grid-template-columns: repeat(2, 105mm);
+      grid-template-rows: repeat(7, 42.4mm);
+      width: 210mm;
+      height: 297mm;
+      margin: 0;
+      padding: 0;
+      gap: 0;
+    }
+
     .etiqueta {
-      width: 105mm;
-      height: 42.4mm;
       box-sizing: border-box;
       padding: 5mm;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      float: left;
+      font-size: 20px;
       display: flex;
       align-items: center;
       gap: 10px;
       font-family: Arial, sans-serif;
-      margin: 2mm;
     }
+
     .etiqueta img {
       height: 100%;
       transform: rotate(-90deg);
       transform-origin: center center;
     }
+
     .etiqueta .contenido {
       flex: 1;
     }
-    .impresion {
-      page-break-before: always;
-      clear: both;
-    }
+
     @media print {
-      .no-print { display: none; }
+      .no-print, .preview-area {
+        display: none !important;
+      }
+
+      #printArea {
+        display: grid !important;
+      }
     }
   </style>
 </head>
@@ -126,11 +158,11 @@
       <input id="color" placeholder="Color">
       <input id="maquina" placeholder="Máquina">
       <input id="encerado" placeholder="Encerado para">
-      <button onclick="renderPreview()">Previsualizar</button>
-      <button onclick="imprimir()">🖨️ Imprimir 14 etiquetas</button>
+      <button type="button" onclick="renderPreview()">Previsualizar</button>
+      <button type="button" onclick="imprimir()">🖨️ Imprimir</button>
     </div>
     <div id="previewEtiqueta" class="preview-area no-print"></div>
-    <div id="printArea" class="impresion"></div>
+    <div id="printArea" class="etiqueta-sheet"></div>
   </div>
 
   <script>
@@ -138,19 +170,18 @@
       document.getElementById("bloque-selector").style.display = "none";
       if (tipo === 'rollos') {
         document.getElementById("bloque-rollos").style.display = "block";
-        renderPreview();
       }
     }
 
     function buildEtiquetaHTML(titulo, descripcion) {
-      return \`
+      return `
         <div class="etiqueta">
           <img src="logo-vespi.jpg" alt="Logo V.Espi">
           <div class="contenido">
-            <div class="titulo">\${titulo}</div>
-            <div class="descripcion">\${descripcion}</div>
+            <div class="titulo">${titulo}</div>
+            <div class="descripcion">${descripcion}</div>
           </div>
-        </div>\`;
+        </div>`;
     }
 
     function renderPreview() {
@@ -164,20 +195,37 @@
 
       const titulo = modelo || "(modelo)";
       const descripcion =
-        "Lote: " + lote + "\n" +
-        "Mezcla: " + mezcla + " | Grosor: " + grosor + "\n" +
-        "Color: " + color + " | Máquina: " + maquina + "\n" +
-        "Encerado para: " + encerado;
+        "Lote " + lote + " / " + mezcla + " / " + grosor + " /\n" +
+        color + " / " + maquina + ".\n" +
+        "Encerado para : " + encerado;
 
-      const etiqueta = buildEtiquetaHTML(titulo, descripcion);
-      document.getElementById("previewEtiqueta").innerHTML = etiqueta;
-      document.getElementById("printArea").innerHTML = etiqueta.repeat(14);
+      const etiquetaHTML = buildEtiquetaHTML(titulo, descripcion);
+      document.getElementById("previewEtiqueta").classList.add("active");
+      document.getElementById("previewEtiqueta").innerHTML = etiquetaHTML;
     }
 
     function imprimir() {
-      if (!document.getElementById("printArea").innerHTML.trim()) {
-        renderPreview();
+      const modelo = document.getElementById("modelo").value.trim();
+      if (!modelo) {
+        alert("Por favor, introduce al menos el MODELO antes de imprimir.");
+        return;
       }
+
+      const lote = document.getElementById("lote").value.trim();
+      const mezcla = document.getElementById("mezcla").value.trim();
+      const grosor = document.getElementById("grosor").value.trim();
+      const color = document.getElementById("color").value.trim();
+      const maquina = document.getElementById("maquina").value.trim();
+      const encerado = document.getElementById("encerado").value.trim();
+
+      const titulo = modelo;
+      const descripcion =
+        "Lote " + lote + " / " + mezcla + " / " + grosor + " /\n" +
+        color + " / " + maquina + ".\n" +
+        "Encerado para : " + encerado;
+
+      const etiquetaHTML = buildEtiquetaHTML(titulo, descripcion);
+      document.getElementById("printArea").innerHTML = etiquetaHTML.repeat(14);
       window.print();
     }
   </script>
