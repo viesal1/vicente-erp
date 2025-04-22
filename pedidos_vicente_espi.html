@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pedidos Vicente Espi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+  <style>
+    .pedido-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .pedido-card h3 {
+      margin: 0 0 10px 0;
+    }
+    .acciones {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .acciones button {
+      padding: 8px 16px;
+      border: none;
+      background: #00a9e0;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+    #uploadSection {
+      margin: 20px 0;
+      padding: 20px;
+      background: #f0f8ff;
+      border: 1px dashed #00a9e0;
+      border-radius: 8px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📄 Pedidos Vicente Espi</h1>
+
+    <div id="uploadSection" class="no-print">
+      <h3>Subir nuevo pedido (.xlsx)</h3>
+      <input type="file" id="fileInput" accept=".xlsx">
+      <button onclick="subirPedido()">📤 Subir Pedido</button>
+    </div>
+
+    <div class="pedido-card">
+      <h3>Pedido P_054 - VELAS MARTINEZ MORALES</h3>
+      <p>Fecha: 22/04/2025</p>
+      <div class="acciones">
+        <button onclick="document.getElementById('excelPedido054').style.display='block'">👁️ Ver Excel</button>
+        <button onclick="window.open('etiquetas_pedido_vicente_espi.html', '_blank')">🖨️ Generar Etiquetas</button>
+        <button onclick="alert('Pedido marcado como finalizado')">✅ Finalizar</button>
+      </div>
+      <iframe id="excelPedido054" src="/pedidos/054_PEDIDO_LUMAR.xlsx" style="display:none;"></iframe>
+    </div>
+
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
+      authDomain: "etiquetadora-vespi.firebaseapp.com",
+      projectId: "etiquetadora-vespi",
+      storageBucket: "etiquetadora-vespi.appspot.com",
+      messagingSenderId: "714344837885",
+      appId: "1:714344837885:web:d80abbd7a0898e1d1ec494"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user && user.email === "admin@erp.com") {
+        document.getElementById("uploadSection").style.display = "block";
+      }
+    });
+
+    function subirPedido() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) return alert("Selecciona un archivo .xlsx");
+      const storageRef = firebase.storage().ref("pedidos/" + file.name);
+      storageRef.put(file).then(() => {
+        alert("📤 Pedido subido con éxito. Recarga para verlo en la lista.");
+      }).catch(err => alert("Error al subir: " + err));
+    }
+  </script>
+</body>
+</html>
