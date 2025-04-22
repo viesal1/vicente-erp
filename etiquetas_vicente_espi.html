@@ -11,6 +11,25 @@
       margin: 0;
       padding: 20px;
     }
+    .selector {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      margin-top: 100px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 30px 40px;
+      text-align: center;
+      font-size: 18px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
     .formulario {
       max-width: 400px;
       margin: 20px auto;
@@ -91,23 +110,38 @@
   </style>
 </head>
 <body>
-  <div class="formulario no-print">
-    <h2>Etiqueta Vicente Espi - Rollos</h2>
-    <input id="modelo" placeholder="Modelo">
-    <input id="lote" placeholder="Lote">
-    <input id="mezcla" placeholder="Mezcla">
-    <input id="grosor" placeholder="Grosor">
-    <input id="color" placeholder="Color">
-    <input id="maquina" placeholder="Máquina">
-    <input id="encerado" placeholder="Encerado para">
-    <button onclick="renderPreview()">Previsualizar</button>
-    <button onclick="imprimir()">🖨️ Imprimir 14 etiquetas</button>
+  <div id="bloque-selector" class="selector no-print">
+    <div class="card" onclick="abrirFormulario('rollos')">🏷️ Etiquetas Rollos</div>
+    <div class="card" onclick="alert('Etiquetas Cono: próximamente')">🧵 Etiquetas Cono</div>
+    <div class="card" onclick="alert('Etiquetas de la Semana: próximamente')">📅 Etiquetas de la Semana</div>
   </div>
 
-  <div id="previewEtiqueta" class="preview-area no-print"></div>
-  <div id="printArea" class="impresion"></div>
+  <div id="bloque-rollos" style="display:none;">
+    <div class="formulario no-print">
+      <h2>Etiqueta Vicente Espi - Rollos</h2>
+      <input id="modelo" placeholder="Modelo">
+      <input id="lote" placeholder="Lote">
+      <input id="mezcla" placeholder="Mezcla">
+      <input id="grosor" placeholder="Grosor">
+      <input id="color" placeholder="Color">
+      <input id="maquina" placeholder="Máquina">
+      <input id="encerado" placeholder="Encerado para">
+      <button onclick="renderPreview()">Previsualizar</button>
+      <button onclick="imprimir()">🖨️ Imprimir 14 etiquetas</button>
+    </div>
+    <div id="previewEtiqueta" class="preview-area no-print"></div>
+    <div id="printArea" class="impresion"></div>
+  </div>
 
   <script>
+    function abrirFormulario(tipo) {
+      document.getElementById("bloque-selector").style.display = "none";
+      if (tipo === 'rollos') {
+        document.getElementById("bloque-rollos").style.display = "block";
+        renderPreview();
+      }
+    }
+
     function buildEtiquetaHTML(titulo, descripcion) {
       return \`
         <div class="etiqueta">
@@ -135,18 +169,17 @@
         "Color: " + color + " | Máquina: " + maquina + "\n" +
         "Encerado para: " + encerado;
 
-      document.getElementById("previewEtiqueta").innerHTML = buildEtiquetaHTML(titulo, descripcion);
-      document.getElementById("printArea").innerHTML = buildEtiquetaHTML(titulo, descripcion).repeat(14);
+      const etiqueta = buildEtiquetaHTML(titulo, descripcion);
+      document.getElementById("previewEtiqueta").innerHTML = etiqueta;
+      document.getElementById("printArea").innerHTML = etiqueta.repeat(14);
     }
 
     function imprimir() {
-      if (document.getElementById("printArea").innerHTML.trim() === "") {
+      if (!document.getElementById("printArea").innerHTML.trim()) {
         renderPreview();
       }
       window.print();
     }
-
-    window.onload = renderPreview;
   </script>
 </body>
 </html>
