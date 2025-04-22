@@ -54,12 +54,12 @@
       margin-bottom: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
-      font-size: 16px;
+      font-size: 18px; line-height: 1.4;
     }
 
     .formulario button {
       padding: 10px 20px;
-      font-size: 16px;
+      font-size: 18px; line-height: 1.4;
       margin-right: 10px;
     }
 
@@ -83,6 +83,8 @@
     }
 
     .etiqueta {
+  justify-content: center;
+  align-items: center;
       box-sizing: border-box;
       width: 105mm;
       height: 42.4mm;
@@ -90,31 +92,34 @@
       font-size: 18px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
       font-family: Arial, sans-serif;
     }
 
     .etiqueta img {
-      height: 15mm;
-      margin-left: 0;
-      margin-right: 10px;
-      width: auto;
-      transform: rotate(-90deg);
-      transform-origin: center center;
-    }
+  height: 33mm !important;
+  width: auto !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  
+  
+}
 
     .contenido {
+  padding-left: 10mm;
       flex: 1;
     }
 
     .titulo {
-      font-size: 32px;
+      font-size: 36px; padding-top: 4mm;
       font-weight: bold;
       margin-bottom: 5px;
     }
 
     .descripcion {
-      font-size: 16px;
+      font-size: 18px; line-height: 1.4;
       white-space: pre-wrap;
     }
 
@@ -139,6 +144,8 @@
       }
 
       .etiqueta {
+  justify-content: center;
+  align-items: center;
         page-break-inside: avoid;
       }
     }
@@ -179,7 +186,7 @@
     function buildEtiquetaHTML(titulo, descripcion) {
       return `
         <div class="etiqueta">
-          <img src="logo-vespi.jpg" alt="Logo V.Espi">
+          <img src="logo-vespi-vertical-large.jpg" alt="Logo V.Espi">
           <div class="contenido">
             <div class="titulo">${titulo}</div>
             <div class="descripcion">${descripcion}</div>
