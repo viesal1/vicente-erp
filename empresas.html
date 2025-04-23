@@ -3,31 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Seleccionar Empresa</title>
-  <link rel="stylesheet" href="estilos_odoo.css">
+  <link rel="stylesheet" href="css/estilos_odoo.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-  @media (max-width: 768px) {
-    .modulos-container {
-      flex-direction: column !important;
-      align-items: stretch !important;
-    }
-    .modulo {
-      width: 100% !important;
-      font-size: 22px !important;
-      padding: 24px !important;
-    }
-    .modulo h3 {
-      font-size: 26px !important;
-    }
-  }
-</style>
-
 </head>
 <body>
-<script>
-firebase.auth().onAuthStateChanged(user => { if (!user) location.href = 'index.html'; });
-</script>
   <div class="container">
     <h1>🏢 Selecciona una Empresa</h1>
     <div class="modulos-container">

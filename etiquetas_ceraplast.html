@@ -119,36 +119,9 @@
         left: 0;
       }
     }
-  
-@media (max-width: 768px) {
-  input, button {
-    font-size: 20px !important;
-    padding: 14px !important;
-  }
-  .formulario {
-    padding: 20px !important;
-    width: 95% !important;
-  }
-  .preview-area {
-    transform: scale(1.1);
-    transform-origin: top left;
-    overflow-x: auto;
-  }
-  .etiqueta {
-    transform: scale(1.05);
-    transform-origin: top left;
-  }
-  h1, h2, h3 {
-    font-size: 28px !important;
-  }
-}
-
-</style>
+  </style>
 </head>
 <body>
-<script>
-firebase.auth().onAuthStateChanged(user => { if (!user) location.href = 'index.html'; });
-</script>
   <div id="selector" class="selector">
     <div class="card" onclick="mostrarEtiquetas()">🏷️ Etiquetas Anónimas</div>
   </div>

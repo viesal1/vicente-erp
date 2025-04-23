@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Login ERP</title>
-  <link rel="stylesheet" href="estilos_odoo.css">
+  <link rel="stylesheet" href="css/estilos_odoo.css">
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -23,77 +23,9 @@
     // Inicializar Firebase
     firebase.initializeApp(firebaseConfig);
   </script>
-
-<style>
-  .login-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    padding: 20px;
-  }
-  form.modal-content {
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
-  }
-  @media (max-width: 768px) {
-    form.modal-content {
-      font-size: 20px;
-    }
-    input, button {
-      font-size: 20px;
-      padding: 14px;
-    }
-  }
-
-<style>
-  .login-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    padding: 20px;
-  }
-
-  form.modal-content {
-    width: 100%;
-    max-width: 400px;
-    padding: 24px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-
-  form.modal-content input, form.modal-content button {
-    width: 100%;
-    font-size: 20px;
-    padding: 14px;
-    margin-top: 10px;
-    border-radius: 6px;
-  }
-
-  @media (max-width: 768px) {
-    form.modal-content {
-      font-size: 20px;
-      padding: 28px;
-    }
-
-    form.modal-content h2 {
-      font-size: 28px;
-    }
-
-    input, button {
-      font-size: 20px;
-      padding: 14px;
-    }
-  }
-</style>
-
-</style>
 </head>
 <body>
-  <div class="login-wrapper">
+  <div class="login-wrapper" style="display:flex;justify-content:center;align-items:center;height:100vh;">
     <form id="loginForm" class="modal-content">
       <h2>🔐 Acceso al sistema</h2>
       <input type="email" id="usuario" placeholder="Correo electrónico" required>
