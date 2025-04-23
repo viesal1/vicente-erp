@@ -171,7 +171,7 @@ h1 {
 
 
 
-/* === Estilo visual uniforme para todos los marcos === */
+
 .modulo, .formulario, .modal-content, .pedido-card, .card {
   border-radius: 12px !important;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
@@ -184,4 +184,20 @@ h1 {
 }
 .modulo:hover, .card:hover {
   box-shadow: 0 6px 16px rgba(0,0,0,0.15) !important;
+}
+
+
+
+/* === Estilo limpio y equilibrado para marcos === */
+.modulo, .formulario, .modal-content, .card, .pedido-card {
+  border-radius: 10px !important;
+  border: 1px solid #ddd !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
+  background-color: #fff !important;
+  padding: 20px !important;
+  margin-bottom: 20px !important;
+  transition: box-shadow 0.2s ease;
+}
+.modulo:hover, .card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
 }
