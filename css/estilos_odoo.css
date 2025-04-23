@@ -27,15 +27,6 @@ h1 {
   color: var(--primary-color);
 }
 
-.logo-header {
-  display: block;
-  margin: 20px auto;
-  max-width: 120px;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
 .modulos-container {
   display: flex;
   flex-wrap: wrap;
@@ -116,8 +107,18 @@ h1 {
   background-color: var(--primary-color);
 }
 
-/* MÓVIL: ajustes sin afectar escritorio */
+
+
+/* Estilos móviles ampliados */
 @media (max-width: 768px) {
+  body, html {
+    font-size: 20px !important;
+  }
+
+  .container {
+    padding: 10px !important;
+  }
+
   .modulos-container {
     flex-direction: column !important;
     align-items: stretch !important;
@@ -126,29 +127,31 @@ h1 {
 
   .modulo {
     width: 100% !important;
-    font-size: 22px !important;
+    font-size: 24px !important;
     padding: 30px !important;
   }
 
-  .modulo h3 {
-    font-size: 26px !important;
-  }
-
-  .logo-header {
-    max-width: 100px !important;
-  }
-
-  input, button {
-    font-size: 18px !important;
-    padding: 14px !important;
-  }
-
-  h1, h2, h3 {
+  .modulo h3, .modulo p {
     font-size: 26px !important;
   }
 
   .modal-content {
+    font-size: 20px !important;
     width: 95% !important;
-    font-size: 18px;
+  }
+
+  .modal-content input, .modal-content button {
+    font-size: 20px !important;
+    padding: 14px !important;
+  }
+
+  h1, h2, h3 {
+    font-size: 28px !important;
+    text-align: center !important;
+  }
+
+  input, button {
+    font-size: 20px !important;
+    padding: 14px !important;
   }
 }

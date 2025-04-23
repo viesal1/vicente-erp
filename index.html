@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <title>Login ERP</title>
   <link rel="stylesheet" href="css/estilos_odoo.css">
@@ -26,13 +25,13 @@
   </script>
 </head>
 <body>
-  <div class="login-wrapper">
+  <div class="login-wrapper" style="display:flex;justify-content:center;align-items:center;height:100vh;">
     <form id="loginForm" class="modal-content">
       <h2>🔐 Acceso al sistema</h2>
       <input type="email" id="usuario" placeholder="Correo electrónico" required>
       <input type="password" id="contrasena" placeholder="Contraseña" required>
       <button type="submit">Ingresar</button>
-      <p id="mensaje"></p>
+      <p id="mensaje" style="color:red;"></p>
     </form>
   </div>
 
