@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,31 +5,39 @@
   <title>Etiquetas Vicente Espi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    @page { margin: 0; size: A4; }
+    @page {
+      margin: 0;
+      size: A4;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
     }
+
     .selector {
       display: flex;
       gap: 30px;
       justify-content: center;
-      margin-top: 60px;
+      margin-top: 100px;
     }
+
     .card {
       background: #fff;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      padding: 20px 30px;
+      padding: 30px 40px;
       text-align: center;
       font-size: 18px;
       cursor: pointer;
       transition: transform 0.2s ease;
     }
+
     .card:hover {
       transform: scale(1.05);
     }
+
     .formulario {
       max-width: 400px;
       margin: 20px auto;
@@ -39,78 +46,104 @@
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
+
     .formulario input {
       width: 100%;
       padding: 10px;
       margin-bottom: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
-      font-size: 16px;
+      font-size: 18px; line-height: 1.4;
     }
+
     .formulario button {
       padding: 10px 20px;
-      font-size: 16px;
+      font-size: 18px; line-height: 1.4;
       margin-right: 10px;
     }
+
     .preview-area {
       margin: 30px auto;
       width: 105mm;
       height: 42.4mm;
       border: 1px solid #ccc;
-      display: flex;
+      display: none;
       align-items: center;
       padding: 5mm;
       gap: 10px;
     }
-    .preview-area img {
-      height: 25mm;
-      width: auto;
-      object-fit: contain;
-    }
-    .contenido {
-      flex: 1;
-      padding-left: 8mm;
+
+    .preview-area.active {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
     }
-    .titulo {
-      font-size: 36px;
-      font-weight: bold;
-      padding-bottom: 4px;
-    }
-    .descripcion {
-      font-size: 18px;
-      line-height: 1.4;
-    }
+
     .etiqueta-sheet {
-      display: grid;
-      grid-template-columns: repeat(2, 105mm);
-      grid-auto-rows: 42.4mm;
-      width: 210mm;
-      box-sizing: border-box;
+      display: none;
     }
+
     .etiqueta {
+      justify-content: center;
+      align-items: center;
       box-sizing: border-box;
       width: 105mm;
       height: 42.4mm;
       padding: 5mm;
+      font-size: 18px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-family: Arial, sans-serif;
     }
+
     .etiqueta img {
-      height: 25mm;
-      width: auto;
-      object-fit: contain;
+      height: 33mm !important;
+      width: auto !important;
+      display: block !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      max-width: none !important;
     }
+
+    .contenido {
+      padding-left: 10mm;
+      flex: 1;
+    }
+
+    .titulo {
+      font-size: 36px; padding-top: 4mm;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .descripcion {
+      font-size: 18px; line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
     @media print {
+      body {
+        padding: 0;
+        margin: 0;
+      }
+
       .no-print, .preview-area {
         display: none !important;
       }
-      #printArea {
+
+      .etiqueta-sheet {
         display: grid !important;
+        grid-template-columns: repeat(2, 105mm);
+        grid-template-rows: repeat(7, 42.4mm);
+        width: 210mm;
+        height: 297mm;
+        margin: 0;
+        padding: 0;
+      }
+
+      .etiqueta {
+        justify-content: center;
+        align-items: center;
+        page-break-inside: avoid;
       }
     }
   </style>
@@ -132,12 +165,11 @@
       <input id="color" placeholder="Color">
       <input id="maquina" placeholder="Máquina">
       <input id="encerado" placeholder="Encerado para">
-      <button onclick="renderPreview()">Previsualizar</button>
-      <button onclick="imprimirPersonalizado()">🖨️ Imprimir etiquetas</button>
+      <button type="button" onclick="renderPreview()">Previsualizar</button>
+      <button type="button" onclick="imprimir()">🖨️ Imprimir</button>
     </div>
-
-    <div class="preview-area no-print" id="previewEtiqueta"></div>
-    <div class="etiqueta-sheet" id="printArea" style="display: none;"></div>
+    <div id="previewEtiqueta" class="preview-area no-print"></div>
+    <div id="printArea" class="etiqueta-sheet"></div>
   </div>
 
   <script>
@@ -159,7 +191,7 @@
         </div>`;
     }
 
-    function getDatos() {
+    function renderPreview() {
       const modelo = document.getElementById("modelo").value.trim();
       const lote = document.getElementById("lote").value.trim();
       const mezcla = document.getElementById("mezcla").value.trim();
@@ -169,39 +201,63 @@
       const encerado = document.getElementById("encerado").value.trim();
 
       const titulo = modelo || "(modelo)";
-      const descripcion = `Lote ${lote} / ${mezcla} / ${grosor} /<br>${color} / ${maquina}.<br>Encerado para : ${encerado}`;
-      return [titulo, descripcion];
+      const descripcion =
+        "Lote " + lote + " / " + mezcla + " / " + grosor + " /\n" +
+        color + " / " + maquina + ".\n" +
+        "Encerado para : " + encerado;
+
+      const etiquetaHTML = buildEtiquetaHTML(titulo, descripcion);
+      const preview = document.getElementById("previewEtiqueta");
+      preview.innerHTML = etiquetaHTML;
+      preview.classList.add("active");
     }
 
-    function renderPreview() {
-      const etiqueta = buildEtiquetaHTML(...getDatos());
-      document.getElementById("previewEtiqueta").innerHTML = etiqueta;
-    }
-
-    function imprimirPersonalizado() {
-      const cantidad = parseInt(prompt("¿Cuántas etiquetas quieres imprimir? (1-14)", "1"));
-      const posicion = parseInt(prompt("¿Desde qué posición? (1 arriba izq, 14 abajo der)", "1"));
-
-      if (isNaN(cantidad) || isNaN(posicion) || cantidad < 1 || posicion < 1 || cantidad + posicion - 1 > 14) {
-        alert("Valores inválidos. Posición + cantidad no debe superar 14.");
+    function imprimir() {
+      const modelo = document.getElementById("modelo").value.trim();
+      if (!modelo) {
+        alert("Por favor, introduce al menos el MODELO antes de imprimir.");
         return;
       }
 
-      const etiquetaHTML = buildEtiquetaHTML(...getDatos());
-      let html = "";
-      for (let i = 1; i <= 14; i++) {
-        if (i < posicion || i >= posicion + cantidad) {
-          html += '<div class="etiqueta"></div>';
-        } else {
-          html += etiquetaHTML;
-        }
+      const lote = document.getElementById("lote").value.trim();
+      const mezcla = document.getElementById("mezcla").value.trim();
+      const grosor = document.getElementById("grosor").value.trim();
+      const color = document.getElementById("color").value.trim();
+      const maquina = document.getElementById("maquina").value.trim();
+      const encerado = document.getElementById("encerado").value.trim();
+
+      const titulo = modelo;
+      const descripcion =
+        "Lote " + lote + " / " + mezcla + " / " + grosor + " /\n" +
+        color + " / " + maquina + ".\n" +
+        "Encerado para : " + encerado;
+
+      let cantidad = parseInt(prompt("¿Cuántas etiquetas deseas imprimir? (máximo 14)", "1"));
+      if (isNaN(cantidad) || cantidad < 1 || cantidad > 14) {
+        alert("Cantidad inválida. Debe ser un número entre 1 y 14.");
+        return;
       }
-      const area = document.getElementById("printArea");
-      area.innerHTML = html;
-      area.style.display = "grid";
-      document.getElementById("previewEtiqueta").style.display = "none";
+
+      let posicion = parseInt(prompt("¿En qué posición quieres empezar? (1 a 14, donde 1 es superior izquierda)", "1"));
+      if (isNaN(posicion) || posicion < 1 || posicion > 14) {
+        alert("Posición inválida. Debe estar entre 1 y 14.");
+        return;
+      }
+
+      if (posicion - 1 + cantidad > 14) {
+        alert("La combinación de posición y cantidad excede el límite de 14 etiquetas.");
+        return;
+      }
+
+      const etiquetas = new Array(14).fill('');
+      const etiquetaHTML = buildEtiquetaHTML(titulo, descripcion);
+
+      for (let i = 0; i < cantidad; i++) {
+        etiquetas[posicion - 1 + i] = etiquetaHTML;
+      }
+
+      document.getElementById("printArea").innerHTML = etiquetas.join('');
       window.print();
-      document.getElementById("previewEtiqueta").style.display = "flex";
     }
   </script>
 </body>
