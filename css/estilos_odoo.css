@@ -5,8 +5,7 @@
   --background-color: #f4f7fa;
   --card-background-color: #ffffff;
   --text-color: #3c3c3c;
-  --shadow-color: rgba(0, 0, 0, 0.15);
-  --border-color: #d0d7de;
+  --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
 body, html {
@@ -15,7 +14,6 @@ body, html {
   margin: 0;
   padding: 0;
   height: 100%;
-  color: var(--text-color);
 }
 
 .container {
@@ -27,23 +25,21 @@ body, html {
 h1 {
   text-align: center;
   color: var(--primary-color);
-  margin-bottom: 30px;
 }
 
 .modulos-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 24px;
+  gap: 30px;
 }
 
 .modulo {
   background-color: var(--card-background-color);
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
-  box-shadow: 0 4px 10px var(--shadow-color);
-  padding: 18px;
-  width: 200px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  padding: 20px;
+  width: 220px;
   text-align: center;
   transition: all 0.3s ease;
   cursor: pointer;
@@ -51,23 +47,18 @@ h1 {
 }
 
 .modulo:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 6px 14px var(--shadow-color);
-  border-color: var(--secondary-color);
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px var(--shadow-color);
+  border: 1px solid var(--secondary-color);
 }
 
-.modulo h3 {
-  margin: 12px 0 5px;
-  font-size: 18px;
-}
-
-.modulo p {
+.modulo h3, .modulo p {
   margin: 0;
-  font-size: 16px;
+  color: inherit;
 }
 
 .disabled {
-  opacity: 0.4;
+  opacity: 0.5;
   pointer-events: none;
 }
 
@@ -85,65 +76,33 @@ h1 {
 
 .modal-content {
   background-color: var(--card-background-color);
-  border: 1px solid var(--border-color);
-  padding: 24px;
-  border-radius: 12px;
+  padding: 20px;
+  border-radius: 10px;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 6px 18px var(--shadow-color);
+  box-shadow: 0 4px 8px var(--shadow-color);
 }
 
 .modal-content input {
   width: 100%;
   padding: 10px;
-  margin: 10px 0;
+  margin: 8px 0;
   border: 1px solid #ccc;
   border-radius: 6px;
-  font-size: 16px;
 }
 
 .modal-content button {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   margin-top: 10px;
   background-color: var(--secondary-color);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 16px;
 }
 
 .modal-content button:hover {
   background-color: var(--primary-color);
-}
-
-/* Mobile optimization */
-@media (max-width: 768px) {
-  .modulos-container {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .modulo {
-    width: 90%;
-    padding: 16px;
-  }
-
-  h1 {
-    font-size: 22px;
-  }
-}
-
-/* Print override protection for etiquetas pages */
-@media print {
-  body, html {
-    background: white !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  .modulos-container, .modulo, .modal, .container {
-    all: unset;
-  }
 }

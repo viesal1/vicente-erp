@@ -111,11 +111,11 @@
         let etiquetas = "";
         for (let i = 0; i < totalEtiquetas; i++) {
           etiquetas += `
-          <div class="etiqueta" >
-            <img src="logo-vespi-vertical-large.jpg" >
-            <div >
-              <div >${modelo}</div>
-              <div >
+          <div class="etiqueta" style="width:105mm;height:42.4mm;padding:5mm;display:flex;align-items:center;gap:10px;">
+            <img src="logo-vespi-vertical-large.jpg" style="height:33mm;display:block;">
+            <div style="flex:1;padding-left:10mm;">
+              <div style="font-size:36px;font-weight:bold;padding-top:4mm;">${modelo}</div>
+              <div style="font-size:18px;line-height:1.4;">
                 Lote ${lote} / ${mezcla} / ${grosor} /<br>
                 ${color} / ${maquina}.<br>
                 Encerado para : ${encerado}
