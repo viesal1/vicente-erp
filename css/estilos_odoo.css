@@ -1,3 +1,4 @@
+
 :root {
   --primary-color: #1e2a44;
   --secondary-color: #00a9e0;
@@ -107,78 +108,50 @@ h1 {
 }
 
 
-/* Estilos móviles mejorados */
+
+/* Estilos móviles ampliados */
 @media (max-width: 768px) {
+  body, html {
+    font-size: 20px !important;
+  }
+
+  .container {
+    padding: 10px !important;
+  }
+
   .modulos-container {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 20px !important;
   }
 
   .modulo {
     width: 100% !important;
+    font-size: 24px !important;
     padding: 30px !important;
-    font-size: 20px !important;
   }
 
-  .modulo h3 {
+  .modulo h3, .modulo p {
     font-size: 26px !important;
   }
 
-  input, button {
+  .modal-content {
+    font-size: 20px !important;
+    width: 95% !important;
+  }
+
+  .modal-content input, .modal-content button {
     font-size: 20px !important;
     padding: 14px !important;
   }
 
   h1, h2, h3 {
     font-size: 28px !important;
-    text-align: center;
+    text-align: center !important;
   }
 
-  .formulario {
-    width: 95% !important;
-    margin: auto !important;
-  }
-
-  .login-wrapper {
-    padding: 20px !important;
-  }
-
-  .modal-content {
-    width: 95% !important;
-  }
-}
-
-
-/* Ajustes móviles para selector y tarjetas */
-
-@media (max-width: 768px) {
-  .modulos-container, .selector {
-    flex-direction: column !important;
-    align-items: stretch !important;
-  }
-
-  .modulo, .card {
-    width: 100% !important;
-    font-size: 22px !important;
-    padding: 24px !important;
-  }
-
-  .modulo h3, .card {
-    font-size: 26px !important;
-  }
-}
-
-
-/* Reforzado para impresión de 14 etiquetas */
-@media print {
-  .etiqueta-sheet {
-    display: grid !important;
-    grid-template-columns: repeat(2, 105mm);
-    grid-template-rows: repeat(7, 42.4mm);
-    width: 210mm;
-    height: 297mm;
-    margin: 0;
-    padding: 0;
+  input, button {
+    font-size: 20px !important;
+    padding: 14px !important;
   }
 }
