@@ -148,3 +148,23 @@ h1 {
     width: 95% !important;
   }
 }
+
+
+/* Ajustes móviles para selector y tarjetas */
+
+@media (max-width: 768px) {
+  .modulos-container, .selector {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .modulo, .card {
+    width: 100% !important;
+    font-size: 22px !important;
+    padding: 24px !important;
+  }
+
+  .modulo h3, .card {
+    font-size: 26px !important;
+  }
+}
