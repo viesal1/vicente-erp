@@ -242,7 +242,45 @@ firebase.auth().onAuthStateChanged(user => { if (!user) location.href = 'index.h
       preview.classList.add("active");
     }
 
-    function imprimir() {
+    
+function imprimir() {
+  document.getElementById("modalPrint").style.display = "flex";
+}
+function cerrarModal() {
+  document.getElementById("modalPrint").style.display = "none";
+}
+function confirmarImpresion() {
+  const cantidad = parseInt(document.getElementById("inputCantidad").value);
+  const posicion = parseInt(document.getElementById("inputPosicion").value);
+  if (isNaN(cantidad) || cantidad < 1 || cantidad > 14 || isNaN(posicion) || posicion < 1 || posicion > 14 || (posicion - 1 + cantidad > 14)) {
+    alert("Verifica que la cantidad y la posición inicial sean válidas y no excedan el límite de 14 etiquetas.");
+    return;
+  }
+  cerrarModal();
+  const modelo = document.getElementById("modelo").value.trim();
+  if (!modelo) {
+    alert("Por favor, introduce al menos el MODELO antes de imprimir.");
+    return;
+  }
+  const lote = document.getElementById("lote").value.trim();
+  const mezcla = document.getElementById("mezcla").value.trim();
+  const grosor = document.getElementById("grosor").value.trim();
+  const color = document.getElementById("color").value.trim();
+  const maquina = document.getElementById("maquina").value.trim();
+  const encerado = document.getElementById("encerado").value.trim();
+  const titulo = modelo;
+  const descripcion = "Lote " + lote + " / " + mezcla + " / " + grosor + " /\n" + color + " / " + maquina + ".\n" + "Encerado para : " + encerado;
+  const etiquetas = new Array(14).fill('<div class="etiqueta"></div>');
+  const etiquetaHTML = buildEtiquetaHTML(titulo, descripcion);
+  for (let i = 0; i < cantidad; i++) {
+    etiquetas[posicion - 1 + i] = etiquetaHTML;
+  }
+  document.getElementById("printArea").innerHTML = etiquetas.join('');
+  window.print();
+}
+
+
+function imprimir() {
       const modelo = document.getElementById("modelo").value.trim();
       if (!modelo) {
         alert("Por favor, introduce al menos el MODELO antes de imprimir.");
@@ -267,5 +305,20 @@ firebase.auth().onAuthStateChanged(user => { if (!user) location.href = 'index.h
       window.print();
     }
   </script>
+
+<div id="modalPrint" class="modal no-print" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color: rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+  <div class="modal-content">
+    <h3>Imprimir etiquetas</h3>
+    <label>Cantidad (1-14):</label>
+    <input id="inputCantidad" type="number" min="1" max="14" value="1">
+    <label>Posición inicial (1-14):</label>
+    <input id="inputPosicion" type="number" min="1" max="14" value="1">
+    <div>
+      <button onclick="confirmarImpresion()">Imprimir</button>
+      <button onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
