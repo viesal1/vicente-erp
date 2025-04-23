@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,18 +6,24 @@
   <title>Etiquetas Vicente Espi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    @page { margin: 0; size: A4; }
+    @page {
+      margin: 0;
+      size: A4;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
     }
+
     .selector {
       display: flex;
       gap: 30px;
       justify-content: center;
       margin-top: 100px;
     }
+
     .card {
       background: #fff;
       border-radius: 12px;
@@ -27,7 +34,11 @@
       cursor: pointer;
       transition: transform 0.2s ease;
     }
-    .card:hover { transform: scale(1.05); }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
     .formulario {
       max-width: 400px;
       margin: 20px auto;
@@ -36,19 +47,22 @@
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
+
     .formulario input {
       width: 100%;
       padding: 10px;
       margin-bottom: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
-      font-size: 18px;
+      font-size: 18px; line-height: 1.4;
     }
+
     .formulario button {
       padding: 10px 20px;
-      font-size: 18px;
+      font-size: 18px; line-height: 1.4;
       margin-right: 10px;
     }
+
     .preview-area {
       margin: 30px auto;
       width: 105mm;
@@ -59,45 +73,66 @@
       padding: 5mm;
       gap: 10px;
     }
-    .preview-area.active { display: flex; }
-    .etiqueta-sheet { display: none; }
+
+    .preview-area.active {
+      display: flex;
+    }
+
+    .etiqueta-sheet {
+      display: none;
+    }
+
     .etiqueta {
-      justify-content: center;
-      align-items: center;
+  justify-content: center;
+  align-items: center;
       box-sizing: border-box;
       width: 105mm;
       height: 42.4mm;
       padding: 5mm;
       font-size: 18px;
       display: flex;
+      align-items: center;
       gap: 12px;
       font-family: Arial, sans-serif;
     }
+
     .etiqueta img {
-      height: 33mm !important;
-      width: auto !important;
-      display: block !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      max-width: none !important;
-    }
+  height: 33mm !important;
+  width: auto !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  
+  
+}
+
     .contenido {
-      padding-left: 10mm;
+  padding-left: 10mm;
       flex: 1;
     }
+
     .titulo {
-      font-size: 36px;
-      padding-top: 4mm;
+      font-size: 36px; padding-top: 4mm;
       font-weight: bold;
       margin-bottom: 5px;
     }
+
     .descripcion {
-      font-size: 18px;
+      font-size: 18px; line-height: 1.4;
       white-space: pre-wrap;
     }
+
     @media print {
-      body { padding: 0; margin: 0; }
-      .no-print, .preview-area { display: none !important; }
+      body {
+        padding: 0;
+        margin: 0;
+      }
+
+      .no-print, .preview-area {
+        display: none !important;
+      }
+
       .etiqueta-sheet {
         display: grid !important;
         grid-template-columns: repeat(2, 105mm);
@@ -107,38 +142,12 @@
         margin: 0;
         padding: 0;
       }
+
       .etiqueta {
-        justify-content: center;
-        align-items: center;
+  justify-content: center;
+  align-items: center;
         page-break-inside: avoid;
       }
-    }
-    #modalPrint {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-    }
-    #modalPrint .modal-content {
-      background: white;
-      padding: 20px 30px;
-      border-radius: 10px;
-      max-width: 90%;
-      width: 300px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-    #modalPrint input {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-    }
-    #modalPrint button {
-      padding: 8px 16px;
-      margin-right: 10px;
     }
   
 @media (max-width: 768px) {
@@ -146,18 +155,19 @@
     font-size: 20px !important;
     padding: 14px !important;
   }
-
   .formulario {
     padding: 20px !important;
     width: 95% !important;
   }
-
   .preview-area {
     transform: scale(1.1);
     transform-origin: top left;
     overflow-x: auto;
   }
-
+  .etiqueta {
+    transform: scale(1.05);
+    transform-origin: top left;
+  }
   h1, h2, h3 {
     font-size: 28px !important;
   }
@@ -187,20 +197,6 @@
     </div>
     <div id="previewEtiqueta" class="preview-area no-print"></div>
     <div id="printArea" class="etiqueta-sheet"></div>
-  </div>
-
-  <div id="modalPrint" class="modal no-print">
-    <div class="modal-content">
-      <h3>Imprimir etiquetas</h3>
-      <label>Cantidad (1-14):</label>
-      <input id="inputCantidad" type="number" min="1" max="14" value="1">
-      <label>Posición inicial (1-14):</label>
-      <input id="inputPosicion" type="number" min="1" max="14" value="1">
-      <div>
-        <button onclick="confirmarImpresion()">Imprimir</button>
-        <button onclick="cerrarModal()">Cancelar</button>
-      </div>
-    </div>
   </div>
 
   <script>
@@ -244,26 +240,6 @@
     }
 
     function imprimir() {
-      document.getElementById("modalPrint").style.display = "flex";
-    }
-
-    function cerrarModal() {
-      document.getElementById("modalPrint").style.display = "none";
-    }
-
-    function confirmarImpresion() {
-      const cantidad = parseInt(document.getElementById("inputCantidad").value);
-      const posicion = parseInt(document.getElementById("inputPosicion").value);
-
-      if (isNaN(cantidad) || cantidad < 1 || cantidad > 14 ||
-          isNaN(posicion) || posicion < 1 || posicion > 14 ||
-          (posicion - 1 + cantidad > 14)) {
-        alert("Verifica que la cantidad y la posición inicial sean válidas y no excedan el límite de 14 etiquetas.");
-        return;
-      }
-
-      cerrarModal();
-
       const modelo = document.getElementById("modelo").value.trim();
       if (!modelo) {
         alert("Por favor, introduce al menos el MODELO antes de imprimir.");
@@ -283,14 +259,8 @@
         color + " / " + maquina + ".\n" +
         "Encerado para : " + encerado;
 
-      const etiquetas = new Array(14).fill('<div class="etiqueta"></div>');
       const etiquetaHTML = buildEtiquetaHTML(titulo, descripcion);
-
-      for (let i = 0; i < cantidad; i++) {
-        etiquetas[posicion - 1 + i] = etiquetaHTML;
-      }
-
-      document.getElementById("printArea").innerHTML = etiquetas.join('');
+      document.getElementById("printArea").innerHTML = etiquetaHTML.repeat(14);
       window.print();
     }
   </script>
