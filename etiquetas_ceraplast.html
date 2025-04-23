@@ -146,6 +146,9 @@
 </style>
 </head>
 <body>
+<script>
+firebase.auth().onAuthStateChanged(user => { if (!user) location.href = 'index.html'; });
+</script>
   <div id="selector" class="selector">
     <div class="card" onclick="mostrarEtiquetas()">🏷️ Etiquetas Anónimas</div>
   </div>

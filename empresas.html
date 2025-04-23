@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>Seleccionar Empresa</title>
-  <link rel="stylesheet" href="estilos_odoo_mobile.css">
+  <link rel="stylesheet" href="estilos_odoo.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+<script>
+firebase.auth().onAuthStateChanged(user => { if (!user) location.href = 'index.html'; });
+</script>
   <div class="container">
     <h1>🏢 Selecciona una Empresa</h1>
     <div class="modulos-container">

@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>Inicio - Ceraplast</title>
-  <link rel="stylesheet" href="estilos_odoo_mobile.css">
+  <link rel="stylesheet" href="estilos_odoo.css">
 </head>
 <body>
+<script>
+firebase.auth().onAuthStateChanged(user => { if (!user) location.href = 'index.html'; });
+</script>
   <div class="container">
     <img src="logo-ceraplast.png" class="logo-header" alt="Logo Ceraplast" style="display:block; margin: 20px auto; max-width: 180px; background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
     <h1 style="text-align: center;">Módulos disponibles</h1>
