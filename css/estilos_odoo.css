@@ -201,3 +201,23 @@ h1 {
 .modulo:hover, .card:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
 }
+
+
+
+/* Ajustes para logos y home visual */
+.logo-header {
+  max-width: 120px !important;
+  display: block;
+  margin: 20px auto !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+h1 {
+  font-size: 24px !important;
+  margin-bottom: 20px;
+}
+
+.modulo h3 {
+  font-size: 20px !important;
+}
