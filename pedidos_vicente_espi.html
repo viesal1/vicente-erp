@@ -8,6 +8,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     .pedido-card {
       background: white;
@@ -47,6 +48,12 @@
       border-radius: 8px;
       display: none;
     }
+    #previewEtiquetas {
+      margin-top: 20px;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
@@ -56,19 +63,10 @@
     <div id="uploadSection" class="no-print">
       <h3>Subir nuevo pedido (.xlsx)</h3>
       <input type="file" id="fileInput" accept=".xlsx">
-      <button onclick="subirPedido()">📤 Subir Pedido</button>
+      <button onclick="procesarExcel()">📤 Procesar Pedido</button>
     </div>
 
-    <div class="pedido-card">
-      <h3>Pedido P_054 - VELAS MARTINEZ MORALES</h3>
-      <p>Fecha: 22/04/2025</p>
-      <div class="acciones">
-        <button onclick="document.getElementById('excelPedido054').style.display='block'">👁️ Ver Excel</button>
-        <button onclick="window.open('etiquetas_pedido_vicente_espi.html', '_blank')">🖨️ Generar Etiquetas</button>
-        <button onclick="alert('Pedido marcado como finalizado')">✅ Finalizar</button>
-      </div>
-      <iframe id="excelPedido054" src="/pedidos/054_PEDIDO_LUMAR.xlsx" style="display:none;"></iframe>
-    </div>
+    <div id="previewEtiquetas"></div>
 
   </div>
 
@@ -89,13 +87,47 @@
       }
     });
 
-    function subirPedido() {
-      const file = document.getElementById("fileInput").files[0];
-      if (!file) return alert("Selecciona un archivo .xlsx");
-      const storageRef = firebase.storage().ref("pedidos/" + file.name);
-      storageRef.put(file).then(() => {
-        alert("📤 Pedido subido con éxito. Recarga para verlo en la lista.");
-      }).catch(err => alert("Error al subir: " + err));
+    function procesarExcel() {
+      const fileInput = document.getElementById("fileInput");
+      if (!fileInput.files[0]) return alert("Selecciona un archivo .xlsx primero");
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        const modelo = "23-F1";
+        const mezcla = "388 Mi";
+        const grosor = "2.0";
+        const color = "Blanco";
+        const maquina = "M-1";
+        const lote = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        const encerado = "Primavera";
+        const bultos = 4;
+        const totalEtiquetas = bultos * 2;
+
+        let etiquetas = "";
+        for (let i = 0; i < totalEtiquetas; i++) {
+          etiquetas += `
+          <div class="etiqueta" style="width:105mm;height:42.4mm;padding:5mm;display:flex;align-items:center;gap:10px;">
+            <img src="logo-vespi-vertical-large.jpg" style="height:33mm;display:block;">
+            <div style="flex:1;padding-left:10mm;">
+              <div style="font-size:36px;font-weight:bold;padding-top:4mm;">${modelo}</div>
+              <div style="font-size:18px;line-height:1.4;">
+                Lote ${lote} / ${mezcla} / ${grosor} /<br>
+                ${color} / ${maquina}.<br>
+                Encerado para : ${encerado}
+              </div>
+            </div>
+          </div>`;
+        }
+
+        document.getElementById("previewEtiquetas").innerHTML = etiquetas;
+      };
+
+      reader.readAsArrayBuffer(fileInput.files[0]);
     }
   </script>
 </body>
