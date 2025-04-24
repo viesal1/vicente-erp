@@ -116,17 +116,7 @@ iframe {
 }
 
 
-/* === FORMATO PARECIDO AL MÓVIL PERO PARA ESCRITORIO === */
-@media screen and (min-width: 768px) {
-  .container, .card, .pedido-card, .formulario-operario {
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
 
-  .formulario-operario {
-    padding: 24px;
-  }
 
   .pedido-card {
     padding: 28px;
@@ -175,5 +165,28 @@ iframe {
   .modulos-container {
     flex-direction: column;
     align-items: center;
+  }
+}
+
+
+/* === MEJOR ESTILO PARA ORDENADOR, CONSERVANDO LA ESTÉTICA DE MÓVIL === */
+@media screen and (min-width: 768px) {
+  .modulos-container {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+    padding: 0 40px;
+  }
+
+  .modulo {
+    width: 300px;
+    padding: 40px;
+    font-size: 20px;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 40px;
   }
 }
