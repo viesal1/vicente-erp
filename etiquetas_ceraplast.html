@@ -1,73 +1,189 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<title>Etiquetas CERAPLAST</title>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta charset="UTF-8">
+  <title>Etiquetas CERAPLAST</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @page { margin: 0; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
+    .selector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      text-align: center;
+      font-size: 24px;
+      transition: transform 0.2s ease;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
 
-<link href="css/estilos_odoo.css" rel="stylesheet"/></head>
+    .hoja {
+      width: 794px;
+      height: 1123px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+      page-break-after: always;
+    }
+    .etiqueta {
+      height: 50%;
+      padding: 60px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .fila-superior {
+      display: flex;
+      justify-content: space-between;
+      gap: 40px;
+    }
+    .campo-rect {
+      flex: 1;
+    }
+    .campo-rect label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    .cuadro {
+      border: 1px solid #000;
+      height: 140px;
+    }
+    .fila-doble {
+      display: flex;
+      justify-content: space-between;
+      gap: 40px;
+    }
+    .izquierda {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    .izquierda div {
+      font-size: 36px;
+    }
+    .derecha {
+      flex: 1;
+    }
+    .derecha label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    .cuadro-uni {
+      border: 1px solid #000;
+      width: 180px;
+      height: 60px;
+    }
+    .logo-container {
+      position: absolute;
+      bottom: 40px;
+      right: 40px;
+    }
+    .logo-container img {
+      max-width: 160px;
+      height: auto;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .hoja, .hoja * {
+        visibility: visible;
+      }
+      .hoja {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    }
+  </style>
+</head>
 <body>
-<div class="selector" id="selector">
-<div class="card" onclick="mostrarEtiquetas()">🏷️ Etiquetas Anónimas</div>
-</div>
-<div id="contenido" style="display: none;"><div style="text-align:center; margin: 20px;"><button onclick="window.print()" style="padding: 10px 20px; font-size: 18px;">🖨️ Imprimir de nuevo</button></div>
-<div class="hoja">
-<div class="etiqueta">
-<div class="fila-superior">
-<div class="campo-rect">
-<label>MODELO:</label>
-<div class="cuadro"></div>
-</div>
-<div class="campo-rect">
-<label>COLOR:</label>
-<div class="cuadro"></div>
-</div>
-</div>
-<div class="fila-doble">
-<div class="izquierda">
-<div><strong>Medidas:</strong></div>
-<div><strong>Fecha:</strong></div>
-<div><strong>Operarios:</strong></div>
-</div>
-<div class="derecha">
-<label>Uni x Caja:</label>
-<div class="cuadro-uni"></div>
-</div>
-</div>
-<div class="logo-container">
-<img alt="Logo Ceraplast" src="logo-ceraplast.png"/>
-</div>
-</div>
-<div class="etiqueta">
-<div class="fila-superior">
-<div class="campo-rect">
-<label>MODELO:</label>
-<div class="cuadro"></div>
-</div>
-<div class="campo-rect">
-<label>COLOR:</label>
-<div class="cuadro"></div>
-</div>
-</div>
-<div class="fila-doble">
-<div class="izquierda">
-<div><strong>Medidas:</strong></div>
-<div><strong>Fecha:</strong></div>
-<div><strong>Operarios:</strong></div>
-</div>
-<div class="derecha">
-<label>Uni x Caja:</label>
-<div class="cuadro-uni"></div>
-</div>
-</div>
-<div class="logo-container">
-<img alt="Logo Ceraplast" src="logo-ceraplast.png"/>
-</div>
-</div>
-</div>
-</div>
-<script>
+  <div id="selector" class="selector">
+    <div class="card" onclick="mostrarEtiquetas()">🏷️ Etiquetas Anónimas</div>
+  </div>
+
+  <div id="contenido" style="display: none;"><div style="text-align:center; margin: 20px;"><button onclick="window.print()" style="padding: 10px 20px; font-size: 18px;">🖨️ Imprimir de nuevo</button></div>
+    <div class="hoja">
+      <div class="etiqueta">
+        <div class="fila-superior">
+          <div class="campo-rect">
+            <label>MODELO:</label>
+            <div class="cuadro"></div>
+          </div>
+          <div class="campo-rect">
+            <label>COLOR:</label>
+            <div class="cuadro"></div>
+          </div>
+        </div>
+        <div class="fila-doble">
+          <div class="izquierda">
+            <div><strong>Medidas:</strong></div>
+            <div><strong>Fecha:</strong></div>
+            <div><strong>Operarios:</strong></div>
+          </div>
+          <div class="derecha">
+            <label>Uni x Caja:</label>
+            <div class="cuadro-uni"></div>
+          </div>
+        </div>
+        <div class="logo-container">
+          <img src="logo-ceraplast.png" alt="Logo Ceraplast">
+        </div>
+      </div>
+      <div class="etiqueta">
+        <div class="fila-superior">
+          <div class="campo-rect">
+            <label>MODELO:</label>
+            <div class="cuadro"></div>
+          </div>
+          <div class="campo-rect">
+            <label>COLOR:</label>
+            <div class="cuadro"></div>
+          </div>
+        </div>
+        <div class="fila-doble">
+          <div class="izquierda">
+            <div><strong>Medidas:</strong></div>
+            <div><strong>Fecha:</strong></div>
+            <div><strong>Operarios:</strong></div>
+          </div>
+          <div class="derecha">
+            <label>Uni x Caja:</label>
+            <div class="cuadro-uni"></div>
+          </div>
+        </div>
+        <div class="logo-container">
+          <img src="logo-ceraplast.png" alt="Logo Ceraplast">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
     function mostrarEtiquetas() {
       document.getElementById("selector").style.display = "none";
       document.getElementById("contenido").style.display = "block";

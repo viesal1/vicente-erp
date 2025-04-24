@@ -1,192 +1,108 @@
 
-/* === GENERAL LAYOUT === */
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+:root {
+  --primary-color: #1e2a44;
+  --secondary-color: #00a9e0;
+  --background-color: #f4f7fa;
+  --card-background-color: #ffffff;
+  --text-color: #3c3c3c;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+body, html {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--background-color);
   margin: 0;
   padding: 0;
-  background: #f4f6f8;
-  color: #333;
+  height: 100%;
 }
 
-.container, .card {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  max-width: 900px;
-  margin: 30px auto;
-  border: 1px solid #e0e0e0;
-}
-
-/* === TARJETAS DE PEDIDO === */
-.pedido-card {
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-  padding: 24px;
-  margin: 20px 0;
-  transition: transform 0.2s;
-}
-.pedido-card:hover {
-  transform: translateY(-4px);
-}
-
-/* === FORMULARIOS === */
-.formulario-operario {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  margin-bottom: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  max-width: 500px;
-}
-
-.formulario-operario input, 
-.formulario-operario button {
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
-
-/* === IMPRESIÓN ETIQUETAS A4 === */
-@media print {
-  @page {
-    size: A4 portrait;
-    margin: 10mm;
-  }
-
-  body {
-    margin: 0;
-    padding: 0;
-    background: white;
-  }
-
-  .etiqueta {
-    width: 100%;
-    max-width: 210mm;
-    height: auto;
-    margin: 0 auto 10mm;
-    page-break-inside: avoid;
-  }
-}
-
-/* === DISEÑO RESPONSIVO PARA ETIQUETAS === */
-.etiqueta {
-  width: 100%;
-  max-width: 210mm;
-  height: auto;
+.container {
+  max-width: 1200px;
   margin: 0 auto;
-  page-break-inside: avoid;
-  box-sizing: border-box;
+  padding: 20px;
 }
 
-/* === AJUSTE DE INTERFAZ GENERAL === */
-.acciones {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
+h1 {
+  text-align: center;
+  color: var(--primary-color);
 }
 
-.acciones button {
-  padding: 8px 16px;
-  border: none;
-  background: #00a9e0;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.2s;
-}
-.acciones button:hover {
-  background: #0086b3;
-}
-
-iframe {
-  width: 100%;
-  height: 500px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  margin-top: 10px;
-}
-
-
-
-
-  .pedido-card {
-    padding: 28px;
-  }
-
-  .acciones {
-    justify-content: center;
-  }
-
-  iframe {
-    height: 600px;
-  }
-}
-
-
-/* === MODULOS DE INICIO COMO TARJETAS === */
 .modulos-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 20px;
-  margin-top: 30px;
-  padding: 0 10px;
+  gap: 30px;
 }
 
 .modulo {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  width: 260px;
+  background-color: var(--card-background-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  padding: 20px;
+  width: 220px;
   text-align: center;
+  transition: all 0.3s ease;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  color: var(--text-color);
 }
+
 .modulo:hover {
-  transform: translateY(-6px);
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px var(--shadow-color);
+  border: 1px solid var(--secondary-color);
 }
-.modulo.disabled {
+
+.modulo h3, .modulo p {
+  margin: 0;
+  color: inherit;
+}
+
+.disabled {
   opacity: 0.5;
-  cursor: not-allowed;
+  pointer-events: none;
 }
 
-/* Diseño responsivo: apilado en móviles */
-@media screen and (max-width: 768px) {
-  .modulos-container {
-    flex-direction: column;
-    align-items: center;
-  }
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
+.modal-content {
+  background-color: var(--card-background-color);
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 8px var(--shadow-color);
+}
 
-/* === MEJOR ESTILO PARA ORDENADOR, CONSERVANDO LA ESTÉTICA DE MÓVIL === */
-@media screen and (min-width: 768px) {
-  .modulos-container {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 40px;
-    padding: 0 40px;
-  }
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
 
-  .modulo {
-    width: 300px;
-    padding: 40px;
-    font-size: 20px;
-  }
+.modal-content button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
 
-  .container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 40px;
-  }
+.modal-content button:hover {
+  background-color: var(--primary-color);
 }
