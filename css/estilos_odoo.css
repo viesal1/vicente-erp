@@ -1,108 +1,116 @@
 
-:root {
-  --primary-color: #1e2a44;
-  --secondary-color: #00a9e0;
-  --background-color: #f4f7fa;
-  --card-background-color: #ffffff;
-  --text-color: #3c3c3c;
-  --shadow-color: rgba(0, 0, 0, 0.1);
-}
-
-body, html {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: var(--background-color);
+/* === GENERAL LAYOUT === */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 0;
-  height: 100%;
+  background: #f4f6f8;
+  color: #333;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
+.container, .card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  max-width: 900px;
+  margin: 30px auto;
+  border: 1px solid #e0e0e0;
+}
+
+/* === TARJETAS DE PEDIDO === */
+.pedido-card {
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  margin: 20px 0;
+  transition: transform 0.2s;
+}
+.pedido-card:hover {
+  transform: translateY(-4px);
+}
+
+/* === FORMULARIOS === */
+.formulario-operario {
+  background: #f8f9fa;
   padding: 20px;
-}
-
-h1 {
-  text-align: center;
-  color: var(--primary-color);
-}
-
-.modulos-container {
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 30px;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 500px;
 }
 
-.modulo {
-  background-color: var(--card-background-color);
-  border-radius: 10px;
-  box-shadow: 0 4px 8px var(--shadow-color);
-  padding: 20px;
-  width: 220px;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  color: var(--text-color);
-}
-
-.modulo:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px var(--shadow-color);
-  border: 1px solid var(--secondary-color);
-}
-
-.modulo h3, .modulo p {
-  margin: 0;
-  color: inherit;
-}
-
-.disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background-color: var(--card-background-color);
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 4px 8px var(--shadow-color);
-}
-
-.modal-content input {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
+.formulario-operario input, 
+.formulario-operario button {
+  padding: 10px 14px;
+  border-radius: 8px;
   border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.modal-content button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  background-color: var(--secondary-color);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
   font-size: 16px;
 }
 
-.modal-content button:hover {
-  background-color: var(--primary-color);
+/* === IMPRESIÓN ETIQUETAS A4 === */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+
+  .etiqueta {
+    width: 100%;
+    max-width: 210mm;
+    height: auto;
+    margin: 0 auto 10mm;
+    page-break-inside: avoid;
+  }
+}
+
+/* === DISEÑO RESPONSIVO PARA ETIQUETAS === */
+.etiqueta {
+  width: 100%;
+  max-width: 210mm;
+  height: auto;
+  margin: 0 auto;
+  page-break-inside: avoid;
+  box-sizing: border-box;
+}
+
+/* === AJUSTE DE INTERFAZ GENERAL === */
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.acciones button {
+  padding: 8px 16px;
+  border: none;
+  background: #00a9e0;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+.acciones button:hover {
+  background: #0086b3;
+}
+
+iframe {
+  width: 100%;
+  height: 500px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 10px;
 }
