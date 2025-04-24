@@ -106,15 +106,3 @@ h1 {
 .modal-content button:hover {
   background-color: var(--primary-color);
 }
-
-@media (max-width: 768px) {
-  .modulos-container {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .modulo {
-    width: 90%;
-    max-width: 320px;
-  }
-}
