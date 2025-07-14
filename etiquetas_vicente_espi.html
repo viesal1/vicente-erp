@@ -1,23 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
-<style>
-@media (max-width: 768px) {
-  .modulos-container,
-  .selector {
-    flex-direction: column !important;
-    align-items: center !important;
-  }
-
-  .modulo,
-  .card {
-    width: 90% !important;
-    max-width: 320px !important;
-  }
-}
-</style>
-
   <meta charset="UTF-8">
   <title>Etiquetas Vicente Espi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -46,26 +29,71 @@
     }
     .card:hover { transform: scale(1.05); }
     .formulario {
-      max-width: 400px;
-      margin: 20px auto;
-      padding: 0;
-      background: #f8f8f8;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    .formulario input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 18px;
-    }
-    .formulario button {
-      padding: 10px 20px;
-      font-size: 18px;
-      margin-right: 10px;
-    }
+  max-width: 500px;
+  margin: 30px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.formulario h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #1e2a44;
+}
+
+.formulario input {
+  font-size: 16px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  transition: border 0.2s ease;
+}
+
+.formulario input:focus {
+  border-color: #00a9e0;
+  outline: none;
+}
+
+.formulario button {
+  font-size: 16px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.formulario button:first-of-type {
+  background-color: #f0f0f0;
+  color: #1e2a44;
+}
+
+.formulario button:last-of-type {
+  background-color: #00a9e0;
+  color: white;
+}
+
+.formulario button:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 600px) {
+  .formulario {
+    margin: 20px;
+    padding: 15px;
+  }
+
+  .formulario button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
     .preview-area {
       margin: 30px auto;
       width: 105mm;
@@ -89,10 +117,7 @@
       display: flex;
       gap: 12px;
       font-family: Arial, sans-serif;
-    
-  page-break-after: avoid;
-  page-break-inside: avoid;
-}
+    }
     .etiqueta img {
       height: 33mm !important;
       width: auto !important;
@@ -127,7 +152,7 @@
     grid-template-columns: repeat(2, 105mm);
     grid-template-rows: repeat(7, 42.4mm);
     width: 210mm;
-    
+    height: 297mm;
     margin: 0;
     padding: 0;
   }
@@ -145,7 +170,7 @@
         grid-template-columns: repeat(2, 105mm);
         grid-template-rows: repeat(7, 42.4mm);
         width: 210mm;
-        
+        height: 297mm;
         margin: 0;
         padding: 0;
       }
@@ -153,10 +178,7 @@
         justify-content: center;
         align-items: center;
         page-break-inside: avoid;
-      
-  page-break-after: avoid;
-  page-break-inside: avoid;
-}
+      }
     }
     #modalPrint {
       display: none;
@@ -185,9 +207,7 @@
       padding: 8px 16px;
       margin-right: 10px;
     }
-  </style>
-
-<style>
+  
 @media (max-width: 768px) {
   .modulos-container,
   .selector {
@@ -201,8 +221,8 @@
     max-width: 320px !important;
   }
 }
-</style>
 
+</style>
 </head>
 <body>
   <div id="bloque-selector" class="selector no-print">
