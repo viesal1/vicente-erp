@@ -5,130 +5,124 @@
   <title>Pedidos Vicente Espi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/estilos_odoo.css">
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <style>
-    .pedido-card {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    .pedido-card h3 {
-      margin: 0 0 10px 0;
-    }
-    .acciones {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .acciones button {
-      padding: 8px 16px;
-      border: none;
-      background: #00a9e0;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    iframe {
-      width: 100%;
-      height: 500px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-top: 10px;
-    }
-    #uploadSection {
-      margin: 20px 0;
-      padding: 20px;
-      background: #f0f8ff;
-      border: 1px dashed #00a9e0;
-      border-radius: 8px;
-      display: none;
-    }
-    #previewEtiquetas {
-      margin-top: 20px;
-      padding: 10px;
-      background: #fff;
-      border: 1px solid #ccc;
-    }
-  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>📄 Pedidos Vicente Espi</h1>
-
-    <div id="uploadSection" class="no-print">
-      <h3>Subir nuevo pedido (.xlsx)</h3>
-      <input type="file" id="fileInput" accept=".xlsx">
-      <button onclick="procesarExcel()">📤 Procesar Pedido</button>
-    </div>
-
-    <div id="previewEtiquetas"></div>
-
+<div class="container">
+  <h1>📄 Pedidos Vicente Espi</h1>
+  <div class="no-print">
+    <input type="file" id="fileInput" accept=".xlsx">
+    <button onclick="cargarPedido()">📤 Subir Pedido</button>
   </div>
+  <hr>
+  <div id="listaPedidos"></div>
+</div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
-      authDomain: "etiquetadora-vespi.firebaseapp.com",
-      projectId: "etiquetadora-vespi",
-      storageBucket: "etiquetadora-vespi.appspot.com",
-      messagingSenderId: "714344837885",
-      appId: "1:714344837885:web:d80abbd7a0898e1d1ec494"
-    };
-    firebase.initializeApp(firebaseConfig);
+<script>
+const STORAGE_KEY = "pedidos_vicente";
 
-    firebase.auth().onAuthStateChanged(user => {
-      if (user && user.email === "admin@erp.com") {
-        document.getElementById("uploadSection").style.display = "block";
-      }
-    });
+function cargarPedidosDesdeStorage() {
+  const data = localStorage.getItem(STORAGE_KEY);
+  return data ? JSON.parse(data) : [];
+}
 
-    function procesarExcel() {
-      const fileInput = document.getElementById("fileInput");
-      if (!fileInput.files[0]) return alert("Selecciona un archivo .xlsx primero");
+function guardarPedidosEnStorage(pedidos) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(pedidos));
+}
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+function extraerNumeroYNombre(nombreArchivo) {
+  const match = nombreArchivo.match(/(\d+)_([^\.]+)\.xlsx$/);
+  if (!match) return null;
+  return { numero: match[1], nombre: match[2] };
+}
 
-        const modelo = "23-F1";
-        const mezcla = "388 Mi";
-        const grosor = "2.0";
-        const color = "Blanco";
-        const maquina = "M-1";
-        const lote = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-        const encerado = "Primavera";
-        const bultos = 4;
-        const totalEtiquetas = bultos * 2;
+function cargarPedido() {
+  const file = document.getElementById("fileInput").files[0];
+  if (!file) return alert("Selecciona un archivo .xlsx primero");
 
-        let etiquetas = "";
-        for (let i = 0; i < totalEtiquetas; i++) {
-          etiquetas += `
-          <div class="etiqueta" style="width:105mm;height:42.4mm;padding:5mm;display:flex;align-items:center;gap:10px;">
-            <img src="logo-vespi-vertical-large.jpg" style="height:33mm;display:block;">
-            <div style="flex:1;padding-left:10mm;">
-              <div style="font-size:36px;font-weight:bold;padding-top:4mm;">${modelo}</div>
-              <div style="font-size:18px;line-height:1.4;">
-                Lote ${lote} / ${mezcla} / ${grosor} /<br>
-                ${color} / ${maquina}.<br>
-                Encerado para : ${encerado}
-              </div>
-            </div>
-          </div>`;
-        }
+  const info = extraerNumeroYNombre(file.name);
+  if (!info) return alert("Nombre de archivo no válido. Usa el formato: 001_nombre.xlsx");
 
-        document.getElementById("previewEtiquetas").innerHTML = etiquetas;
-      };
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const contenidoBase64 = btoa(String.fromCharCode(...new Uint8Array(e.target.result)));
+    const pedidos = cargarPedidosDesdeStorage();
 
-      reader.readAsArrayBuffer(fileInput.files[0]);
-    }
-  </script>
+    const yaExiste = pedidos.some(p => p.numero === info.numero);
+    if (yaExiste) return alert("Ese número de pedido ya está cargado.");
+
+    pedidos.push({ numero: info.numero, nombre: info.nombre, archivo: contenidoBase64 });
+    pedidos.sort((a, b) => parseInt(a.numero) - parseInt(b.numero));
+    guardarPedidosEnStorage(pedidos);
+    renderListaPedidos();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function renderListaPedidos() {
+  const pedidos = cargarPedidosDesdeStorage();
+  const contenedor = document.getElementById("listaPedidos");
+
+  if (pedidos.length === 0) {
+    contenedor.innerHTML = "<p>No hay pedidos almacenados.</p>";
+    return;
+  }
+
+  contenedor.innerHTML = '<table><thead><tr><th>N° Pedido</th><th>Nombre</th><th>Acciones</th></tr></thead><tbody>' +
+    pedidos.map((p, i) => `
+      <tr>
+        <td>${p.numero}</td>
+        <td>${p.nombre}</td>
+        <td>
+          <button onclick="verPedido(${i})">🔍 Ver</button>
+          <button onclick="verEtiquetas(${i})">🏷️ Etiquetas</button>
+        </td>
+      </tr>`).join('') +
+    '</tbody></table>';
+}
+
+function verPedido(index) {
+  const pedidos = cargarPedidosDesdeStorage();
+  const pedido = pedidos[index];
+  const bin = atob(pedido.archivo);
+  const array = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) array[i] = bin.charCodeAt(i);
+
+  const workbook = XLSX.read(array, { type: "array" });
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+  const win = window.open("", "_blank");
+  win.document.write(`
+    <html><head><title>Pedido ${pedido.numero}</title>
+    <style>
+      body { font-family: Arial; padding: 20px; }
+      h1, h2 { text-align: center; }
+      table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+      th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+      th { background-color: #f0f0f0; }
+      .cabecera { text-align: left; margin-top: 20px; font-size: 14px; }
+    </style></head><body>
+    <h1>VICENTE ESPI, S.L.</h1>
+    <h2>Pedido P_${pedido.numero} - ${pedido.nombre}</h2>
+    <div class="cabecera">
+      <p>Avda. del Textil, 6-8 Ap.Corr: 37 - 46860 ALBAIDA</p>
+      <p>Tel/Fax: 962901013 &nbsp;&nbsp; | &nbsp;&nbsp; info@vicenteespi.es</p>
+      <p>Web: www.vicenteespi.es &nbsp;&nbsp; | &nbsp;&nbsp; CIF: B46421475</p>
+      <p>Fecha: ${new Date().toLocaleDateString()}</p>
+    </div>
+    <table><tbody>
+      ${rows.map(row => `<tr>${row.map(cell => `<td>${cell ?? ""}</td>`).join('')}</tr>`).join('')}
+    </tbody></table>
+    </body></html>`);
+  win.document.close();
+}
+
+function verEtiquetas(index) {
+  alert("Funcionalidad de etiquetas en desarrollo...");
+}
+
+renderListaPedidos();
+</script>
 </body>
 </html>
