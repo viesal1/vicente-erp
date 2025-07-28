@@ -2,127 +2,196 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Pedidos Vicente Espi</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/estilos_odoo.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <title>Generador de Etiquetas desde PDF</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <style>
+    @page { size: A4; margin: 0; }
+    html, body {
+      width: 210mm;
+      height: 297mm;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: white;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .formulario {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 100%;
+      margin: 30px auto 10px auto;
+    }
+    .formulario input, .formulario button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .formulario button {
+      background-color: #00a9e0;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+    .etiqueta-sheet {
+      display: grid;
+      grid-template-columns: repeat(2, 105mm);
+      grid-template-rows: repeat(7, 42.4mm);
+      width: 210mm;
+      height: 297mm;
+      margin: 0 auto;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .etiqueta {
+      width: 105mm;
+      height: 42.4mm;
+      display: flex;
+      align-items: center;
+      padding: 5mm;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    .etiqueta img {
+      height: 33mm;
+      width: auto;
+      display: block;
+      margin: 0;
+      padding: 0;
+      max-width: none;
+    }
+    .contenido {
+      flex: 1;
+      padding-left: 10mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      line-height: 1;
+    }
+    .contenido .titulo {
+      font-size: 34px;
+      font-weight: bold;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      line-height: 1;
+    }
+    .contenido .descripcion {
+      font-size: 18px;
+      line-height: 1.1;
+      white-space: pre-line;
+      text-align: left;
+      margin: 0;
+      padding: 0;
+    }
+    @media print {
+      body * { visibility: hidden; }
+      .etiqueta-sheet, .etiqueta-sheet * {
+        visibility: visible;
+      }
+      .formulario { display: none !important; }
+      .etiqueta-sheet {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-  <h1>📄 Pedidos Vicente Espi</h1>
-  <div class="no-print">
-    <input type="file" id="fileInput" accept=".xlsx">
-    <button onclick="cargarPedido()">📤 Subir Pedido</button>
+  <div class="formulario">
+    <h2>Generador de Etiquetas desde PDF</h2>
+    <input type="file" id="pdfInput" accept="application/pdf">
+    <input type="text" id="maquina" placeholder="Máquina">
+    <input type="text" id="encerado" placeholder="Encerado para">
+    <button onclick="procesarPDF()">Generar Etiquetas</button>
+    <button onclick="window.print()">🖨️ Imprimir</button>
   </div>
-  <hr>
-  <div id="listaPedidos"></div>
-</div>
 
-<script>
-const STORAGE_KEY = "pedidos_vicente";
+  <div id="output" class="etiqueta-sheet"></div>
 
-function cargarPedidosDesdeStorage() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [];
-}
+  <script>
+    async function procesarPDF() {
+      const fileInput = document.getElementById('pdfInput');
+      const maquina = document.getElementById("maquina").value.trim();
+      const encerado = document.getElementById("encerado").value.trim();
+      if (!fileInput.files[0] || !maquina || !encerado) {
+        return alert("Sube un PDF e introduce Máquina y Encerado.");
+      }
 
-function guardarPedidosEnStorage(pedidos) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(pedidos));
-}
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = async function () {
+        const typedarray = new Uint8Array(this.result);
+        const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+        let fullText = "";
 
-function extraerNumeroYNombre(nombreArchivo) {
-  const match = nombreArchivo.match(/(\d+)_([^\.]+)\.xlsx$/);
-  if (!match) return null;
-  return { numero: match[1], nombre: match[2] };
-}
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const strings = content.items.map(item => item.str);
+          fullText += strings.join("\n") + "\n";
+        }
 
-function cargarPedido() {
-  const file = document.getElementById("fileInput").files[0];
-  if (!file) return alert("Selecciona un archivo .xlsx primero");
+        console.log("Texto completo del PDF:", fullText);
 
-  const info = extraerNumeroYNombre(file.name);
-  if (!info) return alert("Nombre de archivo no válido. Usa el formato: 001_nombre.xlsx");
+        const fechaMatch = /Fecha\s+(\d{2})\/(\d{2})\/(\d{4})/.exec(fullText);
+        if (!fechaMatch) return alert("No se encontró la fecha en el PDF.");
+        const lote = fechaMatch[1] + fechaMatch[2] + fechaMatch[3];
+        console.log("Fecha detectada:", lote);
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const contenidoBase64 = btoa(String.fromCharCode(...new Uint8Array(e.target.result)));
-    const pedidos = cargarPedidosDesdeStorage();
+        const regex = /(\d+)\s+\d+(?:[\.,]\d+)?\s*kg\.?\s+([A-Z0-9\-]+)\s+([A-Z]+)\s+(\d+(?:[\.,]\d+)?)\s+([\d\/]+\s*\w*)/gi;
 
-    const yaExiste = pedidos.some(p => p.numero === info.numero);
-    if (yaExiste) return alert("Ese número de pedido ya está cargado.");
+        let match;
+        let etiquetasHTML = "";
+        let encontrados = 0;
 
-    pedidos.push({ numero: info.numero, nombre: info.nombre, archivo: contenidoBase64 });
-    pedidos.sort((a, b) => parseInt(a.numero) - parseInt(b.numero));
-    guardarPedidosEnStorage(pedidos);
-    renderListaPedidos();
-  };
-  reader.readAsArrayBuffer(file);
-}
+        while ((match = regex.exec(fullText)) !== null) {
+          encontrados++;
+          const bultos = parseInt(match[1]);
+          const modelo = match[2];
+          const color = match[3];
+          const grosor = match[4].replace(",", ".");
+          const mezcla = match[5];
+          const cantidad = bultos * 2;
 
-function renderListaPedidos() {
-  const pedidos = cargarPedidosDesdeStorage();
-  const contenedor = document.getElementById("listaPedidos");
+          console.log(`Detectado: ${modelo} - ${color} - ${grosor} - ${mezcla} -> ${cantidad} etiquetas`);
 
-  if (pedidos.length === 0) {
-    contenedor.innerHTML = "<p>No hay pedidos almacenados.</p>";
-    return;
-  }
+          for (let i = 0; i < cantidad; i++) {
+            etiquetasHTML += `
+            <div class="etiqueta">
+              <img src="logo-vespi-vertical-large.jpg" alt="Logo V.Espi">
+              <div class="contenido">
+                <div class="titulo">${modelo}</div>
+                <div class="descripcion">
+Lote ${lote} / ${mezcla} / ${grosor} /
+${color} / ${maquina}.
+Encerado para : ${encerado}
+                </div>
+              </div>
+            </div>`;
+          }
+        }
 
-  contenedor.innerHTML = '<table><thead><tr><th>N° Pedido</th><th>Nombre</th><th>Acciones</th></tr></thead><tbody>' +
-    pedidos.map((p, i) => `
-      <tr>
-        <td>${p.numero}</td>
-        <td>${p.nombre}</td>
-        <td>
-          <button onclick="verPedido(${i})">🔍 Ver</button>
-          <button onclick="verEtiquetas(${i})">🏷️ Etiquetas</button>
-        </td>
-      </tr>`).join('') +
-    '</tbody></table>';
-}
+        if (!etiquetasHTML) {
+          console.warn("No se encontraron artículos válidos.");
+          return alert("No se encontraron líneas válidas.");
+        }
 
-function verPedido(index) {
-  const pedidos = cargarPedidosDesdeStorage();
-  const pedido = pedidos[index];
-  const bin = atob(pedido.archivo);
-  const array = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) array[i] = bin.charCodeAt(i);
-
-  const workbook = XLSX.read(array, { type: "array" });
-  const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-  const win = window.open("", "_blank");
-  win.document.write(`
-    <html><head><title>Pedido ${pedido.numero}</title>
-    <style>
-      body { font-family: Arial; padding: 20px; }
-      h1, h2 { text-align: center; }
-      table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-      th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-      th { background-color: #f0f0f0; }
-      .cabecera { text-align: left; margin-top: 20px; font-size: 14px; }
-    </style></head><body>
-    <h1>VICENTE ESPI, S.L.</h1>
-    <h2>Pedido P_${pedido.numero} - ${pedido.nombre}</h2>
-    <div class="cabecera">
-      <p>Avda. del Textil, 6-8 Ap.Corr: 37 - 46860 ALBAIDA</p>
-      <p>Tel/Fax: 962901013 &nbsp;&nbsp; | &nbsp;&nbsp; info@vicenteespi.es</p>
-      <p>Web: www.vicenteespi.es &nbsp;&nbsp; | &nbsp;&nbsp; CIF: B46421475</p>
-      <p>Fecha: ${new Date().toLocaleDateString()}</p>
-    </div>
-    <table><tbody>
-      ${rows.map(row => `<tr>${row.map(cell => `<td>${cell ?? ""}</td>`).join('')}</tr>`).join('')}
-    </tbody></table>
-    </body></html>`);
-  win.document.close();
-}
-
-function verEtiquetas(index) {
-  alert("Funcionalidad de etiquetas en desarrollo...");
-}
-
-renderListaPedidos();
-</script>
+        console.log("Total etiquetas generadas:", encontrados);
+        document.getElementById("output").innerHTML = etiquetasHTML;
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  </script>
 </body>
 </html>
