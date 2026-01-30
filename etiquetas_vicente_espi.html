@@ -355,6 +355,9 @@ window.imprimirSemana = function(){
    <div class="card" onclick="abrirFormulario('semana')">
     📅 Etiquetas de la Semana
    </div>
+   <div class="card" onclick="abrirFormulario('psf')">
+    📁 PSF
+   </div>
   </div>
   <!-- ROLLOS -->
   <div id="bloque-rollos" style="display:none;">
@@ -438,7 +441,42 @@ window.imprimirSemana = function(){
    <div class="etiqueta-sheet" id="outputSemana" style="display:grid; grid-template-columns:repeat(4,52.5mm); grid-template-rows:repeat(10,29.7mm); width:210mm; height:297mm;">
    </div>
   </div>
-  <!-- Modal Rollos -->
+  
+  <!-- PSF -->
+  <div id="bloque-psf" style="display:none;">
+   <div class="formulario no-print">
+    <h2>
+     PSF
+    </h2>
+    <div class="selector">
+     <div class="card" onclick="imprimirPDF('psf_aduana_pabilos.pdf')">
+      🖨️ Aduana · Pabilos
+     </div>
+     <div class="card" onclick="imprimirPDF('psf_aduana_pabilos_ensamblados.pdf')">
+      🖨️ Aduana · Pabilos ensamblados
+     </div>
+     <div class="card" onclick="imprimirPDF('psf_aduana_pabilos_rayon_algodon_crudo.pdf')">
+      🖨️ Aduana · Pabilos rayón / algodón crudo
+     </div>
+     <div class="card" onclick="imprimirPDF('psf_aduana_pabilos_rayon_cono_sin_encerar.pdf')">
+      🖨️ Aduana · Pabilos rayón cono sin encerar
+     </div>
+     <div class="card" onclick="imprimirPDF('psf_aduana_pabilo_encerado.pdf')">
+      🖨️ Aduana · Pabilo encerado
+     </div>
+     <div class="card" onclick="imprimirPDF('psf_aduana_pabilo_encerado_rayon_algodon.pdf')">
+      🖨️ Aduana · Pabilo encerado rayón / algodón
+     </div>
+    </div>
+    <div class="row">
+     <button class="btn-secondary" onclick="volver()" type="button">
+      Volver
+     </button>
+    </div>
+   </div>
+  </div>
+
+<!-- Modal Rollos -->
   <div class="modal no-print" id="modalPrint">
    <div class="modal-content">
     <h3>
@@ -474,6 +512,7 @@ window.imprimirSemana = function(){
     document.getElementById('bloque-rollos').style.display = (tipo==='rollos') ? 'block':'none';
     document.getElementById('bloque-cono').style.display   = (tipo==='cono')   ? 'block':'none';
     document.getElementById('bloque-semana').style.display = (tipo==='semana') ? 'block':'none';
+    document.getElementById('bloque-psf').style.display    = (tipo==='psf')    ? 'block':'none';
     if (tipo==='semana'){ precargarSemanaActual(); renderSemana(); }
   }
   function volver(){
@@ -481,6 +520,28 @@ window.imprimirSemana = function(){
     document.getElementById('bloque-rollos').style.display='none';
     document.getElementById('bloque-cono').style.display='none';
     document.getElementById('bloque-semana').style.display='none';
+    document.getElementById('bloque-psf').style.display='none';
+  }
+
+
+  /* PSF */
+  function imprimirPDF(archivo){
+    const w = window.open(archivo, "_blank");
+    if(!w){
+      alert("Permite ventanas emergentes para imprimir los PDFs");
+      return;
+    }
+    const timer = setInterval(function(){
+      try{
+        if(w.document && w.document.readyState === "complete"){
+          clearInterval(timer);
+          w.focus();
+          w.print();
+        }
+      }catch(e){
+        // ignore cross-origin / not ready yet
+      }
+    }, 300);
   }
 
   /* ROLLOS */
