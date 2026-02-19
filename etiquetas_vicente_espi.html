@@ -442,40 +442,48 @@ window.imprimirSemana = function(){
    </div>
   </div>
   
+  
   <!-- PSF -->
   <div id="bloque-psf" style="display:none;">
    <div class="formulario no-print">
-    <h2>
-     PSF
-    </h2>
+    <h2>PSF</h2>
+
+    <h3>📂 Crudo</h3>
     <div class="selector">
-     <div class="card" onclick="imprimirPDF('psf_aduana_pabilos.pdf')">
-      🖨️ Aduana · Pabilos
-     </div>
-     <div class="card" onclick="imprimirPDF('psf_aduana_pabilos_ensamblados.pdf')">
-      🖨️ Aduana · Pabilos ensamblados
-     </div>
-     <div class="card" onclick="imprimirPDF('psf_aduana_pabilos_rayon_algodon_crudo.pdf')">
-      🖨️ Aduana · Pabilos rayón / algodón crudo
-     </div>
-     <div class="card" onclick="imprimirPDF('psf_aduana_pabilos_rayon_cono_sin_encerar.pdf')">
-      🖨️ Aduana · Pabilos rayón cono sin encerar
-     </div>
-     <div class="card" onclick="imprimirPDF('psf_aduana_pabilo_encerado.pdf')">
-      🖨️ Aduana · Pabilo encerado
-     </div>
-     <div class="card" onclick="imprimirPDF('psf_aduana_pabilo_encerado_rayon_algodon.pdf')">
-      🖨️ Aduana · Pabilo encerado rayón / algodón
-     </div>
+      <div class="card" onclick="imprimirPDF('psf/Crudo/psf_aduana_pabilos_rayon_algodon_crudo.pdf')">
+        🖨️ 1. Cono Rayón + Algodón Crudo
+      </div>
+      <div class="card" onclick="imprimirPDF('psf/Crudo/psf_aduana_pabilos_rayon_cono_sin_encerar.pdf')">
+        🖨️ 2. Cono Rayón Crudo
+      </div>
     </div>
+
+    <h3>📂 Encerado</h3>
+    <div class="selector">
+      <div class="card" onclick="imprimirPDF('psf/Encerado/psf_aduana_pabilo_encerado.pdf')">
+        🖨️ 3. Pabilo Encerado 100% Rayón
+      </div>
+      <div class="card" onclick="imprimirPDF('psf/Encerado/psf_aduana_pabilo_encerado_rayon_algodon.pdf')">
+        🖨️ 4. Pabilo Encerado Rayón + Algodón
+      </div>
+    </div>
+
+    <h3>📂 Ensamblado</h3>
+    <div class="selector">
+      <div class="card" onclick="imprimirPDF('psf/Ensamblado/psf_aduana_pabilos_ensamblados.pdf')">
+        🖨️ 5. Pabilo Ensamblado
+      </div>
+      <div class="card" onclick="imprimirPDF('psf/Ensamblado/psf_40_caguama.pdf')">
+        🖨️ 6. R-23 13cm · Caguama
+      </div>
+    </div>
+
     <div class="row">
-     <button class="btn-secondary" onclick="volver()" type="button">
-      Volver
-     </button>
+      <button class="btn-secondary" onclick="volver()" type="button">Volver</button>
     </div>
+
    </div>
   </div>
-
 <!-- Modal Rollos -->
   <div class="modal no-print" id="modalPrint">
    <div class="modal-content">
@@ -601,8 +609,37 @@ Encerado para : ${encerado}`;
 
   /* CONO */
   function renderCono(){
-    const texto = (document.getElementById("textoCono").value.trim() || "R-15").toUpperCase();
-    let html=""; for(let i=0;i<24;i++){ html += `<div class="etiqueta" style="font-size: 48px; font-weight:bold; display:flex; justify-content:flex-end; align-items:flex-start; padding:4px 12px; text-align:right;">${texto}</div>`; }
+    const texto = (document.getElementById("textoCono").value.trim() || "R-15")
+                      .toUpperCase()
+                      .slice(0,8);
+
+    // Ajuste automático tamaño (máx 8 caracteres)
+    const len = texto.length;
+    const base = 60;
+    const min  = 24;
+    const size = Math.max(min, base - ((len - 2) * 6));
+
+    let html = "";
+
+    for(let i=0;i<24;i++){
+      html += `
+        <div class="etiqueta" style="display:flex;">
+          <div style="width:50%;"></div>
+          <div style="
+              width:50%;
+              display:flex;
+              justify-content:center;
+              align-items:center;
+              font-size:${size}px;
+              font-weight:bold;
+              text-align:center;
+          ">
+            ${texto}
+          </div>
+        </div>
+      `;
+    }
+
     document.getElementById("outputCono").innerHTML = html;
   }
 
@@ -918,8 +955,37 @@ Encerado para : ${encerado}`;
 
   /* CONO */
   function renderCono(){
-    const texto = (document.getElementById("textoCono").value.trim() || "R-15").toUpperCase();
-    let html=""; for(let i=0;i<24;i++){ html += `<div class="etiqueta" style="font-size: 48px; font-weight:bold; display:flex; justify-content:flex-end; align-items:flex-start; padding:4px 12px; text-align:right;">${texto}</div>`; }
+    const texto = (document.getElementById("textoCono").value.trim() || "R-15")
+                      .toUpperCase()
+                      .slice(0,8);
+
+    // Ajuste automático tamaño (máx 8 caracteres)
+    const len = texto.length;
+    const base = 60;
+    const min  = 24;
+    const size = Math.max(min, base - ((len - 2) * 6));
+
+    let html = "";
+
+    for(let i=0;i<24;i++){
+      html += `
+        <div class="etiqueta" style="display:flex;">
+          <div style="width:50%;"></div>
+          <div style="
+              width:50%;
+              display:flex;
+              justify-content:center;
+              align-items:center;
+              font-size:${size}px;
+              font-weight:bold;
+              text-align:center;
+          ">
+            ${texto}
+          </div>
+        </div>
+      `;
+    }
+
     document.getElementById("outputCono").innerHTML = html;
   }
 
