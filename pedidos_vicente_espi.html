@@ -2,196 +2,544 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Generador de Etiquetas desde PDF</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedidos - V.ESPI</title>
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
+      authDomain: "etiquetadora-vespi.firebaseapp.com",
+      projectId: "etiquetadora-vespi",
+      storageBucket: "etiquetadora-vespi.firebasestorage.app",
+      messagingSenderId: "714344837885",
+      appId: "1:714344837885:web:d80abbd7a0898e1d1ec494"
+    });
+  </script>
   <style>
-    @page { size: A4; margin: 0; }
-    html, body {
-      width: 210mm;
-      height: 297mm;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: white;
+    :root{--azul:#00a9e0;--marino:#1e2a44;--fondo:#f4f7fa;--blanco:#fff;--borde:#dde3ee;--verde:#27ae60;--rojo:#e74c3c;--naranja:#f39c12;--gris:#7f8c8d;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',sans-serif;background:var(--fondo);color:#2c3e50;font-size:15px;}
+
+    /* HEADER */
+    .header{background:var(--marino);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+    .header h1{font-size:1.15em;font-weight:600;}
+    .back-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:14px;}
+    .back-btn:hover{background:rgba(255,255,255,.28);}
+
+    .container{max-width:860px;margin:0 auto;padding:20px 16px 60px;}
+
+    /* VISTAS */
+    .vista{display:none;} .vista.activa{display:block;}
+
+    /* BOTÓN NUEVO */
+    .btn-nuevo{display:flex;align-items:center;gap:8px;background:var(--azul);color:#fff;border:none;padding:14px 22px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;margin-bottom:20px;box-shadow:0 3px 10px rgba(0,169,224,.3);transition:all .2s;}
+    .btn-nuevo:hover{background:#0090c0;transform:translateY(-1px);}
+
+    /* FILTROS */
+    .filtros{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+    .filtros input,.filtros select{padding:10px 14px;border:1px solid var(--borde);border-radius:10px;font-size:14px;background:#fff;flex:1;min-width:140px;}
+    .filtros input:focus,.filtros select:focus{outline:none;border-color:var(--azul);}
+
+    /* CARDS LISTA */
+    .pedidos-lista{display:flex;flex-direction:column;gap:10px;}
+    .pedido-card{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:5px solid var(--azul);cursor:pointer;transition:all .2s;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+    .pedido-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.12);transform:translateY(-1px);}
+    .pedido-card.finalizado{border-left-color:var(--verde);opacity:.85;}
+    .pedido-info{flex:1;}
+    .pedido-num{font-size:1.1em;font-weight:700;color:var(--marino);}
+    .pedido-cliente{color:var(--gris);font-size:.92em;margin-top:2px;}
+    .pedido-fecha{font-size:.82em;color:#aaa;margin-top:4px;}
+    .pedido-badges{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+    .badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;}
+    .badge-pendiente{background:#fff3cd;color:#856404;}
+    .badge-finalizado{background:#d1f5e0;color:#1a7a40;}
+    .badge-lineas{background:var(--fondo);color:var(--gris);}
+    .empty-state{text-align:center;padding:50px 20px;color:var(--gris);}
+    .empty-state .icon{font-size:3em;margin-bottom:12px;}
+
+    /* FORMULARIO */
+    .form-section{background:#fff;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+    .form-section h3{font-size:.82em;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--azul);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--fondo);}
+    .form-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+    .form-group{display:flex;flex-direction:column;flex:1;min-width:140px;}
+    .form-group label{font-size:11px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+    .form-group input,.form-group select{padding:11px 13px;border:1px solid var(--borde);border-radius:10px;font-size:15px;background:#fff;transition:border .2s;}
+    .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--azul);}
+
+    /* SECCIONES ARTÍCULOS */
+    .seccion-articulos{background:#fff;border-radius:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;}
+    .seccion-header{padding:13px 18px;font-weight:700;font-size:.95em;color:#fff;display:flex;justify-content:space-between;align-items:center;}
+    .seccion-sin-encerar .seccion-header{background:#5b6abf;}
+    .seccion-enceradas   .seccion-header{background:#2980b9;}
+    .seccion-ensambladas .seccion-header{background:#8e44ad;}
+    .seccion-arillos     .seccion-header{background:#c0392b;}
+    .seccion-parafinas   .seccion-header{background:#d35400;}
+    .seccion-body{padding:14px 16px;}
+    .btn-add-sec{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;}
+    .btn-add-sec:hover{background:rgba(255,255,255,.35);}
+
+    /* TABLA LÍNEAS */
+    .lineas-tabla{width:100%;border-collapse:collapse;margin-bottom:8px;}
+    .lineas-tabla th{text-align:left;font-size:11px;font-weight:700;color:var(--gris);text-transform:uppercase;letter-spacing:.5px;padding:6px 8px;border-bottom:2px solid var(--fondo);}
+    .lineas-tabla td{padding:5px 4px;vertical-align:middle;}
+    .lineas-tabla input{width:100%;padding:9px 10px;border:1px solid var(--borde);border-radius:8px;font-size:14px;}
+    .lineas-tabla input:focus{outline:none;border-color:var(--azul);}
+    .col-bultos{width:75px;} .col-cantidad{width:95px;} .col-accion{width:38px;text-align:center;}
+    .btn-del{background:none;border:none;color:var(--rojo);font-size:18px;cursor:pointer;padding:4px;border-radius:6px;}
+    .btn-del:hover{background:#fdecea;}
+
+    /* ACCIONES FORM */
+    .form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:2px solid var(--fondo);}
+    .btn{padding:13px 18px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;flex:1;min-width:120px;}
+    .btn:hover{transform:translateY(-1px);}
+    .btn-primary{background:var(--azul);color:#fff;box-shadow:0 3px 10px rgba(0,169,224,.3);}
+    .btn-primary:hover{background:#0090c0;}
+    .btn-success{background:var(--verde);color:#fff;}
+    .btn-success:hover{background:#219a52;}
+    .btn-warning{background:var(--naranja);color:#fff;}
+    .btn-warning:hover{background:#d68910;}
+    .btn-secondary{background:var(--fondo);color:var(--marino);border:1px solid var(--borde);}
+    .btn-secondary:hover{background:#e8ecf1;}
+    .btn-danger{background:var(--rojo);color:#fff;}
+    .btn-danger:hover{background:#c0392b;}
+
+    /* DETALLE */
+    .detalle-header{background:#fff;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+    .det-num{font-size:2em;font-weight:800;color:var(--marino);}
+    .det-cliente{font-size:1.2em;color:var(--azul);margin-top:4px;}
+    .det-meta{display:flex;gap:18px;margin-top:12px;flex-wrap:wrap;}
+    .det-meta span{font-size:13px;color:var(--gris);}
+    .det-meta strong{color:var(--marino);}
+    .tabla-det{width:100%;border-collapse:collapse;font-size:14px;}
+    .tabla-det th{background:var(--fondo);padding:10px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gris);}
+    .tabla-det td{padding:10px 12px;border-bottom:1px solid var(--fondo);}
+    .tabla-det tr:last-child td{border-bottom:none;}
+    .td-num{text-align:center;font-weight:700;color:var(--marino);}
+
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;justify-content:center;align-items:flex-start;padding-top:60px;}
+    .modal-overlay.activo{display:flex;}
+    .modal-box{background:#fff;border-radius:16px;padding:24px;width:90%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:80vh;overflow-y:auto;}
+    .modal-box h3{font-size:1.1em;color:var(--marino);margin-bottom:12px;}
+    .modal-linea{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--fondo);}
+    .modal-linea:last-child{border-bottom:none;}
+    .modal-linea .art{font-weight:700;color:var(--marino);font-size:.95em;}
+    .modal-linea .hint{font-size:12px;color:var(--gris);margin-top:2px;}
+    .modal-linea input[type=number]{width:68px;padding:8px;border:1px solid var(--borde);border-radius:8px;text-align:center;font-size:15px;}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--marino);color:#fff;padding:13px 22px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:999;transition:transform .3s ease;pointer-events:none;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .toast.ok{background:var(--verde);} .toast.err{background:var(--rojo);}
+
+    /* PRINT */
+    #zona-print{display:none;}
+    @media print{
+      body *{visibility:hidden;}
+      #zona-print,#zona-print *{visibility:visible;}
+      #zona-print{position:absolute;top:0;left:0;width:210mm;}
     }
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .formulario {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-      max-width: 600px;
-      width: 100%;
-      margin: 30px auto 10px auto;
-    }
-    .formulario input, .formulario button {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    .formulario button {
-      background-color: #00a9e0;
-      color: white;
-      cursor: pointer;
-      border: none;
-    }
-    .etiqueta-sheet {
-      display: grid;
-      grid-template-columns: repeat(2, 105mm);
-      grid-template-rows: repeat(7, 42.4mm);
-      width: 210mm;
-      height: 297mm;
-      margin: 0 auto;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    .etiqueta {
-      width: 105mm;
-      height: 42.4mm;
-      display: flex;
-      align-items: center;
-      padding: 5mm;
-      box-sizing: border-box;
-      overflow: hidden;
-    }
-    .etiqueta img {
-      height: 33mm;
-      width: auto;
-      display: block;
-      margin: 0;
-      padding: 0;
-      max-width: none;
-    }
-    .contenido {
-      flex: 1;
-      padding-left: 10mm;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      line-height: 1;
-    }
-    .contenido .titulo {
-      font-size: 34px;
-      font-weight: bold;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-      line-height: 1;
-    }
-    .contenido .descripcion {
-      font-size: 18px;
-      line-height: 1.1;
-      white-space: pre-line;
-      text-align: left;
-      margin: 0;
-      padding: 0;
-    }
-    @media print {
-      body * { visibility: hidden; }
-      .etiqueta-sheet, .etiqueta-sheet * {
-        visibility: visible;
-      }
-      .formulario { display: none !important; }
-      .etiqueta-sheet {
-        position: absolute;
-        top: 0;
-        left: 0;
-      }
-    }
+    .et-sheet{display:grid;grid-template-columns:repeat(2,105mm);grid-template-rows:repeat(7,42.4mm);width:210mm;height:297mm;}
+    .et-item{width:105mm;height:42.4mm;display:flex;align-items:center;padding:5mm;box-sizing:border-box;overflow:hidden;}
+    .et-item img{height:33mm;width:auto;}
+    .et-item .ec{flex:1;padding-left:8mm;}
+    .et-item .ec .tit{font-size:34px;font-weight:bold;line-height:1;font-family:Arial,sans-serif;}
+    .et-item .ec .desc{font-size:17px;line-height:1.15;white-space:pre-line;margin-top:4px;font-family:Arial,sans-serif;}
+
+    @media(max-width:600px){.form-row,.form-actions{flex-direction:column;}.det-meta{flex-direction:column;gap:6px;}}
   </style>
 </head>
 <body>
-  <div class="formulario">
-    <h2>Generador de Etiquetas desde PDF</h2>
-    <input type="file" id="pdfInput" accept="application/pdf">
-    <input type="text" id="maquina" placeholder="Máquina">
-    <input type="text" id="encerado" placeholder="Encerado para">
-    <button onclick="procesarPDF()">Generar Etiquetas</button>
-    <button onclick="window.print()">🖨️ Imprimir</button>
+
+<div class="header">
+  <button class="back-btn" onclick="navegarAtras()">← Volver</button>
+  <h1 id="hTitulo">🛒 Pedidos — V.ESPI</h1>
+  <div style="width:80px"></div>
+</div>
+
+<div id="zona-print"></div>
+
+<!-- ===== VISTA LISTA ===== -->
+<div id="vista-lista" class="vista activa">
+  <div class="container">
+    <button class="btn-nuevo" onclick="abrirNuevo()">＋ Nuevo Pedido</button>
+    <div class="filtros">
+      <input type="text" id="buscar" placeholder="🔍 Buscar cliente o número…" oninput="filtrar()">
+      <select id="filtroEst" onchange="filtrar()">
+        <option value="">Todos los estados</option>
+        <option value="pendiente">Pendientes</option>
+        <option value="finalizado">Finalizados</option>
+      </select>
+    </div>
+    <div class="pedidos-lista" id="listaPedidos">
+      <div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div>
+    </div>
   </div>
+</div>
 
-  <div id="output" class="etiqueta-sheet"></div>
+<!-- ===== VISTA FORMULARIO ===== -->
+<div id="vista-form" class="vista">
+  <div class="container">
 
-  <script>
-    async function procesarPDF() {
-      const fileInput = document.getElementById('pdfInput');
-      const maquina = document.getElementById("maquina").value.trim();
-      const encerado = document.getElementById("encerado").value.trim();
-      if (!fileInput.files[0] || !maquina || !encerado) {
-        return alert("Sube un PDF e introduce Máquina y Encerado.");
-      }
+    <div class="form-section">
+      <h3>📋 Datos del Pedido</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Nº Pedido</label><input id="f-num" placeholder="P_048"></div>
+        <div class="form-group"><label>Revisión</label><input id="f-rev" value="01" placeholder="01"></div>
+        <div class="form-group"><label>Fecha</label><input type="date" id="f-fecha"></div>
+        <div class="form-group"><label>Fecha Entrega</label><input type="date" id="f-entrega"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Cliente</label><input id="f-cliente" placeholder="VELAS MARTINEZ MORALES" style="text-transform:uppercase"></div>
+      </div>
+    </div>
 
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-      reader.onload = async function () {
-        const typedarray = new Uint8Array(this.result);
-        const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
-        let fullText = "";
+    <div class="form-section">
+      <h3>🏷️ Datos para Etiquetas</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Máquina</label><input id="f-maquina" placeholder="M-1"></div>
+        <div class="form-group"><label>Encerado para</label><input id="f-encerado" placeholder="Verano"></div>
+      </div>
+    </div>
 
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          const strings = content.items.map(item => item.str);
-          fullText += strings.join("\n") + "\n";
-        }
+    <!-- Secciones dinámicas -->
+    <div class="seccion-articulos seccion-sin-encerar">
+      <div class="seccion-header"><span>📦 BOBINAS SIN ENCERAR</span><button class="btn-add-sec" onclick="addLinea('sin-encerar')">+ Añadir</button></div>
+      <div class="seccion-body"><table class="lineas-tabla"><thead><tr><th class="col-bultos">Bultos</th><th class="col-cantidad">Cantidad</th><th class="col-articulo">Artículo</th><th class="col-accion"></th></tr></thead><tbody id="lb-sin-encerar"></tbody></table></div>
+    </div>
+    <div class="seccion-articulos seccion-enceradas">
+      <div class="seccion-header"><span>🕯️ BOBINAS ENCERADAS</span><button class="btn-add-sec" onclick="addLinea('enceradas')">+ Añadir</button></div>
+      <div class="seccion-body"><table class="lineas-tabla"><thead><tr><th class="col-bultos">Bultos</th><th class="col-cantidad">Cantidad</th><th class="col-articulo">Artículo</th><th class="col-accion"></th></tr></thead><tbody id="lb-enceradas"></tbody></table></div>
+    </div>
+    <div class="seccion-articulos seccion-ensambladas">
+      <div class="seccion-header"><span>🧵 MECHAS ENSAMBLADAS</span><button class="btn-add-sec" onclick="addLinea('ensambladas')">+ Añadir</button></div>
+      <div class="seccion-body"><table class="lineas-tabla"><thead><tr><th class="col-bultos">Bultos</th><th class="col-cantidad">Cantidad</th><th class="col-articulo">Artículo</th><th class="col-accion"></th></tr></thead><tbody id="lb-ensambladas"></tbody></table></div>
+    </div>
+    <div class="seccion-articulos seccion-arillos">
+      <div class="seccion-header"><span>⭕ ARILLOS DE METAL</span><button class="btn-add-sec" onclick="addLinea('arillos')">+ Añadir</button></div>
+      <div class="seccion-body"><table class="lineas-tabla"><thead><tr><th class="col-bultos">Bultos</th><th class="col-cantidad">Cantidad</th><th class="col-articulo">Artículo</th><th class="col-accion"></th></tr></thead><tbody id="lb-arillos"></tbody></table></div>
+    </div>
+    <div class="seccion-articulos seccion-parafinas">
+      <div class="seccion-header"><span>🧪 PARAFINAS</span><button class="btn-add-sec" onclick="addLinea('parafinas')">+ Añadir</button></div>
+      <div class="seccion-body"><table class="lineas-tabla"><thead><tr><th class="col-bultos">Bultos</th><th class="col-cantidad">Cantidad</th><th class="col-articulo">Artículo</th><th class="col-accion"></th></tr></thead><tbody id="lb-parafinas"></tbody></table></div>
+    </div>
 
-        console.log("Texto completo del PDF:", fullText);
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="guardar()">💾 Guardar</button>
+      <button class="btn btn-secondary" onclick="mostrarVista('lista')">✕ Cancelar</button>
+    </div>
+  </div>
+</div>
 
-        const fechaMatch = /Fecha\s+(\d{2})\/(\d{2})\/(\d{4})/.exec(fullText);
-        if (!fechaMatch) return alert("No se encontró la fecha en el PDF.");
-        const lote = fechaMatch[1] + fechaMatch[2] + fechaMatch[3];
-        console.log("Fecha detectada:", lote);
+<!-- ===== VISTA DETALLE ===== -->
+<div id="vista-detalle" class="vista">
+  <div class="container">
+    <div class="detalle-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div class="det-num" id="d-num"></div>
+          <div class="det-cliente" id="d-cliente"></div>
+          <div class="det-meta">
+            <span>📅 Fecha: <strong id="d-fecha"></strong></span>
+            <span>🚚 Entrega: <strong id="d-entrega"></strong></span>
+            <span>📝 Rev: <strong id="d-rev"></strong></span>
+            <span>⚙️ Máquina: <strong id="d-maquina"></strong></span>
+            <span>🕯️ Encerado: <strong id="d-encerado"></strong></span>
+          </div>
+        </div>
+        <div id="d-badge"></div>
+      </div>
+    </div>
+    <div id="d-secciones"></div>
+    <div class="form-actions">
+      <button class="btn btn-warning"   onclick="abrirModalEt()">🏷️ Etiquetas</button>
+      <button class="btn btn-success"   id="btn-fin" onclick="toggleFin()">✅ Finalizar</button>
+      <button class="btn btn-secondary" onclick="editarActual()">✏️ Editar</button>
+      <button class="btn btn-danger"    onclick="eliminar()">🗑️ Eliminar</button>
+    </div>
+  </div>
+</div>
 
-        const regex = /(\d+)\s+\d+(?:[\.,]\d+)?\s*kg\.?\s+([A-Z0-9\-]+)\s+([A-Z]+)\s+(\d+(?:[\.,]\d+)?)\s+([\d\/]+\s*\w*)/gi;
+<!-- ===== MODAL ETIQUETAS ===== -->
+<div class="modal-overlay" id="modalEt">
+  <div class="modal-box">
+    <h3>🏷️ Configurar Etiquetas</h3>
+    <p style="font-size:13px;color:var(--gris);margin-bottom:14px;">Bultos × 2 = etiquetas sugeridas. Ajusta si necesitas.</p>
+    <div id="modal-lineas"></div>
+    <div style="display:flex;gap:10px;margin-top:18px;">
+      <button class="btn btn-warning" style="flex:2" onclick="imprimirEt()">🖨️ Imprimir</button>
+      <button class="btn btn-secondary" style="flex:1" onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
 
-        let match;
-        let etiquetasHTML = "";
-        let encontrados = 0;
+<div class="toast" id="toast"></div>
 
-        while ((match = regex.exec(fullText)) !== null) {
-          encontrados++;
-          const bultos = parseInt(match[1]);
-          const modelo = match[2];
-          const color = match[3];
-          const grosor = match[4].replace(",", ".");
-          const mezcla = match[5];
-          const cantidad = bultos * 2;
+<script>
+const db  = firebase.firestore();
+const col = db.collection('pedidos_vespi');
 
-          console.log(`Detectado: ${modelo} - ${color} - ${grosor} - ${mezcla} -> ${cantidad} etiquetas`);
+const SECS = ['sin-encerar','enceradas','ensambladas','arillos','parafinas'];
+const NOMBRES = {'sin-encerar':'BOBINAS SIN ENCERAR','enceradas':'BOBINAS ENCERADAS','ensambladas':'MECHAS ENSAMBLADAS','arillos':'ARILLOS DE METAL','parafinas':'PARAFINAS'};
 
-          for (let i = 0; i < cantidad; i++) {
-            etiquetasHTML += `
-            <div class="etiqueta">
-              <img src="logo-vespi-vertical-large.jpg" alt="Logo V.Espi">
-              <div class="contenido">
-                <div class="titulo">${modelo}</div>
-                <div class="descripcion">
-Lote ${lote} / ${mezcla} / ${grosor} /
-${color} / ${maquina}.
-Encerado para : ${encerado}
-                </div>
-              </div>
-            </div>`;
-          }
-        }
+let cache=[], actualId=null, actual=null, edicion=false;
 
-        if (!etiquetasHTML) {
-          console.warn("No se encontraron artículos válidos.");
-          return alert("No se encontraron líneas válidas.");
-        }
+// ── NAVEGACIÓN ──
+function mostrarVista(v){
+  document.querySelectorAll('.vista').forEach(x=>x.classList.remove('activa'));
+  document.getElementById('vista-'+v).classList.add('activa');
+  window.scrollTo(0,0);
+  const t={lista:'🛒 Pedidos — V.ESPI',form:edicion?'✏️ Editar Pedido':'➕ Nuevo Pedido',detalle:'📄 Detalle'};
+  document.getElementById('hTitulo').textContent=t[v]||'Pedidos';
+}
+function navegarAtras(){
+  const a=document.querySelector('.vista.activa')?.id;
+  if(a==='vista-lista') location.href='inicio-vicente.html';
+  else mostrarVista('lista');
+}
 
-        console.log("Total etiquetas generadas:", encontrados);
-        document.getElementById("output").innerHTML = etiquetasHTML;
-      };
-      reader.readAsArrayBuffer(file);
+// ── CARGA ──
+function cargar(){
+  col.orderBy('fechaCreacion','desc').onSnapshot(snap=>{
+    cache=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderLista(cache);
+  },()=>{
+    col.get().then(snap=>{
+      cache=snap.docs.map(d=>({id:d.id,...d.data()}));
+      cache.sort((a,b)=>(b.fechaCreacion||'').localeCompare(a.fechaCreacion||''));
+      renderLista(cache);
+    });
+  });
+}
+
+function renderLista(lista){
+  const el=document.getElementById('listaPedidos');
+  const q=document.getElementById('buscar').value.toLowerCase();
+  const st=document.getElementById('filtroEst').value;
+  const f=lista.filter(p=>{
+    const mt=!q||(p.numero||'').toLowerCase().includes(q)||(p.cliente||'').toLowerCase().includes(q);
+    const ms=!st||(p.finalizado?'finalizado':'pendiente')===st;
+    return mt&&ms;
+  });
+  if(!f.length){el.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>No hay pedidos.</p></div>';return;}
+  el.innerHTML=f.map(p=>{
+    const nl=SECS.reduce((a,s)=>a+(p[s]?.length||0),0);
+    const b=p.finalizado?'<span class="badge badge-finalizado">✅ Finalizado</span>':'<span class="badge badge-pendiente">⏳ Pendiente</span>';
+    return `<div class="pedido-card ${p.finalizado?'finalizado':''}" onclick="abrirDetalle('${p.id}')">
+      <div class="pedido-info">
+        <div class="pedido-num">${p.numero||'—'}</div>
+        <div class="pedido-cliente">${p.cliente||'Sin cliente'}</div>
+        <div class="pedido-fecha">📅 ${p.fecha||'—'}${p.fechaEntrega?' &nbsp;🚚 '+p.fechaEntrega:''}</div>
+      </div>
+      <div class="pedido-badges">${b}<span class="badge badge-lineas">${nl} línea${nl!==1?'s':''}</span></div>
+    </div>`;
+  }).join('');
+}
+function filtrar(){renderLista(cache);}
+
+// ── NUEVO ──
+function abrirNuevo(){
+  edicion=false;actualId=null;actual=null;
+  ['f-num','f-rev','f-fecha','f-entrega','f-cliente','f-maquina','f-encerado'].forEach(id=>{
+    document.getElementById(id).value=id==='f-rev'?'01':'';
+  });
+  document.getElementById('f-fecha').value=new Date().toISOString().split('T')[0];
+  SECS.forEach(s=>document.getElementById('lb-'+s).innerHTML='');
+  const nums=cache.map(p=>parseInt((p.numero||'').replace(/\D/g,''))).filter(n=>!isNaN(n));
+  const nxt=nums.length?Math.max(...nums)+1:1;
+  document.getElementById('f-num').value='P_'+String(nxt).padStart(3,'0');
+  mostrarVista('form');
+}
+
+// ── LÍNEAS ──
+function addLinea(sec,b='',c='',a=''){
+  const tb=document.getElementById('lb-'+sec);
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td class="col-bultos"><input type="number" min="0" value="${b}" placeholder="0" class="inp-b"></td>
+    <td class="col-cantidad"><input type="text" value="${c}" placeholder="0 kg." class="inp-c"></td>
+    <td class="col-articulo"><input type="text" value="${a}" placeholder="Artículo…" class="inp-a" style="text-transform:uppercase"></td>
+    <td class="col-accion"><button class="btn-del" onclick="this.closest('tr').remove()">×</button></td>`;
+  tb.appendChild(tr);
+  tr.querySelector('.inp-a').focus();
+}
+function leerLineas(sec){
+  return Array.from(document.querySelectorAll(`#lb-${sec} tr`)).map(tr=>({
+    bultos:tr.querySelector('.inp-b')?.value.trim()||'',
+    cantidad:tr.querySelector('.inp-c')?.value.trim()||'',
+    articulo:tr.querySelector('.inp-a')?.value.trim().toUpperCase()||''
+  })).filter(l=>l.articulo||l.bultos);
+}
+
+// ── GUARDAR ──
+async function guardar(){
+  const num=document.getElementById('f-num').value.trim();
+  const cli=document.getElementById('f-cliente').value.trim().toUpperCase();
+  if(!num||!cli){toast('❌ Número y cliente son obligatorios','err');return;}
+  const d={
+    numero:num,rev:document.getElementById('f-rev').value.trim(),
+    fecha:document.getElementById('f-fecha').value,
+    fechaEntrega:document.getElementById('f-entrega').value,
+    cliente:cli,
+    maquina:document.getElementById('f-maquina').value.trim(),
+    encerado:document.getElementById('f-encerado').value.trim(),
+    fechaCreacion:edicion?(actual.fechaCreacion||new Date().toISOString()):new Date().toISOString(),
+    finalizado:edicion?(actual.finalizado||false):false
+  };
+  SECS.forEach(s=>d[s]=leerLineas(s));
+  try{
+    if(edicion&&actualId){
+      await col.doc(actualId).update(d);
+      actual={...d,id:actualId};
+      toast('✅ Pedido actualizado','ok');
+      renderDetalle(actual);mostrarVista('detalle');
+    }else{
+      const ref=await col.add(d);
+      actualId=ref.id;actual={...d,id:ref.id};
+      toast('✅ Pedido guardado','ok');
+      renderDetalle(actual);mostrarVista('detalle');
     }
-  </script>
+  }catch(e){toast('❌ Error: '+e.message,'err');}
+}
+
+// ── DETALLE ──
+function abrirDetalle(id){
+  const p=cache.find(x=>x.id===id);if(!p)return;
+  actualId=id;actual=p;renderDetalle(p);mostrarVista('detalle');
+}
+function renderDetalle(p){
+  document.getElementById('d-num').textContent=p.numero||'—';
+  document.getElementById('d-cliente').textContent=p.cliente||'—';
+  document.getElementById('d-fecha').textContent=p.fecha||'—';
+  document.getElementById('d-entrega').textContent=p.fechaEntrega||'—';
+  document.getElementById('d-rev').textContent=p.rev||'—';
+  document.getElementById('d-maquina').textContent=p.maquina||'—';
+  document.getElementById('d-encerado').textContent=p.encerado||'—';
+  document.getElementById('d-badge').innerHTML=p.finalizado
+    ?'<span class="badge badge-finalizado" style="font-size:14px;padding:8px 16px">✅ Finalizado</span>'
+    :'<span class="badge badge-pendiente" style="font-size:14px;padding:8px 16px">⏳ Pendiente</span>';
+  const bf=document.getElementById('btn-fin');
+  bf.textContent=p.finalizado?'↩️ Reabrir':'✅ Finalizar';
+  bf.className='btn '+(p.finalizado?'btn-secondary':'btn-success');
+  document.getElementById('d-secciones').innerHTML=SECS.map(s=>{
+    const ls=p[s]||[];if(!ls.length)return'';
+    return`<div class="form-section" style="margin-bottom:12px">
+      <h3>${NOMBRES[s]}</h3>
+      <table class="tabla-det"><thead><tr><th>Bultos</th><th>Cantidad</th><th>Artículo</th></tr></thead>
+      <tbody>${ls.map(l=>`<tr><td class="td-num">${l.bultos||'—'}</td><td class="td-num">${l.cantidad||'—'}</td><td>${l.articulo||'—'}</td></tr>`).join('')}</tbody>
+      </table></div>`;
+  }).join('');
+}
+
+// ── FINALIZAR ──
+async function toggleFin(){
+  if(!actualId)return;
+  const n=!actual.finalizado;
+  try{
+    await col.doc(actualId).update({finalizado:n});
+    actual.finalizado=n;
+    const i=cache.findIndex(x=>x.id===actualId);if(i!==-1)cache[i].finalizado=n;
+    renderDetalle(actual);
+    toast(n?'✅ Marcado como finalizado':'↩️ Pedido reabierto','ok');
+  }catch(e){toast('❌ '+e.message,'err');}
+}
+
+// ── EDITAR ──
+function editarActual(){
+  if(!actual)return;edicion=true;
+  document.getElementById('f-num').value=actual.numero||'';
+  document.getElementById('f-rev').value=actual.rev||'01';
+  document.getElementById('f-fecha').value=actual.fecha||'';
+  document.getElementById('f-entrega').value=actual.fechaEntrega||'';
+  document.getElementById('f-cliente').value=actual.cliente||'';
+  document.getElementById('f-maquina').value=actual.maquina||'';
+  document.getElementById('f-encerado').value=actual.encerado||'';
+  SECS.forEach(s=>{
+    document.getElementById('lb-'+s).innerHTML='';
+    (actual[s]||[]).forEach(l=>addLinea(s,l.bultos,l.cantidad,l.articulo));
+  });
+  mostrarVista('form');
+}
+
+// ── ELIMINAR ──
+async function eliminar(){
+  if(!actualId)return;
+  if(!confirm(`¿Eliminar ${actual?.numero}? No se puede deshacer.`))return;
+  try{await col.doc(actualId).delete();toast('🗑️ Pedido eliminado','ok');mostrarVista('lista');}
+  catch(e){toast('❌ '+e.message,'err');}
+}
+
+// ── MODAL ETIQUETAS ──
+function abrirModalEt(){
+  if(!actual)return;
+  const sEt=['sin-encerar','enceradas','ensambladas'];
+  let lineas=[];
+  sEt.forEach(s=>(actual[s]||[]).forEach(l=>{if(l.articulo&&l.bultos)lineas.push({...l,s});}));
+  if(!lineas.length){toast('⚠️ No hay artículos con bultos','err');return;}
+  const c=document.getElementById('modal-lineas');
+  c.innerHTML=lineas.map((l,i)=>{
+    const sug=parseInt(l.bultos||0)*2;
+    return`<div class="modal-linea">
+      <div><div class="art">${l.articulo}</div><div class="hint">${l.bultos} bultos → ${sug} sugeridas</div></div>
+      <input type="number" min="0" max="56" value="${sug}" id="eq-${i}">
+    </div>`;
+  }).join('');
+  c.dataset.lineas=JSON.stringify(lineas);
+  document.getElementById('modalEt').classList.add('activo');
+}
+function cerrarModal(){document.getElementById('modalEt').classList.remove('activo');}
+
+function imprimirEt(){
+  const c=document.getElementById('modal-lineas');
+  const lineas=JSON.parse(c.dataset.lineas||'[]');
+  const p=actual;
+  // Construir lote desde fecha: ddmmyyyy
+  let lote='';
+  if(p.fecha){const pts=p.fecha.split('-');if(pts.length===3)lote=pts[2]+pts[1]+pts[0];}
+  let todas=[];
+  lineas.forEach((l,i)=>{
+    const qty=parseInt(document.getElementById('eq-'+i)?.value||0);
+    if(qty<=0)return;
+    const pts=l.articulo.trim().split(/\s+/);
+    const modelo=pts[0]||l.articulo;
+    const color=pts[1]||'';
+    const grosor=pts[2]||'';
+    const mezcla=pts.slice(3).join(' ')||'';
+    const desc=`Lote ${lote} / ${mezcla} / ${grosor} /\n${color} / ${p.maquina||''}.\nEncerado para : ${p.encerado||''}`;
+    for(let j=0;j<qty;j++) todas.push({modelo,desc});
+  });
+  if(!todas.length){toast('⚠️ Cantidad = 0','err');return;}
+  // Páginas de 14
+  let html='';
+  for(let i=0;i<todas.length;i+=14){
+    const pg=todas.slice(i,i+14);
+    const celdas=new Array(14).fill('<div class="et-item"></div>');
+    pg.forEach((et,j)=>{
+      celdas[j]=`<div class="et-item">
+        <img src="logo-vespi-vertical-large.jpg" alt="V.ESPI">
+        <div class="ec"><div class="tit">${et.modelo}</div><div class="desc">${et.desc}</div></div>
+      </div>`;
+    });
+    html+=`<div class="et-sheet">${celdas.join('')}</div>`;
+  }
+  document.getElementById('zona-print').innerHTML=html;
+  cerrarModal();
+  setTimeout(()=>window.print(),200);
+}
+
+// ── TOAST ──
+function toast(msg,tipo=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast '+(tipo==='ok'?'ok':tipo==='err'?'err':'');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+// ── INIT ──
+cargar();
+</script>
 </body>
 </html>
