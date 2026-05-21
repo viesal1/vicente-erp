@@ -156,6 +156,120 @@
     .et-item .ec .desc{font-size:17px;line-height:1.15;white-space:pre-line;margin-top:4px;font-family:Arial,sans-serif;}
 
     @media(max-width:600px){.form-row,.form-actions{flex-direction:column;}.det-meta{flex-direction:column;gap:6px;}}
+
+    /* ── CERTIFICADO IMPRIMIBLE ── */
+    .cert-sheet { display:none; }
+    @media print {
+      body > *:not(#zona-print):not(.cert-sheet) { display:none !important; }
+      .cert-sheet {
+        display: block !important;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 11px;
+        color: #000;
+        width: 210mm;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      .cert-page {
+        width: 210mm;
+        min-height: 297mm;
+        padding: 10mm 12mm;
+        box-sizing: border-box;
+        page-break-after: always;
+        position: relative;
+      }
+      .cert-page:last-child { page-break-after: auto; }
+      /* Banda lateral izquierda */
+      .cert-sidebar {
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 8mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .cert-sidebar span {
+        font-size: 7px;
+        white-space: nowrap;
+        transform: rotate(-90deg);
+        color: #333;
+        letter-spacing: 0.3px;
+      }
+      .cert-main { margin-left: 10mm; }
+      .cert-logo { margin-bottom: 4mm; }
+      .cert-logo img { height: 16mm; width: auto; }
+      .cert-logo .slogan { font-size: 10px; font-weight: bold; color: #2c5fa3; margin-top: 1mm; }
+      .cert-direccion { font-size: 9px; line-height: 1.6; margin-bottom: 6mm; color: #222; }
+      .cert-num-row {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 4mm;
+      }
+      .cert-num-box {
+        border: 1px solid #aaa;
+        display: flex;
+        width: 140mm;
+      }
+      .cert-num-box .label { padding: 3px 8px; font-size: 10px; flex: 1; }
+      .cert-num-box .value { padding: 3px 8px; font-size: 10px; border-left: 1px solid #aaa; min-width: 50mm; }
+      .cert-titulo {
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: underline;
+        margin-bottom: 6mm;
+      }
+      .cert-tabla {
+        width: 140mm;
+        margin: 0 auto 6mm auto;
+        border-collapse: collapse;
+      }
+      .cert-tabla tr td {
+        border: 1px solid #aaa;
+        padding: 5px 10px;
+        font-size: 11px;
+      }
+      .cert-tabla tr td:first-child { width: 55mm; }
+      .cert-tabla tr td:last-child { font-size: 11px; }
+      .cert-controles-titulo {
+        width: 140mm;
+        margin: 0 auto 3mm auto;
+        border: 1px solid #aaa;
+        text-align: center;
+        padding: 4px;
+        font-size: 11px;
+        text-decoration: underline;
+        font-weight: normal;
+      }
+      .cert-controles {
+        width: 140mm;
+        margin: 0 auto 8mm auto;
+        border-collapse: collapse;
+      }
+      .cert-controles tr td {
+        border: 1px solid #aaa;
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+      .cert-controles tr td:first-child { width: 55mm; }
+      .cert-fecha-firma {
+        text-align: center;
+        font-size: 11px;
+        margin-top: 8mm;
+      }
+      .cert-footer {
+        position: absolute;
+        bottom: 4mm;
+        left: 10mm;
+        right: 0;
+        font-size: 7.5px;
+        color: #333;
+        border-top: 1px solid #ccc;
+        padding-top: 2mm;
+      }
+      @page { margin: 0; size: A4; }
+    }
   </style>
 </head>
 <body>
@@ -167,6 +281,7 @@
 </div>
 
 <div id="zona-print"></div>
+<div class="cert-sheet" id="cert-sheet"></div>
 
 <!-- ===== VISTA LISTA ===== -->
 <div id="vista-lista" class="vista activa">
@@ -430,6 +545,7 @@ function renderDetalle(p){
   const bf=document.getElementById('btn-fin');
   bf.textContent=p.finalizado?'↩️ Reabrir':'✅ Finalizar';
   bf.className='btn '+(p.finalizado?'btn-secondary':'btn-success');
+  mostrarBtnCert(p);
   document.getElementById('d-secciones').innerHTML=SECS.map(s=>{
     const ls=p[s]||[];if(!ls.length)return'';
     return`<div class="form-section" style="margin-bottom:12px">
@@ -533,9 +649,399 @@ function imprimirEt(){
     });
     html+=`<div class="et-sheet">${celdas.join('')}</div>`;
   }
-  document.getElementById('zona-print').innerHTML=html;
   cerrarModal();
-  setTimeout(()=>window.print(),200);
+
+  // Abrir en nueva pestaña (funciona en iOS y Android)
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Etiquetas ${p.numero||''} - ${p.cliente||''}</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#fff; font-family:Arial,sans-serif; }
+  @page { size:A4; margin:0; }
+  @media print {
+    body { width:210mm; }
+    .no-print { display:none !important; }
+    .et-sheet { page-break-after: always; }
+    .et-sheet:last-child { page-break-after: auto; }
+  }
+  .no-print {
+    background:#1e2a44; color:#fff; padding:14px 20px;
+    display:flex; justify-content:space-between; align-items:center;
+    position:sticky; top:0; z-index:100;
+    font-size:15px; font-weight:600;
+  }
+  .no-print button {
+    background:#00a9e0; color:#fff; border:none;
+    padding:10px 20px; border-radius:8px; font-size:15px;
+    font-weight:600; cursor:pointer;
+  }
+  .et-sheet {
+    display:grid;
+    grid-template-columns:repeat(2,105mm);
+    grid-template-rows:repeat(7,42.4mm);
+    width:210mm; height:297mm;
+  }
+  .et-item {
+    width:105mm; height:42.4mm;
+    display:flex; align-items:center;
+    padding:5mm; box-sizing:border-box; overflow:hidden;
+  }
+  .et-item img { height:33mm; width:auto; }
+  .et-item .ec { flex:1; padding-left:8mm; }
+  .et-item .ec .tit { font-size:34px; font-weight:bold; line-height:1; }
+  .et-item .ec .desc { font-size:17px; line-height:1.15; white-space:pre-line; margin-top:4px; }
+</style>
+</head><body>
+<div class="no-print">
+  <span>🏷️ Etiquetas — ${p.numero||''} ${p.cliente||''}</span>
+  <button onclick="window.print()">🖨️ Imprimir</button>
+</div>
+${html}
+<script>
+  // En móvil intentar imprimir automáticamente
+  window.onload = function() {
+    if (!/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      setTimeout(() => window.print(), 400);
+    }
+  };
+<\/script>
+</body></html>`);
+  win.document.close();
+}
+
+// ── IMPRIMIR PEDIDO ──
+function imprimirPedido() {
+  if (!actual) return;
+  const p = actual;
+  const SECS_P = ['sin-encerar','enceradas','ensambladas','arillos','parafinas'];
+  const NOM_P  = {
+    'sin-encerar':'BOBINAS SIN ENCERAR',
+    'enceradas'  :'BOBINAS ENCERADAS',
+    'ensambladas':'MECHAS ENSAMBLADAS',
+    'arillos'    :'ARILLOS DE METAL',
+    'parafinas'  :'PARAFINAS'
+  };
+  const COLORS = {
+    'sin-encerar':'#5b6abf','enceradas':'#2980b9',
+    'ensambladas':'#8e44ad','arillos':'#c0392b','parafinas':'#d35400'
+  };
+
+  const seccionesHTML = SECS_P.map(s => {
+    const ls = p[s] || [];
+    const filas = ls.length
+      ? ls.map(l => `<tr>
+          <td style="text-align:center;font-weight:700;font-size:13px;padding:5px 8px;border:1px solid #ccc">${l.bultos||''}</td>
+          <td style="text-align:center;font-size:13px;padding:5px 8px;border:1px solid #ccc">${l.cantidad||''}</td>
+          <td style="font-size:13px;padding:5px 8px;border:1px solid #ccc">${l.articulo||''}</td>
+        </tr>`).join('')
+      : `<tr>
+          <td style="padding:10px;border:1px solid #ccc">&nbsp;</td>
+          <td style="padding:10px;border:1px solid #ccc">&nbsp;</td>
+          <td style="padding:10px;border:1px solid #ccc">&nbsp;</td>
+        </tr>
+        <tr>
+          <td style="padding:10px;border:1px solid #ccc">&nbsp;</td>
+          <td style="padding:10px;border:1px solid #ccc">&nbsp;</td>
+          <td style="padding:10px;border:1px solid #ccc">&nbsp;</td>
+        </tr>`;
+    return `
+      <div style="margin-bottom:6mm">
+        <div style="background:${COLORS[s]};color:#fff;font-weight:700;font-size:12px;text-align:center;padding:5px;letter-spacing:1px">
+          ${NOM_P[s]}
+        </div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr>
+              <th style="width:60px;text-align:left;font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#f5f5f5">Bultos</th>
+              <th style="width:80px;text-align:left;font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#f5f5f5">Cantidad</th>
+              <th style="text-align:left;font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#f5f5f5">Artículo</th>
+            </tr>
+          </thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>`;
+  }).join('');
+
+  // Página 2: campos de control
+  const pag2 = `
+    <div style="page-break-before:always;padding:8mm;font-family:Arial,sans-serif;font-size:11px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5mm;margin-bottom:5mm">
+        <div style="border:1px solid #000;padding:4mm;min-height:20mm">
+          <div style="font-size:9px;font-weight:bold;margin-bottom:2mm">BOBINAS UTILIZADAS</div>
+        </div>
+        <div style="border:1px solid #000;padding:4mm;min-height:20mm">
+          <div style="font-size:9px;font-weight:bold;margin-bottom:2mm">PARAFINAS UTILIZADAS</div>
+        </div>
+        <div style="border:1px solid #000;padding:4mm;min-height:20mm">
+          <div style="font-size:9px;font-weight:bold;margin-bottom:2mm">PARAFINA LOTE</div>
+        </div>
+        <div style="border:1px solid #000;padding:4mm;min-height:20mm">
+          <div style="font-size:9px;font-weight:bold;margin-bottom:2mm">ARILLOS UTILIZADOS</div>
+        </div>
+        <div style="border:1px solid #000;padding:4mm;min-height:20mm">
+          <div style="font-size:9px;font-weight:bold;margin-bottom:2mm">ARILLOS LOTE</div>
+        </div>
+        <div style="border:1px solid #000;padding:4mm;min-height:20mm">
+          <div style="font-size:9px;font-weight:bold;margin-bottom:2mm">MECHA SEM. ALMAS</div>
+        </div>
+        <div style="border:1px solid #000;padding:4mm;min-height:20mm">
+          <div style="font-size:9px;font-weight:bold;margin-bottom:2mm">SEM. TRENZADO</div>
+        </div>
+        <div style="border:1px solid #000;padding:4mm;min-height:20mm">
+          <div style="font-size:9px;font-weight:bold;margin-bottom:2mm">SEM. ENCERADO</div>
+        </div>
+      </div>
+    </div>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pedido ${p.numero||''}</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:Arial,sans-serif; font-size:11px; background:#fff; }
+  @page { size:A4; margin:0; }
+  @media print {
+    .no-print { display:none !important; }
+    body { width:210mm; }
+  }
+  .no-print {
+    background:#1e2a44; color:#fff; padding:14px 20px;
+    display:flex; justify-content:space-between; align-items:center;
+    position:sticky; top:0; z-index:100; font-size:15px; font-weight:600;
+  }
+  .no-print button {
+    background:#00a9e0; color:#fff; border:none;
+    padding:10px 20px; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;
+  }
+  .pag1 { padding:8mm; width:210mm; box-sizing:border-box; }
+</style>
+</head><body>
+<div class="no-print">
+  <span>📄 Pedido ${p.numero||''} — ${p.cliente||''}</span>
+  <button onclick="window.print()">🖨️ Imprimir</button>
+</div>
+<div class="pag1">
+  <!-- CABECERA -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5mm">
+    <div style="font-size:10px;line-height:1.6">
+      <div style="font-style:italic;font-weight:bold;font-size:13px">VICENTE ESPI, S.L.</div>
+      Avda. del Textil, 6-8 Ap.Corr: 37<br>
+      46860 ALBAIDA<br>
+      Tel. 962901013 / Fax 962901013<br>
+      e-Mail info@vicenteespi.es<br>
+      Web: http://www.vicenteespi.es<br>
+      C.I.F. B46421475
+    </div>
+    <div style="text-align:center">
+      <img src="logo-vespi.jpg" style="height:18mm;width:auto" alt="V.ESPI">
+      <div style="font-size:10px;font-weight:bold;color:#2c5fa3;margin-top:2px">Wicks for Candles</div>
+    </div>
+    <div>
+      <div style="border:2px solid #000;padding:4px 12px;text-align:center;font-weight:bold;font-size:13px;letter-spacing:2px;margin-bottom:3mm">PEDIDO</div>
+      <div style="border:1px solid #000;display:flex">
+        <div style="padding:3px 6px;font-size:9px;font-weight:bold;border-right:1px solid #000">Número<br>Pedido</div>
+        <div style="padding:3px 10px;font-size:14px;font-weight:bold;display:flex;align-items:center">${p.numero||''}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINALIZADO + CLIENTE -->
+  <div style="display:flex;gap:4mm;margin-bottom:4mm">
+    <div style="border:1px solid #000;padding:4mm;min-width:50mm;min-height:18mm;font-size:10px">
+      Finalizado: ${p.finalizado ? '✓' : ''}
+    </div>
+    <div style="border:1px solid #000;padding:4mm;flex:1;text-align:center">
+      <div style="font-size:9px;font-weight:bold;text-align:left;margin-bottom:2mm">CLIENTE:</div>
+      <div style="font-size:16px;font-weight:bold">${p.cliente||''}</div>
+    </div>
+  </div>
+
+  <!-- REV + FECHAS -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4mm">
+    <div style="font-size:10px">REV.&nbsp;&nbsp;&nbsp;&nbsp;${p.rev||'01'}</div>
+    <div style="border:1px solid #000">
+      <div style="display:flex;border-bottom:1px solid #000">
+        <div style="padding:3px 8px;font-size:10px;font-weight:bold;border-right:1px solid #000;min-width:30mm">Fecha</div>
+        <div style="padding:3px 8px;font-size:10px;min-width:30mm">${p.fecha||''}</div>
+      </div>
+      <div style="display:flex">
+        <div style="padding:3px 8px;font-size:10px;font-weight:bold;border-right:1px solid #000;min-width:30mm">Fecha de entrega</div>
+        <div style="padding:3px 8px;font-size:10px;min-width:30mm">${p.fechaEntrega||''}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIONES -->
+  ${seccionesHTML}
+</div>
+${pag2}
+<script>
+  window.onload = function() {
+    if (!/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      setTimeout(() => window.print(), 400);
+    }
+  };
+<\/script>
+</body></html>`);
+  win.document.close();
+}
+
+// ── CLIENTES QUE NECESITAN CERTIFICADO ──
+const CLIENTES_CERT = ['LUMAR','VELAS MARTINEZ MORALES','VELAS MARTÍNEZ MORALES'];
+
+function clienteNecesitaCert(nombre) {
+  if (!nombre) return false;
+  const n = nombre.toUpperCase().trim();
+  return CLIENTES_CERT.some(c => n.includes(c));
+}
+
+function mostrarBtnCert(p) {
+  const btn = document.getElementById('btn-cert');
+  if (btn) btn.style.display = clienteNecesitaCert(p?.cliente) ? '' : 'none';
+}
+
+// Número de certificado: se guarda en Firestore doc 'config/vespi'
+async function getSiguienteNumCert() {
+  const ref = db.collection('config').doc('vespi');
+  const snap = await ref.get();
+  const anio = new Date().getFullYear();
+  let siguiente = snap.exists && snap.data().numCert ? snap.data().numCert : (anio * 1000 + 1);
+  // Si cambia el año, reiniciar
+  const anioGuardado = Math.floor(siguiente / 1000);
+  if (anioGuardado < anio) siguiente = anio * 1000 + 1;
+  return siguiente;
+}
+
+async function generarCertificados() {
+  if (!actual) return;
+  const p = actual;
+  const lineas = (p['enceradas'] || []).filter(l => l.articulo && l.bultos);
+  if (!lineas.length) { toast('⚠️ No hay líneas en Bobinas Enceradas', 'err'); return; }
+
+  // Obtener número correlativo
+  let numCert = await getSiguienteNumCert();
+
+  // Lote desde fecha del pedido
+  let lote = '';
+  if (p.fecha) {
+    const pts = p.fecha.split('-');
+    if (pts.length === 3) lote = pts[2] + pts[1] + pts[0];
+  }
+
+  // Fecha larga en español
+  const fechaLarga = (() => {
+    if (!p.fecha) return '';
+    const d = new Date(p.fecha + 'T12:00:00');
+    const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    return `Albaida , ${dias[d.getDay()]}, ${d.getDate()} de ${meses[d.getMonth()]} de ${d.getFullYear()}`;
+  })();
+
+  // Banda lateral
+  const sidebarText = `V. ESPI S.L. -- Apartado de correos 37 -- Polig. Laberinto C/ Del Textil, 11 -- 46860- Albaida (Valencia) (España) -- Nº de análisis: ${numCert}`;
+
+  // Footer
+  const footerText = `CIF: B46421475 -- Telf: +34 962 901 013 -- Cell: +34 635 493 415 -- info@vicenteespi.es -- www.vicenteespi.es`;
+
+  let paginasHTML = '';
+
+  for (let i = 0; i < lineas.length; i++) {
+    const l = lineas[i];
+    // Parsear artículo: "R-13 BCO 2.0 389 Mi+"
+    let pts = l.articulo.trim().split(/\s+/);
+    if (pts[0].toLowerCase() === 'kg.' || pts[0].toLowerCase() === 'kg') pts = pts.slice(1);
+    const modelo   = pts[0] || '';
+    const colorRaw = pts[1] || '';
+    const grosor   = pts[2] || '';
+    const mezcla   = pts.slice(3).join(' ') || '';
+
+    // Color traducido (BCO → Blanco, el resto tal cual)
+    const colorMap = { 'BCO': 'Blanco', 'BLANCO': 'Blanco' };
+    const colorTrad = colorMap[colorRaw.toUpperCase()] || colorRaw;
+
+    // Control (Rayon / Algodón)
+    const control = modelo.toUpperCase().startsWith('R') ? 'Rayon' : 'Algodón';
+
+    // Código cliente fijo para Lumar/Velas MM
+    const codCliente = '8';
+    const codProducto = codCliente + modelo;
+    const nombreProducto = 'MECHA ' + modelo;
+
+    // Control parafina: mezcla / máquina
+    const ctrlParafina = mezcla + (p.maquina ? ' / ' + p.maquina : '');
+
+    const certNum = numCert + i;
+
+    paginasHTML += `
+    <div class="cert-page">
+      <div class="cert-sidebar">
+        <span>${sidebarText.replace(/--/g,'--')}</span>
+      </div>
+      <div class="cert-main">
+        <div class="cert-logo">
+          <img src="logo-vespi.jpg" alt="V.ESPI">
+          <div class="slogan">Wicks for Candles</div>
+        </div>
+        <div class="cert-direccion">
+          Vicente ESPI S.L.<br>
+          Apartado de correos 37<br>
+          Polig. Laberinto C/ Del Textil, 11<br>
+          46860- Albaida (Valencia) (España)<br>
+          Teléfono: +34 962 901 013<br>
+          Móvil: +34 635 493 415
+        </div>
+
+        <div class="cert-num-row">
+          <div class="cert-num-box">
+            <div class="label">Nº de análisis:</div>
+            <div class="value">${certNum}</div>
+          </div>
+        </div>
+
+        <div class="cert-titulo">Certificado de análisis</div>
+
+        <table class="cert-tabla">
+          <tr><td>Código de producto</td><td>${codProducto}</td></tr>
+          <tr><td>Nombre de producto</td><td>${nombreProducto}</td></tr>
+          <tr><td>Fecha de fabricación</td><td>${p.fecha || ''}</td></tr>
+          <tr><td>Nº de lote</td><td>${lote}</td></tr>
+          <tr><td>Grosor del encerado</td><td>${grosor} mm</td></tr>
+        </table>
+
+        <div class="cert-controles-titulo">CONTROLES REALIZADOS</div>
+        <table class="cert-controles">
+          <tr><td>Control parafina</td><td>${ctrlParafina}</td></tr>
+          <tr><td>Control</td><td>${control}</td></tr>
+          <tr><td>Control encerado</td><td>${colorTrad}</td></tr>
+        </table>
+
+        <div class="cert-fecha-firma">${fechaLarga}</div>
+      </div>
+      <div class="cert-footer">${footerText}</div>
+    </div>`;
+  }
+
+  document.getElementById('cert-sheet').innerHTML = paginasHTML;
+
+  // Guardar el siguiente número en Firestore
+  try {
+    await db.collection('config').doc('vespi').set(
+      { numCert: numCert + lineas.length },
+      { merge: true }
+    );
+  } catch(e) { console.warn('No se pudo guardar numCert', e); }
+
+  // Ocultar zona-print para que no interfiera
+  document.getElementById('zona-print').innerHTML = '';
+
+  setTimeout(() => window.print(), 200);
 }
 
 // ── TOAST ──
