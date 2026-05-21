@@ -279,8 +279,8 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const db  = firebase.firestore();
-const col = db.collection('pedidos_vespi');
+let db  = null;
+let col = null;
 
 const SECS = ['sin-encerar','enceradas','ensambladas','arillos','parafinas'];
 const NOMBRES = {'sin-encerar':'BOBINAS SIN ENCERAR','enceradas':'BOBINAS ENCERADAS','ensambladas':'MECHAS ENSAMBLADAS','arillos':'ARILLOS DE METAL','parafinas':'PARAFINAS'};
@@ -538,8 +538,17 @@ function toast(msg,tipo=''){
   setTimeout(()=>el.classList.remove('show'),3000);
 }
 
-// ── INIT ──
-cargar();
+// ── INIT: verificar auth antes de nada ──
+firebase.auth().onAuthStateChanged(function(user) {
+  if (!user) {
+    location.href = 'index.html';
+  } else {
+    // Inicializar Firestore con usuario autenticado
+    db  = firebase.firestore();
+    col = db.collection('pedidos_vespi');
+    cargar();
+  }
+});
 </script>
 </body>
 </html>
