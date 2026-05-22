@@ -532,8 +532,17 @@ function cerrarVisor(){
 function imprimirVisor(){
   const contenido = document.getElementById('visorContenido').innerHTML;
   document.getElementById('print-area').innerHTML = contenido;
-  window.print();
-  setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; }, 1000);
+  // Ocultar modal para que no interfiera en móvil
+  const modal = document.getElementById('modalVisor');
+  modal.style.display = 'none';
+  setTimeout(()=>{
+    window.print();
+    // Restaurar modal después de imprimir
+    setTimeout(()=>{
+      modal.style.display = '';
+      document.getElementById('print-area').innerHTML = '';
+    }, 1000);
+  }, 100);
 }
 
 function imprimirEt(){
