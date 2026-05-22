@@ -824,7 +824,7 @@ async function getSiguienteNumCert() {
   const ref = db.collection('config').doc('vespi');
   const snap = await ref.get();
   const anio = new Date().getFullYear();
-  let siguiente = snap.exists && snap.data().numCert ? snap.data().numCert : (anio * 1000 + 1);
+  let siguiente = snap.exists && snap.data().numCert ? snap.data().numCert : 2026034;
   // Si cambia el año, reiniciar
   const anioGuardado = Math.floor(siguiente / 1000);
   if (anioGuardado < anio) siguiente = anio * 1000 + 1;
@@ -857,7 +857,7 @@ async function generarCertificados() {
   })();
 
   // Banda lateral
-  const sidebarText = `V. ESPI S.L. -- Apartado de correos 37 -- Polig. Laberinto C/ Del Textil, 11 -- 46860- Albaida (Valencia) (España) -- Nº de análisis: ${numCert}`;
+  // sidebarText se construye por certificado con certNum
 
   // Footer
   const footerText = `CIF: B46421475 -- Telf: +34 962 901 013 -- Cell: +34 635 493 415 -- info@vicenteespi.es -- www.vicenteespi.es`;
@@ -894,7 +894,7 @@ async function generarCertificados() {
     paginasHTML += `
     <div class="cert-page">
       <div class="cert-sidebar">
-        <span>${sidebarText.replace(/--/g,'--')}</span>
+        <span>V. ESPI S.L. -- Apartado de correos 37 -- Polig. Laberinto C/ Del Textil, 11 -- 46860- Albaida (Valencia) (España) -- Nº de análisis: ${certNum}</span>
       </div>
       <div class="cert-main">
         <div class="cert-logo">
@@ -922,7 +922,7 @@ async function generarCertificados() {
         <table class="cert-tabla">
           <tr><td>Código de producto</td><td>${codProducto}</td></tr>
           <tr><td>Nombre de producto</td><td>${nombreProducto}</td></tr>
-          <tr><td>Fecha de fabricación</td><td>${p.fecha || ''}</td></tr>
+          <tr><td>Fecha de fabricación</td><td>${fechaES(p.fecha)}</td></tr>
           <tr><td>Nº de lote</td><td>${lote}</td></tr>
           <tr><td>Grosor del encerado</td><td>${grosor} mm</td></tr>
         </table>
