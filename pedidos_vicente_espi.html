@@ -913,17 +913,20 @@ async function generarCertificados() {
         <span>V. ESPI S.L. -- Apartado de correos 37 -- Polig. Laberinto C/ Del Textil, 11 -- 46860- Albaida (Valencia) (España) -- Nº de análisis: ${certNum}</span>
       </div>
       <div class="cert-main">
-        <div class="cert-logo">
-          <img src="logo-vespi.jpg" alt="V.ESPI">
-          <div class="slogan">Wicks for Candles</div>
-        </div>
-        <div class="cert-direccion">
-          Vicente ESPI S.L.<br>
-          Apartado de correos 37<br>
-          Polig. Laberinto C/ Del Textil, 11<br>
-          46860- Albaida (Valencia) (España)<br>
-          Teléfono: +34 962 901 013<br>
-          Móvil: +34 635 493 415
+        <!-- Dirección izquierda, logo derecha -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8mm;">
+          <div class="cert-direccion" style="margin-bottom:0;">
+            Vicente ESPI S.L.<br>
+            Apartado de correos 37<br>
+            Polig. Laberinto C/ Del Textil, 11<br>
+            46860- Albaida (Valencia) (España)<br>
+            Teléfono: +34 962 901 013<br>
+            Móvil: +34 635 493 415
+          </div>
+          <div style="text-align:right;">
+            <img src="logo-vespi.jpg" alt="V.ESPI" style="max-height:35mm;max-width:80mm;display:block;margin-left:auto;">
+            <div style="font-size:16px;font-weight:bold;color:#2c5fa3;margin-top:2mm;">Wicks for Candles</div>
+          </div>
         </div>
 
         <div class="cert-num-row">
