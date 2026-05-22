@@ -824,10 +824,12 @@ async function getSiguienteNumCert() {
   const ref = db.collection('config').doc('vespi');
   const snap = await ref.get();
   const anio = new Date().getFullYear();
-  let siguiente = snap.exists && snap.data().numCert ? snap.data().numCert : 2026034;
-  // Si cambia el año, reiniciar
+  // Formato YYYYNNN: 2026034 → año=2026, num=034
+  let siguiente = (snap.exists && snap.data().numCert) ? snap.data().numCert : 2026034;
+  // Si cambia el año, reiniciar desde YYYY001
   const anioGuardado = Math.floor(siguiente / 1000);
   if (anioGuardado < anio) siguiente = anio * 1000 + 1;
+  console.log('numCert Firestore:', snap.exists ? snap.data().numCert : 'no existe', '→ usando:', siguiente);
   return siguiente;
 }
 
@@ -916,16 +918,16 @@ async function generarCertificados() {
         <!-- Dirección izquierda, logo derecha -->
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8mm;">
           <div class="cert-direccion" style="margin-bottom:0;">
-            Vicente ESPI S.L.<br>
-            Apartado de correos 37<br>
-            Polig. Laberinto C/ Del Textil, 11<br>
-            46860- Albaida (Valencia) (España)<br>
-            Teléfono: +34 962 901 013<br>
-            Móvil: +34 635 493 415
+            VICENTE ESPI S.L.<br>
+            APARTADO DE CORREOS 37<br>
+            POLIG. LABERINTO C/ DEL TEXTIL, 11<br>
+            46860- ALBAIDA (VALENCIA) (ESPAÑA)<br>
+            TELÉFONO: +34 962 901 013<br>
+            MÓVIL: +34 635 493 415
           </div>
           <div style="text-align:right;">
             <img src="logo-vespi.jpg" alt="V.ESPI" style="max-height:35mm;max-width:80mm;display:block;margin-left:auto;">
-            <div style="font-size:16px;font-weight:bold;color:#2c5fa3;margin-top:2mm;">Wicks for Candles</div>
+
           </div>
         </div>
 
@@ -1000,22 +1002,30 @@ async function generarCertificados() {
       text-align:center; font-size:20px; font-weight:bold;
       text-decoration:underline; margin-bottom:8mm;
     }
-    /* Tabla datos — centrada */
-    .cert-tabla{ width:160mm; margin:0 auto 8mm auto; border-collapse:collapse; }
-    .cert-tabla td{ border:1px solid #888; padding:7px 14px; font-size:12px; }
-    .cert-tabla td:first-child{ width:60mm; background:#fafafa; }
+    /* Tabla datos — centrada y más grande */
+    .cert-tabla{ width:175mm; margin:0 auto 10mm auto; border-collapse:collapse; }
+    .cert-tabla td{ border:1px solid #888; padding:9px 16px; font-size:13px; }
+    .cert-tabla td:first-child{ width:65mm; background:#fafafa; }
     /* Controles — CON bordes igual que la tabla */
     .cert-ctrl-titulo{
-      font-size:12px; font-weight:normal;
-      text-decoration:underline; margin-bottom:4mm;
-      width:160mm; margin-left:auto; margin-right:auto;
+      font-size:13px; font-weight:normal;
+      text-decoration:underline; margin-bottom:5mm;
+      width:175mm; margin-left:auto; margin-right:auto;
       display:block;
     }
-    .cert-ctrl-tabla{ width:160mm; margin:0 auto 12mm auto; border-collapse:collapse; }
-    .cert-ctrl-tabla td{ border:1px solid #888; padding:7px 14px; font-size:12px; vertical-align:middle; }
-    .cert-ctrl-tabla td:first-child{ width:60mm; background:#fafafa; }
+    .cert-ctrl-tabla{ width:175mm; margin:0 auto 14mm auto; border-collapse:collapse; }
+    .cert-ctrl-tabla td{ border:1px solid #888; padding:9px 16px; font-size:13px; vertical-align:middle; }
+    .cert-ctrl-tabla td:first-child{ width:65mm; background:#fafafa; }
+    /* Nº análisis más grande */
+    .cert-num-box .label{ padding:6px 10px; font-size:12px; flex:1; }
+    .cert-num-box .value{ padding:6px 10px; font-size:12px; border-left:1px solid #888; min-width:70mm; }
+    /* Título más grande */
+    .cert-titulo{
+      text-align:center; font-size:22px; font-weight:bold;
+      text-decoration:underline; margin-bottom:10mm;
+    }
     /* Fecha firma */
-    .cert-fecha-firma{ font-size:12px; margin-top:10mm; width:160mm; margin-left:auto; margin-right:auto; display:block; }
+    .cert-fecha-firma{ font-size:13px; margin-top:12mm; width:175mm; margin-left:auto; margin-right:auto; display:block; }
     /* Footer — más grande y con más margen */
     .cert-footer{
       position:absolute; bottom:10mm; left:25mm; right:15mm;
