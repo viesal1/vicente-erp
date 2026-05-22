@@ -1002,30 +1002,40 @@ async function generarCertificados() {
       text-align:center; font-size:20px; font-weight:bold;
       text-decoration:underline; margin-bottom:8mm;
     }
-    /* Tabla datos — centrada y más grande */
-    .cert-tabla{ width:175mm; margin:0 auto 10mm auto; border-collapse:collapse; }
+    /* Tabla datos — centrada, ancho reducido */
+    .cert-tabla{ width:140mm; margin:0 auto 10mm auto; border-collapse:collapse; }
     .cert-tabla td{ border:1px solid #888; padding:9px 16px; font-size:13px; }
-    .cert-tabla td:first-child{ width:65mm; background:#fafafa; }
-    /* Controles — CON bordes igual que la tabla */
+    .cert-tabla td:first-child{ width:60mm; background:#fafafa; }
+    /* Controles */
     .cert-ctrl-titulo{
       font-size:13px; font-weight:normal;
       text-decoration:underline; margin-bottom:5mm;
-      width:175mm; margin-left:auto; margin-right:auto;
+      width:140mm; margin-left:auto; margin-right:auto;
       display:block;
     }
-    .cert-ctrl-tabla{ width:175mm; margin:0 auto 14mm auto; border-collapse:collapse; }
+    .cert-ctrl-tabla{ width:140mm; margin:0 auto 14mm auto; border-collapse:collapse; }
     .cert-ctrl-tabla td{ border:1px solid #888; padding:9px 16px; font-size:13px; vertical-align:middle; }
-    .cert-ctrl-tabla td:first-child{ width:65mm; background:#fafafa; }
-    /* Nº análisis más grande */
+    .cert-ctrl-tabla td:first-child{ width:60mm; background:#fafafa; }
+    /* Nº análisis — mismo ancho centrado */
+    .cert-num-row{ display:flex; justify-content:center; margin-bottom:6mm; }
+    .cert-num-box{ border:1px solid #888; display:flex; width:140mm; }
     .cert-num-box .label{ padding:6px 10px; font-size:12px; flex:1; }
-    .cert-num-box .value{ padding:6px 10px; font-size:12px; border-left:1px solid #888; min-width:70mm; }
-    /* Título más grande */
+    .cert-num-box .value{ padding:6px 10px; font-size:12px; border-left:1px solid #888; min-width:60mm; }
+    /* Título */
     .cert-titulo{
       text-align:center; font-size:22px; font-weight:bold;
       text-decoration:underline; margin-bottom:10mm;
     }
-    /* Fecha firma */
-    .cert-fecha-firma{ font-size:13px; margin-top:12mm; width:175mm; margin-left:auto; margin-right:auto; display:block; }
+    /* Fecha firma — mismo ancho */
+    .cert-fecha-firma{ font-size:13px; margin-top:12mm; width:140mm; margin-left:auto; margin-right:auto; display:block; }
+    /* Pie de página más grande */
+    .cert-footer{
+      position:absolute; bottom:10mm; left:25mm; right:15mm;
+      font-size:10px; color:#333;
+      border-top:1px solid #999; padding-top:3mm;
+    }
+    /* Banda lateral más grande */
+    .cert-sidebar span{ font-size:9px; }
     /* Footer — más grande y con más margen */
     .cert-footer{
       position:absolute; bottom:10mm; left:25mm; right:15mm;
