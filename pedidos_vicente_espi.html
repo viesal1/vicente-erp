@@ -837,8 +837,24 @@ async function generarCertificados() {
   const lineas = (p['enceradas'] || []).filter(l => l.articulo && l.bultos);
   if (!lineas.length) { toast('⚠️ No hay líneas en Bobinas Enceradas', 'err'); return; }
 
-  // Obtener número correlativo
-  let numCert = await getSiguienteNumCert();
+  // Si el pedido ya tiene numCert guardado, reutilizarlo
+  // Si no, obtener el siguiente y guardarlo en el pedido
+  let numCert;
+  if (p.numCert) {
+    numCert = p.numCert;
+  } else {
+    numCert = await getSiguienteNumCert();
+    // Guardar en el pedido para reutilizar siempre el mismo
+    try {
+      await col.doc(actualId).update({ numCert: numCert });
+      actual.numCert = numCert;
+      // Actualizar el correlativo global
+      await db.collection('config').doc('vespi').set(
+        { numCert: numCert + lineas.length },
+        { merge: true }
+      );
+    } catch(e) { console.warn('No se pudo guardar numCert en pedido', e); }
+  }
 
   // Lote desde fecha del pedido
   let lote = '';
@@ -927,8 +943,8 @@ async function generarCertificados() {
           <tr><td>Grosor del encerado</td><td>${grosor} mm</td></tr>
         </table>
 
-        <div class="cert-controles-titulo">CONTROLES REALIZADOS</div>
-        <table class="cert-controles">
+        <div class="cert-ctrl-titulo">CONTROLES REALIZADOS</div>
+        <table class="cert-ctrl-tabla">
           <tr><td>Control parafina</td><td>${ctrlParafina}</td></tr>
           <tr><td>Control</td><td>${control}</td></tr>
           <tr><td>Control encerado</td><td>${colorTrad}</td></tr>
@@ -943,34 +959,66 @@ async function generarCertificados() {
   // Mostrar en visor interno
   document.getElementById('visorTitulo').textContent = '📋 Certificados — ' + (p.numero||'') + ' ' + (p.cliente||'');
   document.getElementById('visorContenido').innerHTML = `<style>
-    .cert-page{width:210mm;min-height:297mm;padding:10mm 12mm 10mm 20mm;box-sizing:border-box;page-break-after:always;position:relative;font-family:Arial,sans-serif;font-size:11px;color:#000;}
+    /* Una página A4 por certificado */
+    .cert-page{
+      width:210mm; min-height:297mm;
+      padding:15mm 15mm 20mm 20mm;
+      box-sizing:border-box;
+      page-break-after:always;
+      position:relative;
+      font-family:Arial,sans-serif;
+      font-size:11px; color:#000;
+    }
     .cert-page:last-child{page-break-after:auto;}
-    .cert-sidebar{position:absolute;left:0;top:0;bottom:0;width:8mm;display:flex;align-items:center;justify-content:center;}
-    .cert-sidebar span{font-size:7px;white-space:nowrap;transform:rotate(-90deg);color:#333;}
-    .cert-num-row{display:flex;justify-content:center;margin-bottom:4mm;}
-    .cert-num-box{border:1px solid #aaa;display:flex;width:140mm;}
-    .cert-num-box .label{padding:3px 8px;font-size:10px;flex:1;}
-    .cert-num-box .value{padding:3px 8px;font-size:10px;border-left:1px solid #aaa;min-width:50mm;}
-    .cert-titulo{text-align:center;font-size:16px;font-weight:bold;text-decoration:underline;margin-bottom:6mm;}
-    .cert-tabla{width:140mm;margin:0 auto 6mm auto;border-collapse:collapse;}
-    .cert-tabla td{border:1px solid #aaa;padding:5px 10px;font-size:11px;}
-    .cert-tabla td:first-child{width:55mm;}
-    .cert-ctrl-tit{width:140mm;margin:0 auto 3mm auto;border:1px solid #aaa;text-align:center;padding:4px;font-size:11px;text-decoration:underline;}
-    .cert-ctrl{width:140mm;margin:0 auto 8mm auto;border-collapse:collapse;}
-    .cert-ctrl td{border:1px solid #aaa;padding:6px 10px;font-size:12px;}
-    .cert-ctrl td:first-child{width:55mm;}
-    .cert-footer{position:absolute;bottom:4mm;left:12mm;right:0;font-size:7.5px;color:#333;border-top:1px solid #ccc;padding-top:2mm;}
+    /* Banda lateral izquierda */
+    .cert-sidebar{
+      position:absolute; left:0; top:0; bottom:0; width:8mm;
+      display:flex; align-items:center; justify-content:center;
+      border-right:1px solid #ddd;
+    }
+    .cert-sidebar span{
+      font-size:6.5px; white-space:nowrap;
+      transform:rotate(-90deg); color:#555;
+      letter-spacing:0.3px;
+    }
+    /* Logo */
+    .cert-logo img{ max-height:28mm; max-width:70mm; display:block; }
+    .cert-logo .slogan{ font-size:22px; font-weight:bold; color:#2c5fa3; margin-top:2mm; }
+    /* Dirección */
+    .cert-direccion{ font-size:9px; line-height:1.6; margin-bottom:5mm; color:#222; }
+    /* Nº análisis */
+    .cert-num-row{ display:flex; margin-bottom:5mm; }
+    .cert-num-box{ border:1px solid #aaa; display:flex; width:100%; }
+    .cert-num-box .label{ padding:4px 8px; font-size:10px; flex:1; }
+    .cert-num-box .value{ padding:4px 8px; font-size:10px; border-left:1px solid #aaa; min-width:60mm; }
+    /* Título */
+    .cert-titulo{
+      text-align:center; font-size:18px; font-weight:bold;
+      text-decoration:underline; margin-bottom:7mm;
+    }
+    /* Tabla datos */
+    .cert-tabla{ width:100%; margin:0 auto 7mm auto; border-collapse:collapse; }
+    .cert-tabla td{ border:1px solid #aaa; padding:6px 12px; font-size:11px; }
+    .cert-tabla td:first-child{ width:50mm; background:#fafafa; }
+    /* Controles */
+    .cert-ctrl-titulo{
+      font-size:11px; font-weight:normal;
+      text-decoration:underline; margin-bottom:3mm;
+    }
+    .cert-ctrl-tabla{ width:100%; border-collapse:collapse; margin-bottom:10mm; }
+    .cert-ctrl-tabla td{ padding:5px 12px; font-size:11px; vertical-align:top; }
+    .cert-ctrl-tabla td:first-child{ width:40mm; font-weight:normal; }
+    /* Fecha firma */
+    .cert-fecha-firma{ font-size:11px; margin-top:8mm; }
+    /* Footer */
+    .cert-footer{
+      position:absolute; bottom:8mm; left:20mm; right:15mm;
+      font-size:7.5px; color:#444;
+      border-top:1px solid #bbb; padding-top:2mm;
+    }
     @media print{@page{margin:0;size:A4;}}
   </style>` + paginasHTML;
   document.getElementById('modalVisor').classList.add('activo');
-
-  // Guardar el siguiente número en Firestore
-  try {
-    await db.collection('config').doc('vespi').set(
-      { numCert: numCert + lineas.length },
-      { merge: true }
-    );
-  } catch(e) { console.warn('No se pudo guardar numCert', e); }
 
   // El usuario imprime desde el botón del visor
 }
