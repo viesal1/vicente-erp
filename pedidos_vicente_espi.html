@@ -694,25 +694,64 @@ function imprimirPedido() {
 
   // Página 2: campos de control
   const pag2 = `
-    <div style="page-break-before:always;font-family:Arial,sans-serif;font-size:11px;width:210mm;height:297mm;box-sizing:border-box;padding:6mm;">
-      <table style="width:100%;height:100%;border-collapse:collapse;table-layout:fixed">
-        <tr style="height:25%">
-          <td style="border:2px solid #000;padding:5mm;vertical-align:top;width:50%"><strong style="font-size:10px;display:block;margin-bottom:3mm">BOBINAS UTILIZADAS</strong></td>
-          <td style="border:2px solid #000;padding:5mm;vertical-align:top;width:50%"><strong style="font-size:10px;display:block;margin-bottom:3mm">PARAFINAS UTILIZADAS</strong></td>
-        </tr>
-        <tr style="height:25%">
-          <td style="border:2px solid #000;padding:5mm;vertical-align:top"><strong style="font-size:10px;display:block;margin-bottom:3mm">PARAFINA LOTE</strong></td>
-          <td style="border:2px solid #000;padding:5mm;vertical-align:top"><strong style="font-size:10px;display:block;margin-bottom:3mm">ARILLOS UTILIZADOS</strong></td>
-        </tr>
-        <tr style="height:25%">
-          <td style="border:2px solid #000;padding:5mm;vertical-align:top"><strong style="font-size:10px;display:block;margin-bottom:3mm">ARILLOS LOTE</strong></td>
-          <td style="border:2px solid #000;padding:5mm;vertical-align:top"><strong style="font-size:10px;display:block;margin-bottom:3mm">MECHA SEM. ALMAS</strong></td>
-        </tr>
-        <tr style="height:25%">
-          <td style="border:2px solid #000;padding:5mm;vertical-align:top"><strong style="font-size:10px;display:block;margin-bottom:3mm">SEM. TRENZADO</strong></td>
-          <td style="border:2px solid #000;padding:5mm;vertical-align:top"><strong style="font-size:10px;display:block;margin-bottom:3mm">SEM. ENCERADO</strong></td>
-        </tr>
-      </table>
+    <div style="page-break-before:always;font-family:Arial,sans-serif;font-size:11px;width:210mm;box-sizing:border-box;padding:6mm;display:flex;flex-direction:column;gap:4mm;">
+
+      <!-- FILA SUPERIOR: BOBINAS (50%) + espacio + ARILLOS (50%) -->
+      <div style="display:flex;gap:4mm;">
+
+        <!-- BLOQUE BOBINAS UTILIZADAS -->
+        <div style="flex:1;border:2px solid #000;">
+          <div style="background:#f0f0f0;border-bottom:1px solid #000;padding:3mm 4mm;">
+            <strong style="font-size:10px">BOBINAS UTILIZADAS</strong>
+          </div>
+          <div style="display:flex;">
+            <div style="flex:1;border-right:1px solid #000;padding:3mm;">
+              <strong style="font-size:8px;display:block;margin-bottom:2mm">MECHA</strong><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div>
+            </div>
+            <div style="flex:1;border-right:1px solid #000;padding:3mm;">
+              <strong style="font-size:8px;display:block;margin-bottom:2mm">SEM. TRENZADO</strong><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div>
+            </div>
+            <div style="flex:1;border-right:1px solid #000;padding:3mm;">
+              <strong style="font-size:8px;display:block;margin-bottom:2mm">SEM. ALMAS</strong><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div>
+            </div>
+            <div style="flex:1;padding:3mm;">
+              <strong style="font-size:8px;display:block;margin-bottom:2mm">SEM. ENCERADO</strong><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOQUE ARILLOS UTILIZADOS -->
+        <div style="flex:1;border:2px solid #000;">
+          <div style="background:#f0f0f0;border-bottom:1px solid #000;padding:3mm 4mm;">
+            <strong style="font-size:10px">ARILLOS UTILIZADOS</strong>
+          </div>
+          <div style="display:flex;">
+            <div style="flex:1;border-right:1px solid #000;padding:3mm;">
+              <strong style="font-size:8px;display:block;margin-bottom:2mm">ARILLOS</strong><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div>
+            </div>
+            <div style="flex:1;padding:3mm;">
+              <strong style="font-size:8px;display:block;margin-bottom:2mm">LOTE</strong><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BLOQUE INFERIOR: PARAFINAS UTILIZADAS (ancho completo) -->
+      <div style="border:2px solid #000;">
+        <div style="background:#f0f0f0;border-bottom:1px solid #000;padding:3mm 4mm;">
+          <strong style="font-size:10px">PARAFINAS UTILIZADAS</strong>
+        </div>
+        <div style="display:flex;">
+          <div style="flex:1;border-right:1px solid #000;padding:3mm;">
+            <strong style="font-size:8px;display:block;margin-bottom:2mm">PARAFINA</strong><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div>
+          </div>
+          <div style="flex:1;padding:3mm;">
+            <strong style="font-size:8px;display:block;margin-bottom:2mm">LOTE</strong><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div><div style="border-bottom:1px solid #ccc;height:5.5mm;"></div>
+          </div>
+        </div>
+      </div>
+
     </div>`;
 
   const pedHTML = `
