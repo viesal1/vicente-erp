@@ -363,7 +363,7 @@ function renderLista(lista){
       <div class="pedido-info">
         <div class="pedido-num">${p.numero||'—'}</div>
         <div class="pedido-cliente">${p.cliente||'Sin cliente'}</div>
-        <div class="pedido-fecha">📅 ${p.fecha||'—'}${p.fechaEntrega?' &nbsp;🚚 '+p.fechaEntrega:''}</div>
+        <div class="pedido-fecha">📅 ${fechaES(p.fecha)||'—'}${p.fechaEntrega?' &nbsp;🚚 '+fechaES(p.fechaEntrega):''}</div>
       </div>
       <div class="pedido-badges">${b}<span class="badge badge-lineas">${nl} línea${nl!==1?'s':''}</span></div>
     </div>`;
@@ -753,13 +753,13 @@ function imprimirPedido() {
           </div>
           <div style="display:flex">
             <div style="padding:3px 8px;font-size:10px;font-weight:bold;border-right:1px solid #000;min-width:32mm">Fecha de entrega</div>
-            <div style="padding:3px 8px;font-size:10px;min-width:32mm">${p.fechaEntrega||''}</div>
+            <div style="padding:3px 8px;font-size:10px;min-width:32mm">${fechaES(p.fechaEntrega)}</div>
           </div>
         </div>
       </div>
-      ${secsHTML2}
+      ${seccionesHTML}
     </div>
-    ${pag2HTML}`;
+    ${pag2}`;
 
   document.getElementById('visorTitulo').textContent = '📄 Pedido ' + (p.numero||'') + ' — ' + (p.cliente||'');
   document.getElementById('visorContenido').innerHTML = pedHTML;
