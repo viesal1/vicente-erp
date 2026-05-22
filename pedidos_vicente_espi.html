@@ -444,8 +444,8 @@ function abrirDetalle(id){
 function renderDetalle(p){
   document.getElementById('d-num').textContent=p.numero||'—';
   document.getElementById('d-cliente').textContent=p.cliente||'—';
-  document.getElementById('d-fecha').textContent=p.fecha||'—';
-  document.getElementById('d-entrega').textContent=p.fechaEntrega||'—';
+  document.getElementById('d-fecha').textContent=fechaES(p.fecha)||'—';
+  document.getElementById('d-entrega').textContent=fechaES(p.fechaEntrega)||'—';
   document.getElementById('d-rev').textContent=p.rev||'—';
   document.getElementById('d-maquina').textContent=p.maquina||'—';
   document.getElementById('d-encerado').textContent=p.encerado||'—';
@@ -694,23 +694,23 @@ function imprimirPedido() {
 
   // Página 2: campos de control
   const pag2 = `
-    <div style="page-break-before:always;padding:8mm;font-family:Arial,sans-serif;font-size:11px;width:210mm;box-sizing:border-box">
-      <table style="width:100%;border-collapse:collapse;table-layout:fixed">
-        <tr>
-          <td style="border:1px solid #000;padding:4mm;height:40mm;vertical-align:top;width:50%"><strong style="font-size:9px">BOBINAS UTILIZADAS</strong></td>
-          <td style="border:1px solid #000;padding:4mm;height:40mm;vertical-align:top;width:50%"><strong style="font-size:9px">PARAFINAS UTILIZADAS</strong></td>
+    <div style="page-break-before:always;font-family:Arial,sans-serif;font-size:11px;width:210mm;height:297mm;box-sizing:border-box;padding:6mm;">
+      <table style="width:100%;height:100%;border-collapse:collapse;table-layout:fixed">
+        <tr style="height:25%">
+          <td style="border:2px solid #000;padding:5mm;vertical-align:top;width:50%"><strong style="font-size:10px;display:block;margin-bottom:3mm">BOBINAS UTILIZADAS</strong></td>
+          <td style="border:2px solid #000;padding:5mm;vertical-align:top;width:50%"><strong style="font-size:10px;display:block;margin-bottom:3mm">PARAFINAS UTILIZADAS</strong></td>
         </tr>
-        <tr>
-          <td style="border:1px solid #000;padding:4mm;height:40mm;vertical-align:top"><strong style="font-size:9px">PARAFINA LOTE</strong></td>
-          <td style="border:1px solid #000;padding:4mm;height:40mm;vertical-align:top"><strong style="font-size:9px">ARILLOS UTILIZADOS</strong></td>
+        <tr style="height:25%">
+          <td style="border:2px solid #000;padding:5mm;vertical-align:top"><strong style="font-size:10px;display:block;margin-bottom:3mm">PARAFINA LOTE</strong></td>
+          <td style="border:2px solid #000;padding:5mm;vertical-align:top"><strong style="font-size:10px;display:block;margin-bottom:3mm">ARILLOS UTILIZADOS</strong></td>
         </tr>
-        <tr>
-          <td style="border:1px solid #000;padding:4mm;height:40mm;vertical-align:top"><strong style="font-size:9px">ARILLOS LOTE</strong></td>
-          <td style="border:1px solid #000;padding:4mm;height:40mm;vertical-align:top"><strong style="font-size:9px">MECHA SEM. ALMAS</strong></td>
+        <tr style="height:25%">
+          <td style="border:2px solid #000;padding:5mm;vertical-align:top"><strong style="font-size:10px;display:block;margin-bottom:3mm">ARILLOS LOTE</strong></td>
+          <td style="border:2px solid #000;padding:5mm;vertical-align:top"><strong style="font-size:10px;display:block;margin-bottom:3mm">MECHA SEM. ALMAS</strong></td>
         </tr>
-        <tr>
-          <td style="border:1px solid #000;padding:4mm;height:40mm;vertical-align:top"><strong style="font-size:9px">SEM. TRENZADO</strong></td>
-          <td style="border:1px solid #000;padding:4mm;height:40mm;vertical-align:top"><strong style="font-size:9px">SEM. ENCERADO</strong></td>
+        <tr style="height:25%">
+          <td style="border:2px solid #000;padding:5mm;vertical-align:top"><strong style="font-size:10px;display:block;margin-bottom:3mm">SEM. TRENZADO</strong></td>
+          <td style="border:2px solid #000;padding:5mm;vertical-align:top"><strong style="font-size:10px;display:block;margin-bottom:3mm">SEM. ENCERADO</strong></td>
         </tr>
       </table>
     </div>`;
