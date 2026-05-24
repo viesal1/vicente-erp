@@ -554,43 +554,43 @@ window.imprimirSemana = function(){
   
   <!-- PSF -->
   <div id="bloque-psf" style="display:none;">
-   <div class="formulario no-print">
-    <h2>PSF</h2>
+   <div class="no-print" style="max-width:500px;margin:16px auto;padding:0 16px;">
 
-    <h3>📂 Crudo</h3>
-    <div class="selector">
-      <div class="card" onclick="imprimirPDF('psf/Crudo/psf_aduana_pabilos_rayon_algodon_crudo.pdf')">
-        🖨️ 1. Cono Rayón + Algodón Crudo
-      </div>
-      <div class="card" onclick="imprimirPDF('psf/Crudo/psf_aduana_pabilos_rayon_cono_sin_encerar.pdf')">
-        🖨️ 2. Cono Rayón Crudo
-      </div>
-    </div>
+     <div style="font-size:.85em;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#00a9e0;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #f4f7fa;">
+       📁 Carpeta PSF
+     </div>
 
-    <h3>📂 Encerado</h3>
-    <div class="selector">
-      <div class="card" onclick="imprimirPDF('psf/Encerado/psf_aduana_pabilo_encerado.pdf')">
-        🖨️ 3. Pabilo Encerado 100% Rayón
-      </div>
-      <div class="card" onclick="imprimirPDF('psf/Encerado/psf_aduana_pabilo_encerado_rayon_algodon.pdf')">
-        🖨️ 4. Pabilo Encerado Rayón + Algodón
-      </div>
-    </div>
+     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7f8c8d;margin-bottom:10px;">📂 Crudo</div>
+     <div class="modulos-container" style="gap:8px;margin-bottom:16px;">
+       <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Crudo/psf_aduana_pabilos_rayon_algodon_crudo.pdf')">
+         <h3 style="font-size:1em;">🖨️ Cono Rayón + Algodón Crudo</h3>
+       </div>
+       <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Crudo/psf_aduana_pabilos_rayon_cono_sin_encerar.pdf')">
+         <h3 style="font-size:1em;">🖨️ Cono Rayón Crudo</h3>
+       </div>
+     </div>
 
-    <h3>📂 Ensamblado</h3>
-    <div class="selector">
-      <div class="card" onclick="imprimirPDF('psf/Ensamblado/psf_aduana_pabilos_ensamblados.pdf')">
-        🖨️ 5. Pabilo Ensamblado
-      </div>
-      <div class="card" onclick="imprimirPDF('psf/Ensamblado/psf_40_caguama.pdf')">
-        🖨️ 6. R-23 13cm · Caguama
-      </div>
-    </div>
+     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7f8c8d;margin-bottom:10px;">📂 Encerado</div>
+     <div class="modulos-container" style="gap:8px;margin-bottom:16px;">
+       <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Encerado/psf_aduana_pabilo_encerado.pdf')">
+         <h3 style="font-size:1em;">🖨️ Pabilo Encerado 100% Rayón</h3>
+       </div>
+       <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Encerado/psf_aduana_pabilo_encerado_rayon_algodon.pdf')">
+         <h3 style="font-size:1em;">🖨️ Pabilo Encerado Rayón + Algodón</h3>
+       </div>
+     </div>
 
-    <div class="row">
-      <button class="btn-secondary" onclick="volver()" type="button">Volver</button>
-    </div>
+     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7f8c8d;margin-bottom:10px;">📂 Ensamblado</div>
+     <div class="modulos-container" style="gap:8px;margin-bottom:20px;">
+       <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Ensamblado/psf_aduana_pabilos_ensamblados.pdf')">
+         <h3 style="font-size:1em;">🖨️ Pabilo Ensamblado</h3>
+       </div>
+       <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Ensamblado/psf_40_caguama.pdf')">
+         <h3 style="font-size:1em;">🖨️ R-23 13cm · Caguama</h3>
+       </div>
+     </div>
 
+     <button class="btn-secondary" onclick="volver()" type="button" style="width:100%;padding:13px;">← Volver</button>
    </div>
   </div>
 <!-- Modal Rollos -->
