@@ -6,6 +6,7 @@
    Etiquetas V. ESPI
   </title>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link rel="stylesheet" href="css/estilos_odoo.css">
   <!-- === RETOQUES 2025-09-09 === -->
   <!-- === RETOQUES 2025-09-09 (v3) === -->
   <!-- === RETOQUES 2025-09-09 (v4) === -->
@@ -341,23 +342,131 @@ window.imprimirSemana = function(){
   #bloque-semana .etiqueta.etiqueta-semana .logo img{
     height: 80%; width: auto; display:block;
   }
-  </style>
+  
+  /* ── UI FORMULARIOS ── */
+  .no-print.formulario, .formulario.no-print {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  .formulario h2 {
+    font-size: .85em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #00a9e0;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f4f7fa;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .row input {
+    flex: 1;
+    min-width: 120px;
+    padding: 11px 13px;
+    border: 1px solid #dde3ee;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: inherit;
+  }
+  .row input:focus { outline: none; border-color: #00a9e0; }
+  .btn-primary {
+    background: #00a9e0;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-primary:hover { background: #0090c0; }
+  .btn-secondary {
+    background: #f4f7fa;
+    color: #1e2a44;
+    border: 1px solid #dde3ee;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-secondary:hover { background: #e8ecf1; }
+  .preview-area {
+    max-width: 600px;
+    margin: 16px auto;
+    padding: 16px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  }
+  /* PSF lista */
+  .psf-lista {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .psf-item {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #00a9e0;
+  }
+  .psf-item span { font-weight: 600; color: #1e2a44; }
+  .psf-item button {
+    background: #00a9e0;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  @media(max-width:600px){
+    .row { flex-direction: column; }
+  }
+</style>
  </head>
  <body>
+  <!-- HEADER -->
+  <div class="header no-print">
+    <button class="back-btn" onclick="location.href='inicio-vicente.html'">← Volver</button>
+    <h1 style="color:white;font-size:1.1em">🏷️ Etiquetas — V.ESPI</h1>
+    <div style="width:80px"></div>
+  </div>
+
   <!-- Selector -->
-  <div class="selector no-print" id="bloque-selector">
-   <div class="card" onclick="abrirFormulario('rollos')">
-    🏷️ Etiquetas Rollos
-   </div>
-   <div class="card" onclick="abrirFormulario('cono')">
-    🧵 Etiquetas Cono
-   </div>
-   <div class="card" onclick="abrirFormulario('semana')">
-    📅 Etiquetas de la Semana
-   </div>
-   <div class="card" onclick="abrirFormulario('psf')">
-    📁 PSF
-   </div>
+  <div class="no-print" id="bloque-selector" style="max-width:500px;margin:24px auto;padding:0 16px;">
+    <div class="modulos-container">
+      <div class="modulo" onclick="abrirFormulario('rollos')">
+        <h3>🏷️ Etiquetas Rollos</h3>
+        <p>14 etiquetas por hoja A4</p>
+      </div>
+      <div class="modulo" onclick="abrirFormulario('cono')">
+        <h3>🧵 Etiquetas Cono</h3>
+        <p>24 etiquetas por hoja A4</p>
+      </div>
+      <div class="modulo" onclick="abrirFormulario('semana')">
+        <h3>📅 Etiquetas Semana</h3>
+        <p>40 etiquetas por hoja A4</p>
+      </div>
+      <div class="modulo" onclick="abrirFormulario('psf')">
+        <h3>📁 PSF</h3>
+        <p>Carpeta de PDFs</p>
+      </div>
+    </div>
   </div>
   <!-- ROLLOS -->
   <div id="bloque-rollos" style="display:none;">
