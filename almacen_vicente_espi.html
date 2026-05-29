@@ -337,14 +337,32 @@ firebase.auth().onAuthStateChanged(user => {
 });
 
 function init() {
-  document.getElementById('recFecha').value = new Date().toISOString().split('T')[0];
-  document.getElementById('pinoFecha').value = new Date().toISOString().split('T')[0];
+  const hoy = new Date().toISOString().split('T')[0];
+  document.getElementById('recFecha').value = hoy;
+  document.getElementById('pinoFecha').value = hoy;
+  
   const semActual = getSemanaActual();
   document.getElementById('semanaNum').value = semActual;
   document.getElementById('pinoSemana').value = semActual;
+  
+  // Calcular período automático (lunes a domingo de la semana actual)
+  const periodo = getPeriodoSemana();
+  document.getElementById('semanaPeriodo').value = periodo;
+  
   cargarLotes();
   cargarRecepciones();
   cargarPinos();
+}
+
+function getPeriodoSemana() {
+  const hoy = new Date();
+  const diaSemana = hoy.getDay() === 0 ? 6 : hoy.getDay() - 1; // 0=lunes
+  const lunes = new Date(hoy);
+  lunes.setDate(hoy.getDate() - diaSemana);
+  const domingo = new Date(lunes);
+  domingo.setDate(lunes.getDate() + 6);
+  const fmt = d => String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+  return 'DEL ' + fmt(lunes) + ' AL ' + fmt(domingo);
 }
 
 // ══════════════════════════════════════════

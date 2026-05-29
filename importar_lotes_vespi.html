@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Importar Lotes — V.ESPI</title>
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
+      authDomain: "etiquetadora-vespi.firebaseapp.com",
+      projectId: "etiquetadora-vespi",
+      storageBucket: "etiquetadora-vespi.firebasestorage.app",
+      messagingSenderId: "714344837885",
+      appId: "1:714344837885:web:d80abbd7a0898e1d1ec494"
+    });
+  </script>
+  <style>
+    .lote-item { background:#fff; border-radius:12px; padding:14px 18px; margin-bottom:8px; box-shadow:0 2px 8px rgba(0,0,0,.06); display:flex; justify-content:space-between; align-items:center; border-left:4px solid #dde3ee; }
+    .lote-item.en_uso { border-left-color:#27ae60; }
+    .lote-item.almacen { border-left-color:#00a9e0; }
+    .lote-codigo { font-family:monospace; font-weight:700; color:#1e2a44; font-size:14px; }
+    .lote-meta { font-size:12px; color:#7f8c8d; margin-top:3px; }
+    .badge-uso { background:#d1f5e0; color:#1a7a40; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+    .badge-alm { background:#e8f4fd; color:#1a5276; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+    .categoria-titulo { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#7f8c8d; margin:16px 0 8px; padding-bottom:6px; border-bottom:2px solid #f4f7fa; }
+    .progress-bar { height:8px; background:#f4f7fa; border-radius:4px; margin:10px 0; overflow:hidden; }
+    .progress-fill { height:100%; background:#00a9e0; border-radius:4px; transition:width .3s; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <button class="back-btn" onclick="location.href='almacen_vicente_espi.html'">← Volver</button>
+  <h1 style="color:white;font-size:1.1em">📥 Importar Lotes Iniciales</h1>
+  <div style="width:80px"></div>
+</div>
+
+<div class="container">
+
+  <div class="form-section">
+    <h3>⚠️ Importación única</h3>
+    <p style="font-size:14px;color:#555;line-height:1.6;margin-bottom:16px;">
+      Esta página importa todos tus lotes actuales del Excel a Firestore de una sola vez.
+      <strong>Úsala solo una vez</strong> — si la ejecutas varias veces creará duplicados.
+    </p>
+    <div class="progress-bar"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
+    <div id="progressText" style="font-size:13px;color:#7f8c8d;margin-bottom:16px;">Listo para importar</div>
+    <button onclick="importar()" id="btnImportar" style="background:#00a9e0;color:#fff;border:none;padding:14px 28px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 3px 10px rgba(0,169,224,.3);">
+      🚀 Importar todos los lotes
+    </button>
+  </div>
+
+  <div id="preview">
+    <div class="categoria-titulo">Vista previa — lo que se importará</div>
+    <div id="listaLotes"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let db, colLotes;
+
+firebase.auth().onAuthStateChanged(user => {
+  if (!user) { location.href = 'index.html'; return; }
+  db = firebase.firestore();
+  colLotes = db.collection('almacen_lotes_vespi');
+  renderPreview();
+});
+
+// ══════════════════════════════════════════
+// TODOS LOS LOTES DEL EXCEL
+// ══════════════════════════════════════════
+const LOTES = [
+  // ── FIBRAS ──
+  // ALG-50
+  { material:'ALG-50',    categoria:'FIBRAS',      lote:'CO-111124-A50',  estado:'en_uso',  cantidad:'310 kg',  proveedor:'COLOURNOU', albaran:'243003' },
+  { material:'ALG-50',    categoria:'FIBRAS',      lote:'CO-150925-A50',  estado:'almacen', cantidad:'310 kg',  proveedor:'COLOURNOU', albaran:'243003' },
+  { material:'ALG-50',    categoria:'FIBRAS',      lote:'CO-230925-A50',  estado:'almacen', cantidad:'302 kg',  proveedor:'COLOURNOU', albaran:'250876' },
+  // ALG-22
+  { material:'ALG-22',    categoria:'FIBRAS',      lote:'CO-020524-A22',  estado:'en_uso',  cantidad:'330 kg',  proveedor:'COLOURNOU', albaran:'241193' },
+  // ALG-30
+  { material:'ALG-30',    categoria:'FIBRAS',      lote:'CO-270226-A30',  estado:'en_uso',  cantidad:'1000 kg', proveedor:'COLOURNOU', albaran:'260319' },
+  { material:'ALG-30',    categoria:'FIBRAS',      lote:'CO-061124-A30',  estado:'almacen', cantidad:'',        proveedor:'COLOURNOU', albaran:'' },
+  // PAPEL BLANCO
+  { material:'PAPEL BLANCO', categoria:'FIBRAS',   lote:'RI-171125-PW',   estado:'en_uso',  cantidad:'50 kg',   proveedor:'RIMAFILE',  albaran:'41506' },
+  { material:'PAPEL BLANCO', categoria:'FIBRAS',   lote:'RI-140426-PW',   estado:'almacen', cantidad:'100 kg',  proveedor:'RIMAFILE',  albaran:'41794' },
+  // PAPEL MARRON
+  { material:'PAPEL MARRON', categoria:'FIBRAS',   lote:'RI-100524-PB',   estado:'en_uso',  cantidad:'8.8 kg',  proveedor:'MIMCORD',   albaran:'' },
+  { material:'PAPEL MARRON', categoria:'FIBRAS',   lote:'MI-250923-VV600',estado:'almacen', cantidad:'',        proveedor:'MIMCORD',   albaran:'' },
+  { material:'PAPEL MARRON', categoria:'FIBRAS',   lote:'MI-220526-WW9070',estado:'almacen',cantidad:'40 kg',   proveedor:'MIMCORD',   albaran:'206/M/275' },
+  { material:'PAPEL MARRON', categoria:'FIBRAS',   lote:'MI-240326-WW9070',estado:'almacen',cantidad:'15 kg',   proveedor:'MIMCORD',   albaran:'2026/M/157' },
+  { material:'PAPEL MARRON', categoria:'FIBRAS',   lote:'RI-140426-PB',   estado:'almacen', cantidad:'100 kg',  proveedor:'RIMAFILE',  albaran:'41794' },
+  { material:'PAPEL MARRON', categoria:'FIBRAS',   lote:'RI-181225-PB',   estado:'almacen', cantidad:'49.1 kg', proveedor:'RIMAFILE',  albaran:'41575' },
+  { material:'PAPEL MARRON', categoria:'FIBRAS',   lote:'MI-291025-WW9070',estado:'almacen',cantidad:'20 kg',   proveedor:'MIMCORD',   albaran:'2025/M/606' },
+  // RAYÓN 600
+  { material:'RAYÓN 600', categoria:'FIBRAS',      lote:'CO-011225-R6',   estado:'en_uso',  cantidad:'3000 kg', proveedor:'COLOURNOU', albaran:'749' },
+  { material:'RAYÓN 600', categoria:'FIBRAS',      lote:'CO-120525-R6',   estado:'almacen', cantidad:'2000 kg', proveedor:'COLOURNOU', albaran:'288' },
+  { material:'RAYÓN 600', categoria:'FIBRAS',      lote:'CO-151225-R6',   estado:'almacen', cantidad:'3200 kg', proveedor:'COLOURNOU', albaran:'779' },
+  { material:'RAYÓN 600', categoria:'FIBRAS',      lote:'CO-250326-R6',   estado:'almacen', cantidad:'3000 kg', proveedor:'COLOURNOU', albaran:'260486' },
+  { material:'RAYÓN 600', categoria:'FIBRAS',      lote:'CO-050526-R6',   estado:'almacen', cantidad:'3100 kg', proveedor:'COLOURNOU', albaran:'260725' },
+  // RAYÓN 450
+  { material:'RAYÓN 450', categoria:'FIBRAS',      lote:'CO-101024-R45',  estado:'en_uso',  cantidad:'516 kg',  proveedor:'COLOURNOU', albaran:'240552' },
+  { material:'RAYÓN 450', categoria:'FIBRAS',      lote:'CO-151225-R45',  estado:'almacen', cantidad:'611 kg',  proveedor:'COLOURNOU', albaran:'769' },
+  // RAYÓN 1200
+  { material:'RAYÓN 1200',categoria:'FIBRAS',      lote:'RI-151222-R12',  estado:'en_uso',  cantidad:'100 kg',  proveedor:'RIMAFILE',  albaran:'' },
+
+  // ── PORTAMECHAS ──
+  { material:'PORTAMECHAS 3034', categoria:'PORTAMECHAS', lote:'JOE-090226-3034',  estado:'en_uso',  cantidad:'',        proveedor:'JOE', albaran:'' },
+  { material:'PORTAMECHAS 3034', categoria:'PORTAMECHAS', lote:'JOE-290426-3034',  estado:'almacen', cantidad:'10000 ud',proveedor:'JOE', albaran:'2604-039GR' },
+  { material:'PORTAMECHAS 3034', categoria:'PORTAMECHAS', lote:'JOE-070426-3034',  estado:'almacen', cantidad:'9000 ud', proveedor:'JOE', albaran:'2604-005GR' },
+  { material:'PORTAMECHAS 2534', categoria:'PORTAMECHAS', lote:'JOE-171125-2534-P',estado:'en_uso',  cantidad:'',        proveedor:'JOE', albaran:'' },
+  { material:'PORTAMECHAS 2534', categoria:'PORTAMECHAS', lote:'JOE-070426-2534',  estado:'almacen', cantidad:'3000 ud', proveedor:'JOE', albaran:'2604-005GR' },
+  { material:'PORTAMECHAS 2534', categoria:'PORTAMECHAS', lote:'JOE-050625-2534',  estado:'almacen', cantidad:'800 ud',  proveedor:'JOE', albaran:'' },
+  { material:'PORTAMECHAS 3064', categoria:'PORTAMECHAS', lote:'JOE-050625-3064',  estado:'en_uso',  cantidad:'',        proveedor:'JOE', albaran:'' },
+  { material:'PORTAMECHAS 3064', categoria:'PORTAMECHAS', lote:'JOE-090226-3064',  estado:'almacen', cantidad:'',        proveedor:'JOE', albaran:'' },
+  { material:'PORTAMECHAS 3064', categoria:'PORTAMECHAS', lote:'JOE-010925-3064',  estado:'almacen', cantidad:'2100 ud', proveedor:'JOE', albaran:'' },
+  { material:'PORTAMECHAS 3010', categoria:'PORTAMECHAS', lote:'JOE-090226-3010',  estado:'en_uso',  cantidad:'',        proveedor:'JOE', albaran:'' },
+
+  // ── PARAFINA ──
+  { material:'PARAFINA 5658',  categoria:'PARAFINA', lote:'BE-150426-5658',   estado:'en_uso',  cantidad:'24000 kg', proveedor:'BESTWAX', albaran:'' },
+  { material:'MICRO SP AN73',  categoria:'PARAFINA', lote:'ANIC-070126-AN73', estado:'en_uso',  cantidad:'3600 kg',  proveedor:'ANIC',    albaran:'' },
+  { material:'MICRO SP AN73',  categoria:'PARAFINA', lote:'ANIC-270525-AN73', estado:'almacen', cantidad:'3600 kg',  proveedor:'ANIC',    albaran:'' },
+  { material:'PARAFINA AM6264',categoria:'PARAFINA', lote:'AM-150620-6264',   estado:'almacen', cantidad:'1000 kg',  proveedor:'AMWAX',   albaran:'' },
+  { material:'MICRO AN4058',   categoria:'PARAFINA', lote:'ANIC-280524-AN4058',estado:'almacen',cantidad:'500 kg',   proveedor:'ANIC',    albaran:'' },
+
+  // ── VYBAR ──
+  { material:'VYBAR VY103', categoria:'OTROS', lote:'IB-131225-VY103', estado:'en_uso', cantidad:'400 kg', proveedor:'IBERCERAS', albaran:'NE00040933' },
+
+  // ── COLORANTE ──
+  { material:'COLORANTE ROJO',  categoria:'COLORANTE', lote:'LUX-090425-RED',  estado:'en_uso', cantidad:'25 kg', proveedor:'LUXCHEM', albaran:'VIC125' },
+  { material:'COLORANTE AZUL',  categoria:'COLORANTE', lote:'LUX-090425-BLUE', estado:'en_uso', cantidad:'25 kg', proveedor:'LUXCHEM', albaran:'VIC125' },
+];
+
+function renderPreview() {
+  const cont = document.getElementById('listaLotes');
+  // Agrupar por categoría
+  const grupos = {};
+  LOTES.forEach(l => {
+    if (!grupos[l.categoria]) grupos[l.categoria] = [];
+    grupos[l.categoria].push(l);
+  });
+
+  cont.innerHTML = Object.entries(grupos).map(([cat, lotes]) => `
+    <div class="categoria-titulo">${cat} — ${lotes.length} lotes</div>
+    ${lotes.map(l => `
+      <div class="lote-item ${l.estado}">
+        <div>
+          <div class="lote-codigo">${l.lote}</div>
+          <div class="lote-meta">${l.material} · ${l.cantidad||'—'} · ${l.proveedor}</div>
+        </div>
+        <span class="${l.estado==='en_uso'?'badge-uso':'badge-alm'}">${l.estado==='en_uso'?'EN USO':'ALMACÉN'}</span>
+      </div>`).join('')}
+  `).join('');
+}
+
+async function importar() {
+  const btn = document.getElementById('btnImportar');
+  btn.disabled = true;
+  btn.textContent = '⏳ Importando…';
+
+  let ok = 0;
+  const total = LOTES.length;
+
+  for (const lote of LOTES) {
+    try {
+      await colLotes.add({
+        ...lote,
+        fechaEntrada: new Date().toISOString(),
+        operario: 'TINO',
+        controlVisual: 'OK',
+        createdAt: new Date().toISOString()
+      });
+      ok++;
+      const pct = Math.round(ok / total * 100);
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressText').textContent = `Importando ${ok} de ${total}…`;
+    } catch(e) {
+      console.error('Error en lote', lote.lote, e);
+    }
+  }
+
+  document.getElementById('progressText').textContent = `✅ Importados ${ok} de ${total} lotes correctamente`;
+  btn.textContent = '✅ Importación completada';
+  btn.style.background = '#27ae60';
+
+  toast(`✅ ${ok} lotes importados a Firestore`, 'ok');
+}
+
+function toast(msg, tipo='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast '+(tipo==='ok'?'ok':tipo==='err'?'err':'');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>
