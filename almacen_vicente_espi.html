@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Almacén - V.ESPI</title>
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
+      authDomain: "etiquetadora-vespi.firebaseapp.com",
+      projectId: "etiquetadora-vespi",
+      storageBucket: "etiquetadora-vespi.firebasestorage.app",
+      messagingSenderId: "714344837885",
+      appId: "1:714344837885:web:d80abbd7a0898e1d1ec494"
+    });
+  </script>
+  <style>
+    /* ── TABS ── */
+    .tabs { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+    .tab { padding:10px 18px; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; background:#f4f7fa; color:#7f8c8d; transition:all .2s; }
+    .tab.activo { background:#1e2a44; color:#fff; }
+
+    /* ── CARDS MATERIA ── */
+    .materia-card { background:#fff; border-radius:14px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); overflow:hidden; }
+    .materia-header { padding:14px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f4f7fa; }
+    .materia-nombre { font-size:1.05em; font-weight:700; color:#1e2a44; }
+    .materia-body { padding:14px 18px; }
+
+    /* ── LOTES ── */
+    .lote-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f4f7fa; gap:10px; flex-wrap:wrap; }
+    .lote-row:last-child { border-bottom:none; }
+    .lote-codigo { font-family:monospace; font-size:14px; font-weight:700; color:#1e2a44; }
+    .lote-info { font-size:12px; color:#7f8c8d; margin-top:2px; }
+    .badge-uso { background:#d1f5e0; color:#1a7a40; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+    .badge-almacen { background:#e8ecf1; color:#1e2a44; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+    .lote-actions { display:flex; gap:6px; }
+    .btn-sm { padding:6px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; }
+    .btn-agotar { background:#fdecea; color:#e74c3c; }
+    .btn-usar   { background:#d1f5e0; color:#1a7a40; }
+    .btn-edit   { background:#f4f7fa; color:#1e2a44; }
+
+    /* ── RECEPCIONES ── */
+    .recepcion-card { background:#fff; border-radius:12px; padding:14px 18px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,.06); border-left:4px solid #00a9e0; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap; }
+    .rec-lote { font-family:monospace; font-weight:700; color:#1e2a44; font-size:14px; }
+    .rec-info { font-size:12px; color:#7f8c8d; margin-top:3px; }
+    .rec-fecha { font-size:12px; color:#aaa; text-align:right; }
+
+    /* ── SEMANA ── */
+    .semana-materia { background:#fff; border-radius:12px; padding:14px 18px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,.06); display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+    .semana-mat-nombre { font-weight:700; color:#1e2a44; font-size:14px; min-width:120px; }
+    .semana-lote-select { flex:1; padding:9px 12px; border:1px solid #dde3ee; border-radius:10px; font-size:14px; font-family:monospace; min-width:200px; }
+    .semana-lote-select:focus { outline:none; border-color:#00a9e0; }
+
+    /* ── PIÑOS ── */
+    .pino-row { background:#fff; border-radius:12px; padding:12px 18px; margin-bottom:8px; box-shadow:0 2px 8px rgba(0,0,0,.06); display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .pino-maq { background:#1e2a44; color:#fff; padding:6px 12px; border-radius:8px; font-weight:700; font-size:13px; }
+
+    /* ── MODAL ── */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; justify-content:center; align-items:flex-start; padding-top:60px; }
+    .modal-overlay.activo { display:flex; }
+    .modal-box { background:#fff; border-radius:16px; padding:24px; width:92%; max-width:500px; box-shadow:0 20px 60px rgba(0,0,0,.3); max-height:85vh; overflow-y:auto; }
+    .modal-box h3 { font-size:1.1em; color:#1e2a44; margin-bottom:16px; }
+    .fg { display:flex; flex-direction:column; margin-bottom:12px; }
+    .fg label { font-size:11px; font-weight:600; color:#7f8c8d; text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; }
+    .fg input, .fg select, .fg textarea { padding:11px 13px; border:1px solid #dde3ee; border-radius:10px; font-size:15px; font-family:inherit; }
+    .fg input:focus, .fg select:focus { outline:none; border-color:#00a9e0; }
+    .fg .lote-preview { font-family:monospace; font-size:18px; font-weight:700; color:#1e2a44; background:#f4f7fa; padding:12px; border-radius:10px; text-align:center; margin-top:4px; letter-spacing:1px; }
+    .modal-actions { display:flex; gap:10px; margin-top:16px; }
+    .modal-actions button { flex:1; padding:13px; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; }
+    .btn-confirm { background:#00a9e0; color:#fff; }
+    .btn-cancel  { background:#f4f7fa; color:#1e2a44; }
+
+    /* ── PRINT ETIQUETA ── */
+    #print-area { display:none; }
+    @media print {
+      body > * { display:none !important; }
+      #print-area { display:block !important; }
+      @page { margin:0; size:A4; }
+    }
+    .et-lote-sheet { display:grid; grid-template-columns:repeat(2,105mm); width:210mm; font-family:Arial,sans-serif; }
+    .et-lote-item { width:105mm; padding:8mm; box-sizing:border-box; border:1px dashed #ccc; }
+    .et-lote-item .el-ref { font-size:13px; color:#555; margin-bottom:3mm; }
+    .et-lote-item .el-ref span { font-size:10px; text-transform:uppercase; letter-spacing:.5px; }
+    .et-lote-item .el-codigo { font-size:28px; font-weight:bold; line-height:1.1; margin-bottom:4mm; }
+    .et-lote-item .el-fecha { font-size:11px; color:#555; }
+    .et-lote-item img { max-height:20mm; width:auto; margin-bottom:4mm; display:block; }
+
+    /* ── TOAST ── */
+    .toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(80px); background:#1e2a44; color:#fff; padding:13px 22px; border-radius:12px; font-weight:600; font-size:14px; box-shadow:0 8px 24px rgba(0,0,0,.25); z-index:999; transition:transform .3s ease; pointer-events:none; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+    .toast.ok  { background:#27ae60; }
+    .toast.err { background:#e74c3c; }
+
+    /* ── FILTROS ── */
+    .filtros { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+    .filtros input, .filtros select { padding:10px 14px; border:1px solid #dde3ee; border-radius:10px; font-size:14px; background:#fff; flex:1; min-width:140px; }
+
+    @media(max-width:600px) {
+      .lote-row { flex-direction:column; align-items:flex-start; }
+      .semana-materia { flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <button class="back-btn" onclick="location.href='inicio-vicente.html'">← Volver</button>
+  <h1 style="color:white;font-size:1.1em">📦 Almacén — V.ESPI</h1>
+  <div style="width:80px"></div>
+</div>
+
+<div id="print-area"></div>
+
+<div class="container">
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab activo" onclick="setTab('lotes')">📦 Lotes</button>
+    <button class="tab" onclick="setTab('recepciones')">📥 Recepciones</button>
+    <button class="tab" onclick="setTab('semana')">📋 Semana</button>
+    <button class="tab" onclick="setTab('pinos')">⚙️ Piños</button>
+  </div>
+
+  <!-- ══ TAB LOTES ══ -->
+  <div id="tab-lotes">
+    <button class="btn-fab" onclick="abrirRecepcion()" style="background:#00a9e0;color:#fff;border:none;padding:14px 22px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:8px;box-shadow:0 3px 10px rgba(0,169,224,.3);">
+      ＋ Nueva Recepción
+    </button>
+    <div id="lotes-container">
+      <div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB RECEPCIONES ══ -->
+  <div id="tab-recepciones" style="display:none">
+    <div class="filtros">
+      <input type="text" id="buscarRec" placeholder="🔍 Buscar lote, material, proveedor…" oninput="filtrarRecepciones()">
+      <select id="filtroCategoria" onchange="filtrarRecepciones()">
+        <option value="">Todas las categorías</option>
+        <option value="FIBRAS">Fibras</option>
+        <option value="PARAFINA">Parafina</option>
+        <option value="PORTAMECHAS">Portamechas</option>
+        <option value="COLORANTE">Colorante</option>
+        <option value="OTROS">Otros</option>
+      </select>
+    </div>
+    <div id="recepciones-container">
+      <div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB SEMANA ══ -->
+  <div id="tab-semana" style="display:none">
+    <div style="background:#fff;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
+        <div style="flex:1;min-width:140px;">
+          <label style="font-size:11px;font-weight:700;color:#7f8c8d;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;">Semana</label>
+          <input type="number" id="semanaNum" min="1" max="53" placeholder="22" style="width:100%;padding:11px 13px;border:1px solid #dde3ee;border-radius:10px;font-size:15px;">
+        </div>
+        <div style="flex:2;min-width:200px;">
+          <label style="font-size:11px;font-weight:700;color:#7f8c8d;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;">Período</label>
+          <input type="text" id="semanaPeriodo" placeholder="DEL 25/05 AL 31/05" style="width:100%;padding:11px 13px;border:1px solid #dde3ee;border-radius:10px;font-size:15px;">
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-end;padding-bottom:2px;">
+          <button onclick="cargarSemana()" style="background:#1e2a44;color:#fff;border:none;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">Cargar</button>
+          <button onclick="guardarSemana()" style="background:#27ae60;color:#fff;border:none;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">💾 Guardar</button>
+          <button onclick="imprimirSemana()" style="background:#f39c12;color:#fff;border:none;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">🖨️ Imprimir</button>
+        </div>
+      </div>
+    </div>
+    <div id="semana-container">
+      <div class="empty-state"><div class="icon">📋</div><p>Carga una semana para ver los lotes en uso.</p></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB PIÑOS ══ -->
+  <div id="tab-pinos" style="display:none">
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <button onclick="abrirPino()" style="background:#1e2a44;color:#fff;border:none;padding:12px 20px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;">＋ Nuevo cambio</button>
+      <select id="filtroPinoSemana" onchange="cargarPinos()" style="padding:10px 14px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;background:#fff;">
+        <option value="">Todas las semanas</option>
+      </select>
+    </div>
+    <div id="pinos-container">
+      <div class="empty-state"><div class="icon">⚙️</div><p>Sin registros de piños.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RECEPCIÓN -->
+<div class="modal-overlay" id="modalRecepcion">
+  <div class="modal-box">
+    <h3>📥 Nueva Recepción</h3>
+    <div style="display:flex;gap:10px;">
+      <div class="fg" style="flex:1">
+        <label>Fecha recepción</label>
+        <input type="date" id="recFecha">
+      </div>
+      <div class="fg" style="flex:1">
+        <label>Operario</label>
+        <input type="text" id="recOperario" value="TINO">
+      </div>
+    </div>
+    <div class="fg">
+      <label>Categoría</label>
+      <select id="recCategoria" onchange="actualizarMateriales()">
+        <option value="FIBRAS">Fibras</option>
+        <option value="PARAFINA">Parafina / Ceras</option>
+        <option value="PORTAMECHAS">Portamechas (STC)</option>
+        <option value="COLORANTE">Colorante</option>
+        <option value="OTROS">Otros</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Proveedor</label>
+      <select id="recProveedor" onchange="generarLote()">
+        <option value="CO">COLOURNOU (CO)</option>
+        <option value="MI">MIMCORD (MI)</option>
+        <option value="RI">RIMAFILE (RI)</option>
+        <option value="BE">BESTWAX (BE)</option>
+        <option value="ANIC">ANIC (ANIC)</option>
+        <option value="JOE">JOE/STC (JOE)</option>
+        <option value="IB">IBERCERAS (IB)</option>
+        <option value="LUX">LUXCHEM (LUX)</option>
+        <option value="AM">AMWAX (AM)</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Material</label>
+      <input type="text" id="recMaterial" placeholder="ej: A30, R6, WW9070, 3034…" oninput="generarLote()" style="text-transform:uppercase">
+    </div>
+    <div class="fg">
+      <label>Lote generado (editable)</label>
+      <input type="text" id="recLote" style="font-family:monospace;font-size:16px;font-weight:700;text-transform:uppercase">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <div class="fg" style="flex:1">
+        <label>Cantidad</label>
+        <input type="text" id="recCantidad" placeholder="ej: 1000 kg / 3 PALETS">
+      </div>
+      <div class="fg" style="flex:1">
+        <label>Nº Etiquetas</label>
+        <input type="number" id="recEtiquetas" min="1" value="1" placeholder="1">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <div class="fg" style="flex:1">
+        <label>Albarán / Factura</label>
+        <input type="text" id="recAlbaran" placeholder="ej: 260319">
+      </div>
+      <div class="fg" style="flex:1">
+        <label>Control visual</label>
+        <select id="recControl">
+          <option value="OK">OK</option>
+          <option value="NO OK">NO OK</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Observaciones</label>
+      <input type="text" id="recObs" placeholder="opcional">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-confirm" onclick="confirmarRecepcion()">✅ Registrar + Etiqueta</button>
+      <button class="btn-cancel" onclick="cerrarModal('modalRecepcion')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PIÑOS -->
+<div class="modal-overlay" id="modalPino">
+  <div class="modal-box">
+    <h3>⚙️ Nuevo cambio de piños</h3>
+    <div style="display:flex;gap:10px;">
+      <div class="fg" style="flex:1">
+        <label>Semana</label>
+        <input type="number" id="pinoSemana" min="1" max="53">
+      </div>
+      <div class="fg" style="flex:1">
+        <label>Nº Máquina</label>
+        <select id="pinoMaq">
+          <option>M1</option><option>M2</option><option>M3</option>
+          <option>M4</option><option>M5</option><option>M6</option><option>M7</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <div class="fg" style="flex:1">
+        <label>Mecha</label>
+        <input type="text" id="pinoMecha" placeholder="R-13, V-77…">
+      </div>
+      <div class="fg" style="flex:1">
+        <label>Piños</label>
+        <input type="text" id="pinoPinos" placeholder="ej: 32/28">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <div class="fg" style="flex:1">
+        <label>Fecha</label>
+        <input type="date" id="pinoFecha">
+      </div>
+      <div class="fg" style="flex:1">
+        <label>Cambia</label>
+        <input type="text" id="pinoCambia" placeholder="Operario">
+      </div>
+    </div>
+    <div class="fg">
+      <label>Comprueba</label>
+      <input type="text" id="pinoComprueba" placeholder="Operario">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-confirm" onclick="confirmarPino()">✅ Guardar</button>
+      <button class="btn-cancel" onclick="cerrarModal('modalPino')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// FIREBASE
+// ══════════════════════════════════════════
+let db, colLotes, colRecepciones, colSemanas, colPinos;
+
+firebase.auth().onAuthStateChanged(user => {
+  if (!user) { location.href = 'index.html'; return; }
+  db            = firebase.firestore();
+  colLotes      = db.collection('almacen_lotes_vespi');
+  colRecepciones= db.collection('almacen_recepciones_vespi');
+  colSemanas    = db.collection('almacen_semanas_vespi');
+  colPinos      = db.collection('almacen_pinos_vespi');
+  init();
+});
+
+function init() {
+  document.getElementById('recFecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('pinoFecha').value = new Date().toISOString().split('T')[0];
+  const semActual = getSemanaActual();
+  document.getElementById('semanaNum').value = semActual;
+  document.getElementById('pinoSemana').value = semActual;
+  cargarLotes();
+  cargarRecepciones();
+  cargarPinos();
+}
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function setTab(nombre) {
+  ['lotes','recepciones','semana','pinos'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===nombre ? '' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((el,i) => {
+    el.classList.toggle('activo', ['lotes','recepciones','semana','pinos'][i]===nombre);
+  });
+}
+
+// ══════════════════════════════════════════
+// LOTES — INVENTARIO ACTUAL
+// ══════════════════════════════════════════
+async function cargarLotes() {
+  const cont = document.getElementById('lotes-container');
+  try {
+    const snap = await colLotes.orderBy('categoria').orderBy('material').get();
+    if (snap.empty) {
+      cont.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>Sin lotes. Registra la primera recepción.</p></div>';
+      return;
+    }
+
+    // Agrupar por categoría
+    const grupos = {};
+    snap.docs.forEach(d => {
+      const d2 = d.data();
+      if (!grupos[d2.categoria]) grupos[d2.categoria] = {};
+      if (!grupos[d2.categoria][d2.material]) grupos[d2.categoria][d2.material] = [];
+      grupos[d2.categoria][d2.material].push({ id: d.id, ...d2 });
+    });
+
+    cont.innerHTML = Object.entries(grupos).map(([cat, materiales]) => `
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7f8c8d;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #f4f7fa;">
+          ${cat}
+        </div>
+        ${Object.entries(materiales).map(([mat, lotes]) => {
+          const enUso    = lotes.filter(l => l.estado==='en_uso');
+          const almacen  = lotes.filter(l => l.estado==='almacen');
+          return `
+          <div class="materia-card">
+            <div class="materia-header">
+              <div>
+                <div class="materia-nombre">${mat}</div>
+                <div style="font-size:12px;color:#7f8c8d;margin-top:2px">
+                  ${enUso.length} en uso · ${almacen.length} en almacén
+                </div>
+              </div>
+            </div>
+            <div class="materia-body">
+              ${lotes.map(l => `
+                <div class="lote-row">
+                  <div style="flex:1">
+                    <div class="lote-codigo">${l.lote}</div>
+                    <div class="lote-info">${l.cantidad || ''} ${l.albaran ? '· Albarán: '+l.albaran : ''}</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <span class="${l.estado==='en_uso'?'badge-uso':'badge-almacen'}">${l.estado==='en_uso'?'EN USO':'ALMACÉN'}</span>
+                    <div class="lote-actions">
+                      ${l.estado==='almacen'?`<button class="btn-sm btn-usar" onclick="marcarEnUso('${l.id}','${mat}')">▶ Usar</button>`:''}
+                      <button class="btn-sm btn-agotar" onclick="marcarAgotado('${l.id}','${mat}')">✓ Agotado</button>
+                      <button class="btn-sm btn-edit" onclick="imprimirEtiquetaExistente('${l.lote}','${mat}')">🏷️</button>
+                    </div>
+                  </div>
+                </div>`).join('')}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`).join('');
+  } catch(e) { cont.innerHTML = '<div class="empty-state"><div class="icon">❌</div><p>Error cargando lotes.</p></div>'; }
+}
+
+async function marcarEnUso(id, material) {
+  if (!confirm(`¿Marcar este lote de ${material} como EN USO?`)) return;
+  try {
+    await colLotes.doc(id).update({ estado: 'en_uso', fechaUso: new Date().toISOString() });
+    toast('✅ Lote marcado como en uso', 'ok');
+    cargarLotes();
+  } catch(e) { toast('❌ Error: '+e.message, 'err'); }
+}
+
+async function marcarAgotado(id, material) {
+  if (!confirm(`¿Marcar lote de ${material} como AGOTADO? Se eliminará del inventario activo.`)) return;
+  try {
+    // Actualizar estado en lotes
+    await colLotes.doc(id).update({ estado: 'agotado', fechaAgotado: new Date().toISOString() });
+    // Verificar si hay siguiente lote en almacén y sugerirlo
+    const snap = await colLotes.where('material', '==', material).where('estado', '==', 'almacen').orderBy('fechaEntrada').limit(1).get();
+    if (!snap.empty) {
+      const siguiente = snap.docs[0];
+      if (confirm(`¿Pasar el lote "${siguiente.data().lote}" a EN USO automáticamente?`)) {
+        await colLotes.doc(siguiente.id).update({ estado: 'en_uso', fechaUso: new Date().toISOString() });
+        toast('✅ Lote agotado. Siguiente lote en uso: '+siguiente.data().lote, 'ok');
+      }
+    } else {
+      toast('⚠️ Lote agotado. No hay más lotes en almacén para '+material, 'ok');
+    }
+    cargarLotes();
+  } catch(e) { toast('❌ Error: '+e.message, 'err'); }
+}
+
+// ══════════════════════════════════════════
+// RECEPCIONES
+// ══════════════════════════════════════════
+let recepcionesCache = [];
+
+async function cargarRecepciones() {
+  const cont = document.getElementById('recepciones-container');
+  try {
+    const snap = await colRecepciones.orderBy('fechaEntrada','desc').limit(100).get();
+    recepcionesCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderRecepciones(recepcionesCache);
+  } catch(e) {
+    cont.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>Sin recepciones aún.</p></div>';
+  }
+}
+
+function renderRecepciones(lista) {
+  const cont = document.getElementById('recepciones-container');
+  const q = document.getElementById('buscarRec').value.toLowerCase();
+  const cat = document.getElementById('filtroCategoria').value;
+  const f = lista.filter(r => {
+    const mt = !q || (r.lote||'').toLowerCase().includes(q) || (r.material||'').toLowerCase().includes(q) || (r.proveedor||'').toLowerCase().includes(q);
+    const mc = !cat || r.categoria === cat;
+    return mt && mc;
+  });
+  if (!f.length) { cont.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>Sin recepciones.</p></div>'; return; }
+  cont.innerHTML = f.map(r => `
+    <div class="recepcion-card">
+      <div style="flex:1">
+        <div class="rec-lote">${r.lote}</div>
+        <div class="rec-info">${r.material} · ${r.cantidad||''} · ${r.proveedor||''} ${r.albaran?'· Alb: '+r.albaran:''}</div>
+        <div class="rec-info" style="margin-top:3px">${r.categoria||''} ${r.obs?'· '+r.obs:''}</div>
+      </div>
+      <div class="rec-fecha">
+        <div>${fechaES(r.fechaEntrada?.split('T')[0])}</div>
+        <div style="margin-top:4px;color:#aaa">${r.operario||''}</div>
+        <div style="margin-top:4px">
+          <span style="padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;background:${r.controlVisual==='OK'?'#d1f5e0':'#fdecea'};color:${r.controlVisual==='OK'?'#1a7a40':'#e74c3c'}">${r.controlVisual||'OK'}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filtrarRecepciones() { renderRecepciones(recepcionesCache); }
+
+// ══════════════════════════════════════════
+// MODAL RECEPCIÓN
+// ══════════════════════════════════════════
+function abrirRecepcion() {
+  document.getElementById('recFecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('recMaterial').value = '';
+  document.getElementById('recLote').value = '';
+  document.getElementById('recCantidad').value = '';
+  document.getElementById('recAlbaran').value = '';
+  document.getElementById('recObs').value = '';
+  document.getElementById('recEtiquetas').value = '1';
+  document.getElementById('modalRecepcion').classList.add('activo');
+}
+
+function generarLote() {
+  const prov    = document.getElementById('recProveedor').value;
+  const fecha   = document.getElementById('recFecha').value;
+  const mat     = document.getElementById('recMaterial').value.trim().toUpperCase().replace(/\s+/g,'-');
+  if (!fecha || !mat) return;
+  const p = fecha.split('-');
+  const fechaStr = p[2]+p[1]+p[0].slice(2); // DDMMYY
+  document.getElementById('recLote').value = `${prov}-${fechaStr}-${mat}`;
+}
+
+async function confirmarRecepcion() {
+  const lote      = document.getElementById('recLote').value.trim().toUpperCase();
+  const material  = document.getElementById('recMaterial').value.trim().toUpperCase();
+  const categoria = document.getElementById('recCategoria').value;
+  if (!lote || !material) { toast('❌ Lote y material son obligatorios', 'err'); return; }
+
+  const datos = {
+    lote, material, categoria,
+    proveedor:    document.getElementById('recProveedor').value,
+    fechaEntrada: document.getElementById('recFecha').value,
+    operario:     document.getElementById('recOperario').value,
+    cantidad:     document.getElementById('recCantidad').value,
+    albaran:      document.getElementById('recAlbaran').value,
+    controlVisual:document.getElementById('recControl').value,
+    obs:          document.getElementById('recObs').value,
+    estado:       'almacen',
+    createdAt:    new Date().toISOString()
+  };
+
+  try {
+    // 1. Guardar en recepciones (histórico)
+    await colRecepciones.add(datos);
+    // 2. Guardar en lotes (inventario activo)
+    // Verificar si ya hay algún lote en uso para esta materia
+    const enUsoSnap = await colLotes.where('material','==',material).where('estado','==','en_uso').get();
+    const estadoLote = enUsoSnap.empty ? 'en_uso' : 'almacen';
+    await colLotes.add({ ...datos, estado: estadoLote });
+
+    toast('✅ Recepción registrada', 'ok');
+
+    // 3. Imprimir etiquetas
+    const nEt = parseInt(document.getElementById('recEtiquetas').value) || 1;
+    imprimirEtiquetaLote(lote, material, datos.fechaEntrada, nEt);
+
+    cerrarModal('modalRecepcion');
+    cargarLotes();
+    cargarRecepciones();
+  } catch(e) { toast('❌ Error: '+e.message, 'err'); }
+}
+
+// ══════════════════════════════════════════
+// ETIQUETA DE LOTE
+// ══════════════════════════════════════════
+function imprimirEtiquetaLote(lote, material, fecha, cantidad) {
+  let celdas = '';
+  for (let i = 0; i < cantidad; i++) {
+    celdas += `
+      <div class="et-lote-item">
+        <img src="logo-vespi.jpg" alt="V.ESPI">
+        <div class="el-ref"><span>Referencia:</span><br>${material}</div>
+        <div class="el-codigo">${lote}</div>
+        <div class="el-fecha">${fechaES(fecha)}</div>
+      </div>`;
+  }
+  document.getElementById('print-area').innerHTML = `<div class="et-lote-sheet">${celdas}</div>`;
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => { document.getElementById('print-area').innerHTML = ''; }, 1500);
+  }, 200);
+}
+
+function imprimirEtiquetaExistente(lote, material) {
+  const n = parseInt(prompt('¿Cuántas etiquetas imprimir?', '1')) || 1;
+  imprimirEtiquetaLote(lote, material, '', n);
+}
+
+// ══════════════════════════════════════════
+// SEMANA
+// ══════════════════════════════════════════
+async function cargarSemana() {
+  const num = document.getElementById('semanaNum').value;
+  if (!num) { toast('⚠️ Introduce el número de semana', 'err'); return; }
+  const cont = document.getElementById('semana-container');
+  cont.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div>';
+
+  try {
+    // Cargar lotes en uso actuales
+    const snap = await colLotes.where('estado','==','en_uso').get();
+    const lotesEnUso = {};
+    snap.docs.forEach(d => {
+      const d2 = d.data();
+      if (!lotesEnUso[d2.material]) lotesEnUso[d2.material] = [];
+      lotesEnUso[d2.material].push(d2.lote);
+    });
+
+    // Cargar semana guardada si existe
+    const semSnap = await colSemanas.where('semana','==',parseInt(num)).limit(1).get();
+    const semData = semSnap.empty ? {} : semSnap.docs[0].data();
+
+    // Materias que aparecen en lotes
+    const todasMaterias = [...new Set(snap.docs.map(d => d.data().material))].sort();
+
+    if (!todasMaterias.length) {
+      cont.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>Sin materias en inventario activo.</p></div>';
+      return;
+    }
+
+    cont.innerHTML = `
+      <div style="font-size:12px;color:#7f8c8d;margin-bottom:12px;">Lotes en uso esta semana — puedes modificarlos manualmente:</div>
+      ${todasMaterias.map(mat => {
+        const lotesDisponibles = lotesEnUso[mat] || [];
+        const loteGuardado = semData.materias?.[mat] || lotesDisponibles[0] || '';
+        return `
+        <div class="semana-materia">
+          <div class="semana-mat-nombre">${mat}</div>
+          <input type="text" class="semana-lote-select" id="sem-${mat.replace(/[^a-zA-Z0-9]/g,'_')}"
+            value="${loteGuardado}" placeholder="Lote en uso"
+            style="font-family:monospace;font-size:13px;max-width:280px;">
+        </div>`;
+      }).join('')}`;
+
+    window._semMaterias = todasMaterias;
+    window._semId = semSnap.empty ? null : semSnap.docs[0].id;
+
+  } catch(e) { cont.innerHTML = '<div class="empty-state"><div class="icon">❌</div><p>Error cargando semana.</p></div>'; }
+}
+
+async function guardarSemana() {
+  const num = parseInt(document.getElementById('semanaNum').value);
+  if (!num || !window._semMaterias) { toast('⚠️ Carga primero una semana', 'err'); return; }
+  const materias = {};
+  window._semMaterias.forEach(mat => {
+    const el = document.getElementById('sem-'+mat.replace(/[^a-zA-Z0-9]/g,'_'));
+    if (el) materias[mat] = el.value.trim();
+  });
+  const datos = { semana: num, periodo: document.getElementById('semanaPeriodo').value, materias, updatedAt: new Date().toISOString() };
+  try {
+    if (window._semId) await colSemanas.doc(window._semId).update(datos);
+    else { datos.createdAt = new Date().toISOString(); await colSemanas.add(datos); }
+    toast('✅ Semana guardada', 'ok');
+  } catch(e) { toast('❌ Error: '+e.message, 'err'); }
+}
+
+function imprimirSemana() {
+  const num = document.getElementById('semanaNum').value;
+  const periodo = document.getElementById('semanaPeriodo').value;
+  if (!window._semMaterias) { toast('⚠️ Carga primero una semana', 'err'); return; }
+
+  const filas = window._semMaterias.map(mat => {
+    const el = document.getElementById('sem-'+mat.replace(/[^a-zA-Z0-9]/g,'_'));
+    const lote = el ? el.value : '—';
+    return `<tr><td style="padding:6px 10px;border:1px solid #ccc;font-weight:600">${mat}</td><td style="padding:6px 10px;border:1px solid #ccc;font-family:monospace">${lote}</td><td style="padding:6px 10px;border:1px solid #ccc"></td></tr>`;
+  }).join('');
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;font-size:11px;padding:8mm;width:210mm;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6mm;border-bottom:2px solid #000;padding-bottom:3mm;">
+        <div>
+          <div style="font-size:14px;font-weight:bold">MATERIAS PRIMAS UTILIZADAS</div>
+          <div style="font-size:11px;color:#555">SEMANA ${num} ${periodo?'— '+periodo:''}</div>
+        </div>
+        <img src="logo-vespi.jpg" style="height:14mm;width:auto">
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:6mm;">
+        <thead><tr>
+          <th style="padding:6px 10px;border:1px solid #ccc;background:#f0f0f0;text-align:left">MATERIA PRIMA</th>
+          <th style="padding:6px 10px;border:1px solid #ccc;background:#f0f0f0;text-align:left">LOTE</th>
+          <th style="padding:6px 10px;border:1px solid #ccc;background:#f0f0f0;text-align:left">LOTE 2</th>
+        </tr></thead>
+        <tbody>${filas}</tbody>
+      </table>
+      <div style="margin-top:6mm;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr>
+            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">TIPO DE CONTROL</th>
+            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">OPERARIO</th>
+            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">FECHA</th>
+            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">MECHA</th>
+            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">CONTROL</th>
+            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">SI</th>
+            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">NO</th>
+          </tr></thead>
+          <tbody>
+            ${['TRENZADO','ENCERADO','ENSAMBLADO'].map(tipo => `
+            <tr><td colspan="7" style="padding:4px 8px;border:1px solid #ccc;font-weight:bold;background:#fafafa;font-size:9px">CONTROLES ${tipo}</td></tr>
+            <tr><td style="padding:12px 8px;border:1px solid #ccc"></td><td style="padding:12px 8px;border:1px solid #ccc"></td><td style="padding:12px 8px;border:1px solid #ccc"></td><td style="padding:12px 8px;border:1px solid #ccc"></td><td style="padding:12px 8px;border:1px solid #ccc"></td><td style="padding:12px 8px;border:1px solid #ccc"></td><td style="padding:12px 8px;border:1px solid #ccc"></td></tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+
+  document.getElementById('print-area').innerHTML = html;
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => { document.getElementById('print-area').innerHTML = ''; }, 1500);
+  }, 200);
+}
+
+// ══════════════════════════════════════════
+// PIÑOS
+// ══════════════════════════════════════════
+async function cargarPinos() {
+  const cont = document.getElementById('pinos-container');
+  const filtroSem = document.getElementById('filtroPinoSemana').value;
+  try {
+    let query = colPinos.orderBy('semana','desc').orderBy('fecha','desc');
+    if (filtroSem) query = colPinos.where('semana','==',parseInt(filtroSem)).orderBy('fecha','desc');
+    const snap = await query.limit(100).get();
+
+    // Poblar selector de semanas
+    const sems = [...new Set(snap.docs.map(d => d.data().semana))].sort((a,b)=>b-a);
+    const sel = document.getElementById('filtroPinoSemana');
+    const valActual = sel.value;
+    sel.innerHTML = '<option value="">Todas las semanas</option>' + sems.map(s=>`<option value="${s}" ${s==valActual?'selected':''}>Semana ${s}</option>`).join('');
+
+    if (snap.empty) { cont.innerHTML = '<div class="empty-state"><div class="icon">⚙️</div><p>Sin registros de piños.</p></div>'; return; }
+
+    // Agrupar por semana
+    const grupos = {};
+    snap.docs.forEach(d => {
+      const d2 = d.data();
+      if (!grupos[d2.semana]) grupos[d2.semana] = [];
+      grupos[d2.semana].push({ id: d.id, ...d2 });
+    });
+
+    cont.innerHTML = Object.entries(grupos).sort((a,b)=>b[0]-a[0]).map(([sem, items]) => `
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7f8c8d;margin-bottom:8px;">Semana ${sem}</div>
+        ${items.map(p => `
+        <div class="pino-row">
+          <span class="pino-maq">${p.maquina}</span>
+          <div style="flex:1">
+            <div style="font-weight:700;color:#1e2a44">${p.mecha}</div>
+            <div style="font-size:12px;color:#7f8c8d">Piños: ${p.pinos}</div>
+          </div>
+          <div style="font-size:12px;color:#7f8c8d;text-align:right">
+            <div>${fechaES(p.fecha)}</div>
+            <div>Cambia: ${p.cambia||'—'}</div>
+            <div>Comprueba: ${p.comprueba||'—'}</div>
+          </div>
+        </div>`).join('')}
+      </div>`).join('');
+  } catch(e) { cont.innerHTML = '<div class="empty-state"><div class="icon">❌</div><p>Error cargando piños.</p></div>'; }
+}
+
+function abrirPino() {
+  document.getElementById('pinoFecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('pinoSemana').value = getSemanaActual();
+  document.getElementById('pinoMecha').value = '';
+  document.getElementById('pinoPinos').value = '';
+  document.getElementById('pinoCambia').value = '';
+  document.getElementById('pinoComprueba').value = '';
+  document.getElementById('modalPino').classList.add('activo');
+}
+
+async function confirmarPino() {
+  const datos = {
+    semana:     parseInt(document.getElementById('pinoSemana').value),
+    maquina:    document.getElementById('pinoMaq').value,
+    mecha:      document.getElementById('pinoMecha').value.trim().toUpperCase(),
+    pinos:      document.getElementById('pinoPinos').value.trim(),
+    fecha:      document.getElementById('pinoFecha').value,
+    cambia:     document.getElementById('pinoCambia').value.trim(),
+    comprueba:  document.getElementById('pinoComprueba').value.trim(),
+    createdAt:  new Date().toISOString()
+  };
+  if (!datos.mecha || !datos.pinos) { toast('❌ Mecha y piños son obligatorios', 'err'); return; }
+  try {
+    await colPinos.add(datos);
+    toast('✅ Cambio de piños guardado', 'ok');
+    cerrarModal('modalPino');
+    cargarPinos();
+  } catch(e) { toast('❌ Error: '+e.message, 'err'); }
+}
+
+// ══════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════
+function cerrarModal(id) { document.getElementById(id).classList.remove('activo'); }
+
+function fechaES(iso) {
+  if (!iso) return '';
+  const p = iso.split('-');
+  if (p.length !== 3) return iso;
+  return p[2]+'/'+p[1]+'/'+p[0];
+}
+
+function getSemanaActual() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  return Math.ceil(((now - start) / 86400000 + start.getDay() + 1) / 7);
+}
+
+function actualizarMateriales() { generarLote(); }
+
+function toast(msg, tipo='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast '+(tipo==='ok'?'ok':tipo==='err'?'err':'');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
