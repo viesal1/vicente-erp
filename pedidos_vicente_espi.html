@@ -531,51 +531,32 @@ function cerrarVisor(){
   document.getElementById('print-area').innerHTML='';
 }
 
-async function imprimirVisor(){
-  const { jsPDF } = window.jspdf;
-  const contenido = document.getElementById('visorContenido');
-  const titulo = document.getElementById('visorTitulo').textContent;
+function imprimirVisor(){
+  const contenido = document.getElementById('visorContenido').innerHTML;
+  const esMovil = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  const esPWA = window.matchMedia('(display-mode: standalone)').matches;
 
-  // Botón de feedback
-  const btn = document.querySelector('#modalVisor button[onclick="imprimirVisor()"]');
-  if(btn){ btn.textContent='⏳ Generando PDF...'; btn.disabled=true; }
-
-  try {
-    // Renderizar cada página (.cert-page o el contenido completo)
-    const paginas = contenido.querySelectorAll('.cert-page, .et-sheet, .pag1');
-    const elementos = paginas.length > 0 ? Array.from(paginas) : [contenido];
-
-    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-    const A4_W = 210, A4_H = 297;
-
-    for(let i = 0; i < elementos.length; i++){
-      if(i > 0) pdf.addPage();
-      const canvas = await html2canvas(elementos[i], {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        width: elementos[i].scrollWidth,
-        height: elementos[i].scrollHeight
-      });
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const ratio = Math.min(A4_W / canvas.width, A4_H / canvas.height);
-      const imgW = canvas.width * ratio;
-      const imgH = canvas.height * ratio;
-      const x = (A4_W - imgW) / 2;
-      const y = (A4_H - imgH) / 2;
-      pdf.addImage(imgData, 'JPEG', x, y, imgW, imgH);
-    }
-
-    // Nombre del archivo
-    const nombre = titulo.replace(/[^a-zA-Z0-9_\-áéíóúÁÉÍÓÚñÑ ]/g,'').trim().replace(/ /g,'_');
-    pdf.save(nombre + '.pdf');
-
-  } catch(e) {
-    console.error('Error PDF:', e);
-    toast('❌ Error generando PDF', 'err');
-  } finally {
-    if(btn){ btn.textContent='🖨️ Imprimir'; btn.disabled=false; }
+  if(esMovil || esPWA){
+    // Móvil/PWA: copiar al print-area y llamar window.print()
+    document.getElementById('print-area').innerHTML = contenido;
+    const modal = document.getElementById('modalVisor');
+    modal.style.display = 'none';
+    setTimeout(()=>{
+      window.print();
+      setTimeout(()=>{
+        modal.style.display = '';
+        document.getElementById('print-area').innerHTML = '';
+      }, 1000);
+    }, 100);
+  } else {
+    // Ordenador: usar print-area directamente → abre diálogo impresora
+    document.getElementById('print-area').innerHTML = contenido;
+    setTimeout(()=>{
+      window.print();
+      setTimeout(()=>{
+        document.getElementById('print-area').innerHTML = '';
+      }, 1000);
+    }, 100);
   }
 }
 
