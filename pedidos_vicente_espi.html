@@ -533,31 +533,15 @@ function cerrarVisor(){
 
 function imprimirVisor(){
   const contenido = document.getElementById('visorContenido').innerHTML;
-  const esMovil = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-  const esPWA = window.matchMedia('(display-mode: standalone)').matches;
-
-  if(esMovil || esPWA){
-    // Móvil/PWA: copiar al print-area y llamar window.print()
-    document.getElementById('print-area').innerHTML = contenido;
-    const modal = document.getElementById('modalVisor');
-    modal.style.display = 'none';
+  // En todos los casos: copiar al print-area y lanzar print
+  // NO ocultar el modal — en móvil ocultarlo causa que vuelva atrás
+  document.getElementById('print-area').innerHTML = contenido;
+  setTimeout(()=>{
+    window.print();
     setTimeout(()=>{
-      window.print();
-      setTimeout(()=>{
-        modal.style.display = '';
-        document.getElementById('print-area').innerHTML = '';
-      }, 1000);
-    }, 100);
-  } else {
-    // Ordenador: usar print-area directamente → abre diálogo impresora
-    document.getElementById('print-area').innerHTML = contenido;
-    setTimeout(()=>{
-      window.print();
-      setTimeout(()=>{
-        document.getElementById('print-area').innerHTML = '';
-      }, 1000);
-    }, 100);
-  }
+      document.getElementById('print-area').innerHTML = '';
+    }, 1500);
+  }, 150);
 }
 
 function imprimirEt(){
