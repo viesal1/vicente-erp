@@ -74,11 +74,11 @@
     /* SECCIONES ARTÍCULOS */
     .seccion-articulos{background:#fff;border-radius:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;}
     .seccion-header{padding:13px 18px;font-weight:700;font-size:.95em;color:#fff;display:flex;justify-content:space-between;align-items:center;}
-    .seccion-sin-encerar .seccion-header{background:#5b6abf;}
-    .seccion-enceradas   .seccion-header{background:#2980b9;}
-    .seccion-ensambladas .seccion-header{background:#8e44ad;}
-    .seccion-arillos     .seccion-header{background:#c0392b;}
-    .seccion-parafinas   .seccion-header{background:#d35400;}
+    .seccion-sin-encerar .seccion-header{background:#000;}
+    .seccion-enceradas   .seccion-header{background:#000;}
+    .seccion-ensambladas .seccion-header{background:#000;}
+    .seccion-arillos     .seccion-header{background:#000;}
+    .seccion-parafinas   .seccion-header{background:#000;}
     .seccion-body{padding:14px 16px;}
     .btn-add-sec{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;}
     .btn-add-sec:hover{background:rgba(255,255,255,.35);}
@@ -106,7 +106,7 @@
     .btn-secondary{background:var(--fondo);color:var(--marino);border:1px solid var(--borde);}
     .btn-secondary:hover{background:#e8ecf1;}
     .btn-danger{background:var(--rojo);color:#fff;}
-    .btn-danger:hover{background:#c0392b;}
+    .btn-danger:hover{background:#000;}
 
     /* DETALLE */
     .detalle-header{background:#fff;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
@@ -724,19 +724,19 @@ function imprimirPedido() {
     const ls = p[s] || [];
     const filas = ls.length
       ? ls.map(l => `<tr>
-          <td style="text-align:center;font-weight:700;font-size:13px;padding:5px 8px;border:1px solid #ccc">${l.bultos||''}</td>
-          <td style="text-align:center;font-size:13px;padding:5px 8px;border:1px solid #ccc">${l.cantidad||''}</td>
-          <td style="font-size:13px;padding:5px 8px;border:1px solid #ccc">${l.articulo||''}</td>
+          <td style="text-align:center;font-weight:700;font-size:13px;padding:5px 8px;border:1.5px solid #000">${l.bultos||''}</td>
+          <td style="text-align:center;font-size:13px;padding:5px 8px;border:1.5px solid #000">${l.cantidad||''}</td>
+          <td style="font-size:13px;padding:5px 8px;border:1.5px solid #000">${l.articulo||''}</td>
         </tr>`).join('')
       : `<tr>
-          <td style="padding:10px;border:1px solid #ccc">&nbsp;</td>
-          <td style="padding:10px;border:1px solid #ccc">&nbsp;</td>
-          <td style="padding:10px;border:1px solid #ccc">&nbsp;</td>
+          <td style="padding:10px;border:1.5px solid #000">&nbsp;</td>
+          <td style="padding:10px;border:1.5px solid #000">&nbsp;</td>
+          <td style="padding:10px;border:1.5px solid #000">&nbsp;</td>
         </tr>
         <tr>
-          <td style="padding:10px;border:1px solid #ccc">&nbsp;</td>
-          <td style="padding:10px;border:1px solid #ccc">&nbsp;</td>
-          <td style="padding:10px;border:1px solid #ccc">&nbsp;</td>
+          <td style="padding:10px;border:1.5px solid #000">&nbsp;</td>
+          <td style="padding:10px;border:1.5px solid #000">&nbsp;</td>
+          <td style="padding:10px;border:1.5px solid #000">&nbsp;</td>
         </tr>`;
     return `
       <div style="margin-bottom:6mm">
@@ -746,9 +746,9 @@ function imprimirPedido() {
         <table style="width:100%;border-collapse:collapse">
           <thead>
             <tr>
-              <th style="width:60px;text-align:left;font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#f5f5f5">Bultos</th>
-              <th style="width:80px;text-align:left;font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#f5f5f5">Cantidad</th>
-              <th style="text-align:left;font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#f5f5f5">Artículo</th>
+              <th style="width:60px;text-align:left;font-size:10px;padding:4px 8px;border:1.5px solid #000;background:#e0e0e0">Bultos</th>
+              <th style="width:80px;text-align:left;font-size:10px;padding:4px 8px;border:1.5px solid #000;background:#e0e0e0">Cantidad</th>
+              <th style="text-align:left;font-size:10px;padding:4px 8px;border:1.5px solid #000;background:#e0e0e0">Artículo</th>
             </tr>
           </thead>
           <tbody>${filas}</tbody>
@@ -834,22 +834,22 @@ function imprimirPedido() {
         </div>
         <div>
           <div style="border:2px solid #000;padding:4px 12px;text-align:center;font-weight:bold;font-size:14px;letter-spacing:2px;margin-bottom:3mm">PEDIDO</div>
-          <div style="border:1px solid #000;display:flex">
+          <div style="border:2px solid #000;display:flex">
             <div style="padding:3px 6px;font-size:9px;font-weight:bold;border-right:1px solid #000">Número<br>Pedido</div>
             <div style="padding:3px 10px;font-size:15px;font-weight:bold;display:flex;align-items:center">${p.numero||''}</div>
           </div>
         </div>
       </div>
       <div style="display:flex;gap:4mm;margin-bottom:4mm">
-        <div style="border:1px solid #000;padding:4mm;min-width:50mm;min-height:18mm;font-size:10px">Finalizado: ${p.finalizado?'✓':''}</div>
-        <div style="border:1px solid #000;padding:4mm;flex:1;text-align:center">
+        <div style="border:2px solid #000;padding:4mm;min-width:50mm;min-height:18mm;font-size:10px">Finalizado: ${p.finalizado?'✓':''}</div>
+        <div style="border:2px solid #000;padding:4mm;flex:1;text-align:center">
           <div style="font-size:9px;font-weight:bold;text-align:left;margin-bottom:2mm">CLIENTE:</div>
           <div style="font-size:16px;font-weight:bold">${p.cliente||''}</div>
         </div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4mm">
         <div style="font-size:10px">REV. &nbsp; ${p.rev||'01'}</div>
-        <div style="border:1px solid #000">
+        <div style="border:2px solid #000">
           <div style="display:flex;border-bottom:1px solid #000">
             <div style="padding:3px 8px;font-size:10px;font-weight:bold;border-right:1px solid #000;min-width:32mm">Fecha</div>
             <div style="padding:3px 8px;font-size:10px;min-width:32mm">${fechaES(p.fecha)}</div>
