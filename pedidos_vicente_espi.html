@@ -545,7 +545,7 @@ async function imprimirVisor(){
     return;
   }
 
-  // MÓVIL/PWA → generar PDF con jsPDF para descargar y AirPrint
+  // MÓVIL/PWA → generar PDF con jsPDF — renderizar en div temporal a 794px (A4)
   const { jsPDF } = window.jspdf;
   const contenido = document.getElementById('visorContenido');
   const titulo = document.getElementById('visorTitulo').textContent;
@@ -553,27 +553,48 @@ async function imprimirVisor(){
   if(btn){ btn.textContent='⏳ Generando...'; btn.disabled=true; }
 
   try {
-    const paginas = contenido.querySelectorAll('.cert-page, .pag1, .et-sheet');
-    const elementos = paginas.length > 0 ? Array.from(paginas) : [contenido];
+    // Crear div temporal fuera de pantalla con ancho A4 exacto (794px = 210mm@96dpi)
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:794px;min-width:794px;background:#fff;z-index:-1;';
+    wrapper.innerHTML = contenido.innerHTML;
+    document.body.appendChild(wrapper);
+
+    // Esperar a que se renderice
+    await new Promise(r => setTimeout(r, 300));
+
     const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const A4W = 210, A4H = 297;
+
+    // Buscar páginas dentro del wrapper
+    const paginas = wrapper.querySelectorAll('.cert-page, .pag1');
+    const elementos = paginas.length > 0 ? Array.from(paginas) : [wrapper];
 
     for(let i=0; i<elementos.length; i++){
       if(i>0) pdf.addPage();
       const canvas = await html2canvas(elementos[i], {
-        scale:2, useCORS:true, backgroundColor:'#ffffff'
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 794,
+        windowWidth: 794
       });
       const imgData = canvas.toDataURL('image/jpeg', 0.92);
-      const A4W=210, A4H=297;
-      const ratio = Math.min(A4W/canvas.width, A4H/canvas.height);
-      const iW = canvas.width*ratio;
-      const iH = canvas.height*ratio;
-      pdf.addImage(imgData,'JPEG',(A4W-iW)/2,(A4H-iH)/2,iW,iH);
+      // Ajustar al A4 manteniendo proporción
+      const ratio = Math.min(A4W / (canvas.width/2), A4H / (canvas.height/2));
+      const iW = (canvas.width/2) * ratio;
+      const iH = (canvas.height/2) * ratio;
+      pdf.addImage(imgData, 'JPEG', (A4W-iW)/2, 0, iW, iH);
     }
 
-    const nombre = titulo.replace(/[^\w\s-áéíóúÁÉÍÓÚñÑ]/g,'').trim().replace(/\s+/g,'_');
+    document.body.removeChild(wrapper);
+
+    const nombre = titulo.replace(/[^a-zA-Z0-9 _\-áéíóúñÁÉÍÓÚÑ]/g,'').trim().replace(/\s+/g,'_');
     pdf.save((nombre||'documento')+'.pdf');
+
   } catch(e){
     toast('❌ Error: '+e.message,'err');
+    console.error(e);
   } finally {
     if(btn){ btn.textContent='🖨️ Imprimir'; btn.disabled=false; }
   }
