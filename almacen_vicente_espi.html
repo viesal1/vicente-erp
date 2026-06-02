@@ -199,10 +199,7 @@
     </div>
     <div class="fg"><label>Material</label><input type="text" id="rMaterial" placeholder="ej: A30, R6, 3034…" oninput="generarLote()" style="text-transform:uppercase"></div>
     <div class="fg"><label>Lote (editable)</label><input type="text" id="rLote" style="font-family:monospace;font-weight:700;text-transform:uppercase"></div>
-    <div style="display:flex;gap:8px;">
-      <div class="fg" style="flex:1"><label>Cantidad</label><input type="text" id="rCantidad" placeholder="ej: 1000 kg"></div>
-      <div class="fg" style="flex:1"><label>Nº Etiquetas</label><input type="number" id="rEtiquetas" min="1" value="1"></div>
-    </div>
+    <div class="fg"><label>Cantidad</label><input type="text" id="rCantidad" placeholder="ej: 1000 kg"></div>
     <div style="display:flex;gap:8px;">
       <div class="fg" style="flex:1"><label>Albarán</label><input type="text" id="rAlbaran"></div>
       <div class="fg" style="flex:1"><label>Control visual</label>
@@ -442,24 +439,37 @@ async function eliminarRec(id){
   }catch(e){ toast('❌ '+e.message,'err'); }
 }
 
-// ── ETIQUETA LOTE (2x2 = 4 por hoja) ──
+// ── ETIQUETA LOTE — igual que PDF ──
 function impEtLote(lote,mat,fecha,n){
+  // Formato del PDF: recuadros izq + lote vertical centro + logo+fecha derecha
   let html='';
   for(let i=0;i<n;i++){
-    html+=`<div style="width:105mm;height:148.5mm;box-sizing:border-box;padding:10mm;font-family:Arial,sans-serif;display:flex;flex-direction:column;justify-content:space-between;">
-      <img src="logo-vespi.jpg" style="max-height:25mm;width:auto;display:block;">
-      <div>
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:2mm">Referencia:</div>
-        <div style="font-size:16px;font-weight:700;margin-bottom:4mm">${mat}</div>
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:2mm">Lote:</div>
-        <div style="font-size:32px;font-weight:bold;line-height:1.1;margin-bottom:4mm">${lote}</div>
-        <div style="font-size:12px;color:#555">${fechaES(fecha)}</div>
+    html+=`<div style="width:190mm;height:130mm;box-sizing:border-box;font-family:Arial,sans-serif;display:flex;border:1px solid #ccc;overflow:hidden;">
+      <!-- Izquierda: dos recuadros -->
+      <div style="width:50mm;display:flex;flex-direction:column;border-right:1px solid #ccc;">
+        <div style="flex:1;border-bottom:1px solid #ccc;padding:4mm;">
+          <div style="font-size:9px;color:#555;margin-bottom:2mm;">Referencia:</div>
+          <div style="font-size:16px;font-weight:700;">${mat}</div>
+        </div>
+        <div style="flex:1;padding:4mm;">
+          <div style="font-size:9px;color:#555;margin-bottom:2mm;">LOTE:</div>
+          <div style="font-size:11px;font-family:monospace;font-weight:700;">${lote}</div>
+        </div>
+      </div>
+      <!-- Centro: lote vertical grande -->
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;border-right:1px solid #ccc;padding:4mm;">
+        <div style="font-size:36px;font-weight:bold;writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);letter-spacing:2px;line-height:1;">${lote}</div>
+      </div>
+      <!-- Derecha: logo arriba + fecha abajo -->
+      <div style="width:55mm;display:flex;flex-direction:column;justify-content:space-between;padding:6mm;">
+        <img src="logo-vespi.jpg" style="max-width:45mm;max-height:30mm;width:auto;display:block;">
+        <div style="font-size:12px;font-weight:600;">${fecha ? fechaES(fecha) : new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'})}</div>
       </div>
     </div>`;
   }
   document.getElementById('print-area').innerHTML=`
-    <style>@page{margin:0;size:A4;}</style>
-    <div style="display:grid;grid-template-columns:repeat(2,105mm);grid-template-rows:repeat(2,148.5mm);width:210mm;height:297mm;overflow:hidden;">${html}</div>`;
+    <style>@page{margin:10mm;size:A4;}</style>
+    <div style="display:flex;flex-direction:column;gap:8mm;">${html}</div>`;
   setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
 }
 
@@ -521,61 +531,63 @@ async function imprimirAlmacen(){
   const snap=await colLotes.get();
   const lotes=snap.docs.map(d=>d.data()).filter(l=>l.estado!=='agotado');
 
-  // Orden fijo de materias dentro de FIBRAS
   const ORDEN_FIBRAS=['ALG-30','ALG-50','ALG-22','RAYÓN 600','RAYÓN 450','RAYÓN 1200','PAPEL BLANCO','PAPEL MARRON'];
-  // Grupos: FIBRAS separado, luego RESTO todo junto
-  const fibras={}, resto={};
+  const grupos={FIBRAS:{},PORTAMECHAS:{},PARAFINA:{},COLORANTE:{},OTROS:{}};
+
   lotes.forEach(l=>{
     const mat=l.material||'—';
-    const cat=l.categoria||'OTROS';
-    const target = cat==='FIBRAS' ? fibras : resto;
-    if(!target[mat]) target[mat]={enUso:[],almacen:[]};
-    target[mat][l.estado==='en_uso'?'enUso':'almacen'].push(l);
+    const cat=(l.categoria||'OTROS').toUpperCase();
+    const g=grupos[cat]||grupos.OTROS;
+    if(!g[mat]) g[mat]={enUso:[],almacen:[]};
+    g[mat][l.estado==='en_uso'?'enUso':'almacen'].push(l);
   });
 
   const buildFila=(mat,ls)=>{
     const enUso=ls.enUso[0];
-    const almStr=ls.almacen.map(l=>`${l.cantidad?l.cantidad+' ':''}`+l.lote).join('<br>');
+    const almLotes=ls.almacen;
+    const almStr=almLotes.map(l=>`${l.cantidad?l.cantidad+' ':''}`+l.lote).join('<br>');
     const sig=ls.almacen[0]?.lote||'';
     return `<tr>
-      <td style="padding:4px 8px;border:1px solid #999;font-weight:600;font-size:10px">${mat}</td>
-      <td style="padding:4px 8px;border:1px solid #999;text-align:center;font-size:9px">${enUso?.cantidad||''}</td>
-      <td style="padding:4px 8px;border:1px solid #999;font-family:monospace;font-size:9px">${almStr||'—'}</td>
-      <td style="padding:4px 8px;border:1px solid #999;font-family:monospace;font-size:10px;font-weight:600">${enUso?.lote||'—'}</td>
-      <td style="padding:4px 8px;border:1px solid #999;font-family:monospace;font-size:9px">${sig}</td>
+      <td style="padding:4px 8px;border:1px solid #aaa;font-weight:600;font-size:10px">${mat}</td>
+      <td style="padding:4px 8px;border:1px solid #aaa;text-align:center;font-size:9px">${enUso?.cantidad||''}</td>
+      <td style="padding:4px 8px;border:1px solid #aaa;font-family:monospace;font-size:9px">${almStr||'—'}</td>
+      <td style="padding:4px 8px;border:1px solid #aaa;font-family:monospace;font-size:10px;font-weight:700">${enUso?.lote||'—'}</td>
+      <td style="padding:4px 8px;border:1px solid #aaa;font-family:monospace;font-size:9px">${sig}</td>
     </tr>`;
   };
 
-  // Ordenar fibras según ORDEN_FIBRAS, luego el resto alfabético
+  const sep=(titulo)=>`<tr><td colspan="5" style="padding:4px 8px;background:#1e2a44;color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:1px solid #1e2a44">${titulo}</td></tr>`;
+
+  // FIBRAS en orden fijo
   const fibrasMats=[
-    ...ORDEN_FIBRAS.filter(m=>fibras[m]),
-    ...Object.keys(fibras).filter(m=>!ORDEN_FIBRAS.includes(m)).sort()
+    ...ORDEN_FIBRAS.filter(m=>grupos.FIBRAS[m]),
+    ...Object.keys(grupos.FIBRAS).filter(m=>!ORDEN_FIBRAS.includes(m)).sort()
   ];
-  const restoMats=Object.keys(resto).sort();
 
-  const sepFibras=`<tr><td colspan="5" style="padding:4px 8px;background:#1e2a44;color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase">FIBRAS</td></tr>`;
-  const sepResto=`<tr><td colspan="5" style="padding:4px 8px;background:#555;color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase">PORTAMECHAS / PARAFINAS / COLORANTES / OTROS</td></tr>`;
-
-  const filas=
-    sepFibras +
-    fibrasMats.map(m=>buildFila(m,fibras[m])).join('') +
-    (restoMats.length ? sepResto + restoMats.map(m=>buildFila(m,resto[m])).join('') : '');
+  let filas = '';
+  if(fibrasMats.length) filas += sep('FIBRAS') + fibrasMats.map(m=>buildFila(m,grupos.FIBRAS[m])).join('');
+  if(Object.keys(grupos.PORTAMECHAS).length) filas += sep('PORTAMECHAS') + Object.keys(grupos.PORTAMECHAS).sort().map(m=>buildFila(m,grupos.PORTAMECHAS[m])).join('');
+  if(Object.keys(grupos.PARAFINA).length) filas += sep('PARAFINA') + Object.keys(grupos.PARAFINA).sort().map(m=>buildFila(m,grupos.PARAFINA[m])).join('');
+  if(Object.keys(grupos.COLORANTE).length) filas += sep('COLORANTE') + Object.keys(grupos.COLORANTE).sort().map(m=>buildFila(m,grupos.COLORANTE[m])).join('');
+  if(Object.keys(grupos.OTROS).length) filas += sep('OTROS') + Object.keys(grupos.OTROS).sort().map(m=>buildFila(m,grupos.OTROS[m])).join('');
 
   document.getElementById('print-area').innerHTML=`
     <style>@page{margin:8mm;size:A4 portrait;}</style>
     <div style="font-family:Arial,sans-serif;font-size:10px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5mm;border-bottom:2px solid #000;padding-bottom:3mm;">
-        <div><div style="font-size:14px;font-weight:bold">ALMACEN VICENTE ESPI, S.L.</div>
-        <div style="font-size:10px;color:#555">${fechaES(new Date().toISOString().split('T')[0])}</div></div>
+        <div>
+          <div style="font-size:14px;font-weight:bold">ALMACEN VICENTE ESPI, S.L.</div>
+          <div style="font-size:10px;color:#555">${fechaES(new Date().toISOString().split('T')[0])}</div>
+        </div>
         <img src="logo-vespi.jpg" style="height:14mm;width:auto">
       </div>
       <table style="width:100%;border-collapse:collapse;">
         <thead><tr>
-          <th style="padding:5px 8px;border:1px solid #999;background:#ddd;text-align:left;font-size:9px">MATERIA PRIMA</th>
-          <th style="padding:5px 8px;border:1px solid #999;background:#ddd;font-size:9px">P</th>
-          <th style="padding:5px 8px;border:1px solid #999;background:#ddd;text-align:left;font-size:9px">LOTE ALMACÉN</th>
-          <th style="padding:5px 8px;border:1px solid #999;background:#ddd;text-align:left;font-size:9px">LOTE EN USO</th>
-          <th style="padding:5px 8px;border:1px solid #999;background:#ddd;text-align:left;font-size:9px">SIGUIENTE LOTE</th>
+          <th style="padding:5px 8px;border:1px solid #aaa;background:#ddd;text-align:left;font-size:9px">MATERIA PRIMA</th>
+          <th style="padding:5px 8px;border:1px solid #aaa;background:#ddd;font-size:9px">P</th>
+          <th style="padding:5px 8px;border:1px solid #aaa;background:#ddd;text-align:left;font-size:9px">LOTE ALMACÉN</th>
+          <th style="padding:5px 8px;border:1px solid #aaa;background:#ddd;text-align:left;font-size:9px">LOTE EN USO</th>
+          <th style="padding:5px 8px;border:1px solid #aaa;background:#ddd;text-align:left;font-size:9px">SIGUIENTE LOTE</th>
         </tr></thead>
         <tbody>${filas}</tbody>
       </table>
@@ -626,111 +638,151 @@ function imprimirSemana(){
   const num=document.getElementById('semNum').value;
   const periodo=document.getElementById('semPeriodo').value;
   if(!semMaterias.length){ toast('⚠️ Carga primero una semana','err'); return; }
-  const ORDEN_MAT=['FIBRAS','PORTAMECHAS','PARAFINA','COLORANTE','OTROS'];
-  const getCat=mat=>{ const l=lotesCache.find(x=>x.material===mat); return l?l.categoria:'OTROS'; };
+
+  // Separar materias: fibras arriba, resto abajo (igual que PDF)
+  const ORDEN_FIBRAS=['ALG-30','ALG-50','ALG-22','RAYÓN 600','RAYÓN 450','PAPEL MARRON','PAPEL BLANCO'];
+  const getCat=mat=>{const l=lotesCache.find(x=>x.material===mat);return l?l.categoria:'OTROS';};
   const fibras=semMaterias.filter(m=>getCat(m)==='FIBRAS');
   const otros=semMaterias.filter(m=>getCat(m)!=='FIBRAS');
+
+  // Ordenar fibras
+  const fibrasSorted=[
+    ...ORDEN_FIBRAS.filter(m=>fibras.includes(m)),
+    ...fibras.filter(m=>!ORDEN_FIBRAS.includes(m))
+  ];
+
   const buildFilas=mats=>mats.map(mat=>{
     const el=document.getElementById('sem-'+mat.replace(/[^a-zA-Z0-9]/g,'_'));
     return `<tr>
       <td style="padding:4px 8px;border:1px solid #aaa;font-size:10px">${mat}</td>
       <td style="padding:4px 8px;border:1px solid #aaa;font-family:monospace;font-size:10px;min-width:38mm">${el?el.value:''}</td>
-      <td style="padding:4px 8px;border:1px solid #aaa;min-width:38mm"></td>
+      <td style="padding:4px 8px;border:1px solid #aaa;min-width:35mm"></td>
     </tr>`;
   }).join('');
-  const CONTROLES=['1&nbsp;&nbsp; COMPROBACIÓN MATERIA PRIMA','2&nbsp;&nbsp; CONTROL VELOCIDAD MÁQUINA (PIÑOS)','3&nbsp;&nbsp; COMPROBACIÓN Nº DE HILOS','4&nbsp;&nbsp; CONTROL CALIDAD DEL TRENZADO','5&nbsp;&nbsp; COMPROBAR LA TENSIÓN DE LAS TRENZADORAS','6&nbsp;&nbsp; COMPROBAR EL GROSOR DEL ENCERADO','7&nbsp;&nbsp; COMPROBAR CALIDAD DEL ENCERADO','8&nbsp;&nbsp; COMPROBAR TENSIÓN DE LAS ENCERADORAS','9&nbsp;&nbsp; CONTROL MEDIDA DE LAS ENSAMBLADAS','10 COMPROBACIÓN MEDIDAS DEL PORTAMECHAS','11 COMPROBACIÓN SUJECIÓN PORTAMECHAS'];
+
+  const CONTROLES=['1&nbsp; COMPROBACIÓN MATERIA PRIMA','2&nbsp; CONTROL VELOCIDAD MÁQUINA (PIÑOS)','3&nbsp; COMPROBACIÓN Nº DE HILOS','4&nbsp; CONTROL CALIDAD DEL TRENZADO','5&nbsp; COMPROBAR LA TENSIÓN DE LAS TRENZADORAS','6&nbsp; COMPROBAR EL GROSOR DEL ENCERADO','7&nbsp; COMPROBAR CALIDAD DEL ENCERADO','8&nbsp; COMPROBAR TENSIÓN DE LAS ENCERADORAS','9&nbsp; CONTROL MEDIDA DE LAS ENSAMBLADAS','10 COMPROBACIÓN MEDIDAS DEL PORTAMECHAS','11 COMPROBACIÓN SUJECIÓN PORTAMECHAS'];
+
   const thCtrl=`<tr>
-    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;text-align:left;width:30mm">OPERARIO</th>
-    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;width:22mm">FECHA</th>
-    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;width:25mm">MECHA</th>
-    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;text-align:center;width:20mm">CONTROL</th>
-    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;text-align:center;width:12mm">SI</th>
-    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;text-align:center;width:12mm">NO</th>
-    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px">OBSERVACIÓN</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:left;width:28mm">OPERARIO</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;width:20mm">FECHA</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;width:22mm">MECHA</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center">CONTROL</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center;width:10mm">SI</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center;width:10mm">NO</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px">OBSERVACIÓN</th>
   </tr>`;
+
   const trVacios=Array(12).fill(`<tr>
-    <td style="padding:9px 8px;border:1px solid #aaa"></td><td style="border:1px solid #aaa"></td>
-    <td style="border:1px solid #aaa"></td><td style="border:1px solid #aaa;text-align:center;font-size:8px;color:#aaa">CONFORME</td>
-    <td style="border:1px solid #aaa"></td><td style="border:1px solid #aaa"></td><td style="border:1px solid #aaa"></td>
+    <td style="padding:8px 6px;border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;text-align:center;font-size:8px;color:#bbb">CONFORME</td>
+    <td style="border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;"></td>
   </tr>`).join('');
-  const cabHoja=`<div style="display:flex;align-items:baseline;gap:10mm;margin-bottom:5mm;border-bottom:1px solid #000;padding-bottom:3mm;">
-    <div style="font-size:18px;font-weight:bold">SEMANA ${num}</div>
-    <div style="font-size:11px">${periodo}</div>
-    <div style="font-size:10px;color:#555;margin-left:auto">REV.01</div>
+
+  const cab=`<div style="display:flex;align-items:baseline;gap:8mm;padding-bottom:3mm;margin-bottom:4mm;border-bottom:1px solid #000;">
+    <span style="font-size:18px;font-weight:bold">SEMANA ${num}</span>
+    <span style="font-size:11px">${periodo}</span>
+    <span style="font-size:9px;color:#555;margin-left:auto">REV.01 &nbsp; 01/12/2022</span>
   </div>`;
-  const bloqMat=(titulo,mats)=>`<div style="margin-bottom:3mm;">
-    <div style="font-size:9px;font-weight:bold;background:#e8e8e8;padding:3px 8px;border:1px solid #aaa;border-bottom:none;">${titulo}</div>
-    <table style="width:100%;border-collapse:collapse;">
-      <thead><tr>
-        <th style="padding:3px 8px;border:1px solid #aaa;text-align:left;font-size:9px;background:#f0f0f0"></th>
-        <th style="padding:3px 8px;border:1px solid #aaa;text-align:left;font-size:9px;background:#f0f0f0">Lote</th>
-        <th style="padding:3px 8px;border:1px solid #aaa;text-align:left;font-size:9px;background:#f0f0f0">Lote 2</th>
-      </tr></thead>
-      <tbody>${buildFilas(mats)}</tbody>
-    </table>
-  </div>`;
+
+  const bloqMat=(mats)=>`
+    <div style="margin-bottom:3mm;">
+      <div style="font-size:9px;font-weight:bold;padding:2px 6px;border:1px solid #aaa;border-bottom:none;background:#f0f0f0">MATERIAS PRIMAS UTILIZADAS</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr>
+          <th style="padding:2px 6px;border:1px solid #aaa;font-size:9px;text-align:left;background:#f8f8f8;width:40mm"></th>
+          <th style="padding:2px 6px;border:1px solid #aaa;font-size:9px;text-align:center;background:#f8f8f8">Lote</th>
+          <th style="padding:2px 6px;border:1px solid #aaa;font-size:9px;text-align:center;background:#f8f8f8">Lote</th>
+        </tr></thead>
+        <tbody>${buildFilas(mats)}</tbody>
+      </table>
+    </div>`;
+
+  const bloqControl=(titulo)=>`
+    <div style="margin-bottom:4mm;">
+      <div style="display:flex;align-items:center;gap:8mm;margin-bottom:1mm;">
+        <span style="font-size:10px;font-weight:bold">${titulo}</span>
+        <span style="font-size:10px">CONFORME</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>${thCtrl}</thead>
+        <tbody>${trVacios}</tbody>
+      </table>
+    </div>`;
+
+  // HOJA 1
   const hoja1=`<div style="font-family:Arial,sans-serif;font-size:10px;width:277mm;box-sizing:border-box;padding:8mm;page-break-after:always;">
-    ${cabHoja}
-    <div style="display:flex;gap:8mm;">
-      <div style="flex:0 0 140mm;">${bloqMat('MATERIAS PRIMAS UTILIZADAS',fibras)}${otros.length?bloqMat('MATERIAS PRIMAS UTILIZADAS',otros):''}</div>
+    ${cab}
+    <div style="display:flex;gap:6mm;">
+      <div style="flex:0 0 130mm;">
+        ${bloqMat(fibrasSorted)}
+        ${otros.length?bloqMat(otros):''}
+      </div>
       <div style="flex:1;">
-        <div style="font-size:10px;font-weight:bold;margin-bottom:3mm;">Tipo de control:</div>
-        <table style="width:100%;border-collapse:collapse;margin-bottom:5mm;">
-          ${CONTROLES.map(c=>`<tr><td style="padding:4px 6px;border:1px solid #aaa;font-size:9px">${c}</td></tr>`).join('')}
+        <div style="font-size:9px;font-weight:bold;margin-bottom:2mm;">Tipo de control:</div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:4mm;">
+          ${CONTROLES.map(c=>`<tr><td style="padding:3px 6px;border:1px solid #aaa;font-size:9px">${c}</td></tr>`).join('')}
         </table>
-        <img src="logo-vespi.jpg" style="max-height:20mm;width:auto;display:block;margin:0 auto;">
-        <div style="text-align:center;font-size:11px;font-weight:bold;color:#2c5fa3;margin-top:2mm;">Wicks for Candles</div>
+        <img src="logo-vespi.jpg" style="max-width:40mm;height:auto;display:block;margin:0 auto 2mm auto;">
+        <div style="text-align:center;font-size:10px;font-weight:bold;color:#2c5fa3;">Wicks for Candles</div>
       </div>
     </div>
-    <div style="margin-top:4mm;">
-      <div style="font-size:10px;font-weight:bold;background:#ddd;padding:4px 8px;border:1px solid #aaa;border-bottom:none;">CONTROLES TRENZADO &nbsp;&nbsp; CONFORME</div>
-      <table style="width:100%;border-collapse:collapse;"><thead>${thCtrl}</thead><tbody>${trVacios}</tbody></table>
-    </div>
+    <div style="margin-top:3mm;">${bloqControl('CONTROLES TRENZADO')}</div>
   </div>`;
+
+  // HOJA 2
   const hoja2=`<div style="font-family:Arial,sans-serif;font-size:10px;width:277mm;box-sizing:border-box;padding:8mm;">
-    ${cabHoja}
-    <div style="font-size:10px;font-weight:bold;background:#ddd;padding:4px 8px;border:1px solid #aaa;border-bottom:none;margin-bottom:0;">CONTROLES ENCERADO &nbsp;&nbsp; CONFORME</div>
-    <table style="width:100%;border-collapse:collapse;margin-bottom:5mm;"><thead>${thCtrl}</thead><tbody>${trVacios}</tbody></table>
-    <div style="font-size:10px;font-weight:bold;background:#ddd;padding:4px 8px;border:1px solid #aaa;border-bottom:none;margin-bottom:0;">CONTROLES ENSAMBLADO &nbsp;&nbsp; CONFORME</div>
-    <table style="width:100%;border-collapse:collapse;"><thead>${thCtrl}</thead><tbody>${trVacios}</tbody></table>
+    ${cab}
+    ${bloqControl('CONTROLES ENCERADO')}
+    ${bloqControl('CONTROLES ENSAMBLADO')}
   </div>`;
-  document.getElementById('print-area').innerHTML=`<style>@page{margin:0;size:A4 landscape;}body{margin:0;}</style>${hoja1}${hoja2}`;
+
+  document.getElementById('print-area').innerHTML=`
+    <style>
+      @page{margin:0;size:A4 landscape;}
+      body{margin:0;}
+      .page-break{page-break-after:always;}
+    </style>
+    ${hoja1}${hoja2}`;
   setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
 }
 
 // ── IMPRIMIR PIÑOS ──
 function imprimirPinos(){
   const num=document.getElementById('pinoSemNum').value||getSemana();
-  // 20 filas que ocupan toda la hoja A4 horizontal
-  // A4 landscape: 297x210mm. Margen 8mm. Cabecera ~20mm. Resto ~170mm / 20 filas = 8.5mm por fila
-  const trVacios=Array(20).fill(`<tr style="height:8.5mm">
-    <td style="border:1px solid #aaa;text-align:center;font-size:11px"></td>
-    <td style="border:1px solid #aaa"></td>
-    <td style="border:1px solid #aaa;text-align:center;font-size:11px"></td>
-    <td style="border:1px solid #aaa;text-align:center;font-size:11px"></td>
-    <td style="border:1px solid #aaa"></td>
-    <td style="border:1px solid #aaa"></td>
-  </tr>`).join('');
+  // A4 landscape @margin:8mm → 281×194mm útil
+  // Cabecera ~22mm → tabla 172mm / 20 filas = 8.6mm
+  const tr=`<tr>
+    <td style="height:8.6mm;border:1px solid #aaa;text-align:center;"></td>
+    <td style="border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;text-align:center;"></td>
+    <td style="border:1px solid #aaa;text-align:center;"></td>
+    <td style="border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;"></td>
+  </tr>`;
   document.getElementById('print-area').innerHTML=`
     <style>@page{margin:8mm;size:A4 landscape;}body{margin:0;}</style>
-    <div style="font-family:Arial,sans-serif;font-size:11px;width:281mm;height:194mm;box-sizing:border-box;display:flex;flex-direction:column;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4mm;border-bottom:2px solid #000;padding-bottom:3mm;">
+    <div style="font-family:Arial,sans-serif;font-size:11px;width:281mm;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3mm;border-bottom:2px solid #000;padding-bottom:3mm;">
         <div>
-          <div style="font-size:18px;font-weight:bold">CONTROL CAMBIO DE PIÑOS</div>
-          <div style="font-size:12px;margin-top:1mm">SEMANA ${num}</div>
+          <div style="font-size:18px;font-weight:bold;">CONTROL CAMBIO DE PIÑOS</div>
+          <div style="font-size:12px;margin-top:1mm;">SEMANA ${num}</div>
         </div>
-        <img src="logo-vespi.jpg" style="height:16mm;width:auto">
+        <img src="logo-vespi.jpg" style="height:16mm;width:auto;">
       </div>
-      <table style="width:100%;border-collapse:collapse;flex:1;table-layout:fixed;">
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
         <thead><tr>
-          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:center;width:55px">Nº MÁQUINA</th>
-          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:left">MECHA</th>
-          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:center;width:65px">PIÑOS</th>
-          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:center;width:75px">FECHA</th>
-          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:left">TRABAJADOR CAMBIA</th>
-          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:left">TRABAJADOR COMPRUEBA</th>
+          <th style="padding:5px 4px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:center;width:50px;">Nº MÁQUINA</th>
+          <th style="padding:5px 4px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:left;">MECHA</th>
+          <th style="padding:5px 4px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:center;width:60px;">PIÑOS</th>
+          <th style="padding:5px 4px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:center;width:70px;">FECHA</th>
+          <th style="padding:5px 4px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:left;">TRABAJADOR CAMBIA</th>
+          <th style="padding:5px 4px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:left;">TRABAJADOR COMPRUEBA</th>
         </tr></thead>
-        <tbody>${trVacios}</tbody>
+        <tbody>${tr.repeat(20)}</tbody>
       </table>
     </div>`;
   setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
