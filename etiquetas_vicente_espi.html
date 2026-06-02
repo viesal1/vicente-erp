@@ -659,18 +659,18 @@ window.imprimirSemana = function(){
   // ── ETIQUETAS ROLLOS 15KG ──
 function etR15HTML(modelo, lote){
   const fs = modelo.length > 5 ? '20px' : modelo.length > 3 ? '24px' : '28px';
-  return `<div style="width:105mm;height:42.4mm;box-sizing:border-box;display:flex;align-items:stretch;font-family:Arial,sans-serif;border:1px solid #ccc;overflow:hidden;">
+  return `<div style="width:105mm;height:42.4mm;box-sizing:border-box;display:flex;align-items:stretch;font-family:Arial,sans-serif;overflow:hidden;">
     <!-- Logo vertical izquierda -->
-    <div style="width:13mm;flex-shrink:0;overflow:hidden;position:relative;border-right:1px solid #ddd;">
+    <div style="width:13mm;flex-shrink:0;overflow:hidden;position:relative;">
       <img src="logo-vespi.jpg" alt="VESPI" style="position:absolute;top:50%;left:50%;width:28mm;height:auto;transform:translate(-50%,-50%) rotate(-90deg);">
     </div>
     <!-- 3 filas iguales -->
     <div style="flex:1;display:flex;flex-direction:column;box-sizing:border-box;">
-      <div style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:0 4mm;border-bottom:1px solid #ddd;">
+      <div style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:0 4mm;">
         <span style="font-size:11px;">FECHA____________</span>
         <span style="font-size:${fs};font-weight:bold;">${modelo}</span>
       </div>
-      <div style="flex:1;display:flex;align-items:center;padding:0 4mm;border-bottom:1px solid #ddd;">
+      <div style="flex:1;display:flex;align-items:center;padding:0 4mm;">
         <span style="font-size:11px;">LOTE: ${lote} &nbsp;&nbsp;&nbsp; OPER:</span>
       </div>
       <div style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:0 4mm;">
@@ -698,8 +698,8 @@ function imprimirR15(){
   const pa = document.createElement('div');
   pa.id = 'printAreaR15';
   // Centrado con márgenes por los 4 lados
-  pa.style.cssText = 'display:flex;justify-content:center;align-items:center;width:210mm;height:297mm;box-sizing:border-box;padding:6mm;';
-  pa.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,1fr);width:100%;gap:0;">${html}</div>`;
+  pa.style.cssText = 'position:fixed;top:0;left:0;width:210mm;height:297mm;box-sizing:border-box;display:flex;justify-content:center;align-items:center;background:#fff;';
+  pa.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,105mm);grid-template-rows:repeat(7,42.4mm);width:210mm;height:297mm;">${html}</div>`;
   document.body.appendChild(pa);
   const bloquePsf = document.getElementById('bloque-psf');
   bloquePsf.style.display = 'none';
@@ -1083,18 +1083,18 @@ window.imprimirSemana = function(){
   // ── ETIQUETAS ROLLOS 15KG ──
 function etR15HTML(modelo, lote){
   const fs = modelo.length > 5 ? '20px' : modelo.length > 3 ? '24px' : '28px';
-  return `<div style="width:105mm;height:42.4mm;box-sizing:border-box;display:flex;align-items:stretch;font-family:Arial,sans-serif;border:1px solid #ccc;overflow:hidden;">
+  return `<div style="width:105mm;height:42.4mm;box-sizing:border-box;display:flex;align-items:stretch;font-family:Arial,sans-serif;overflow:hidden;">
     <!-- Logo vertical izquierda -->
-    <div style="width:13mm;flex-shrink:0;overflow:hidden;position:relative;border-right:1px solid #ddd;">
+    <div style="width:13mm;flex-shrink:0;overflow:hidden;position:relative;">
       <img src="logo-vespi.jpg" alt="VESPI" style="position:absolute;top:50%;left:50%;width:28mm;height:auto;transform:translate(-50%,-50%) rotate(-90deg);">
     </div>
     <!-- 3 filas iguales -->
     <div style="flex:1;display:flex;flex-direction:column;box-sizing:border-box;">
-      <div style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:0 4mm;border-bottom:1px solid #ddd;">
+      <div style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:0 4mm;">
         <span style="font-size:11px;">FECHA____________</span>
         <span style="font-size:${fs};font-weight:bold;">${modelo}</span>
       </div>
-      <div style="flex:1;display:flex;align-items:center;padding:0 4mm;border-bottom:1px solid #ddd;">
+      <div style="flex:1;display:flex;align-items:center;padding:0 4mm;">
         <span style="font-size:11px;">LOTE: ${lote} &nbsp;&nbsp;&nbsp; OPER:</span>
       </div>
       <div style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:0 4mm;">
@@ -1122,8 +1122,8 @@ function imprimirR15(){
   const pa = document.createElement('div');
   pa.id = 'printAreaR15';
   // Centrado con márgenes por los 4 lados
-  pa.style.cssText = 'display:flex;justify-content:center;align-items:center;width:210mm;height:297mm;box-sizing:border-box;padding:6mm;';
-  pa.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,1fr);width:100%;gap:0;">${html}</div>`;
+  pa.style.cssText = 'position:fixed;top:0;left:0;width:210mm;height:297mm;box-sizing:border-box;display:flex;justify-content:center;align-items:center;background:#fff;';
+  pa.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,105mm);grid-template-rows:repeat(7,42.4mm);width:210mm;height:297mm;">${html}</div>`;
   document.body.appendChild(pa);
   const bloquePsf = document.getElementById('bloque-psf');
   bloquePsf.style.display = 'none';
