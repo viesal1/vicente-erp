@@ -560,6 +560,30 @@ window.imprimirSemana = function(){
        📁 Carpeta PSF
      </div>
 
+     <!-- ETIQUETAS ROLLOS 15KG -->
+     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7f8c8d;margin-bottom:10px;">🏷️ Etiquetas Rollos 15kg</div>
+     <div style="background:#fff;border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:16px;">
+       <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+         <div style="flex:1;min-width:120px;">
+           <label style="font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;display:block;margin-bottom:4px;">Modelo</label>
+           <input type="text" id="r15modelo" placeholder="ej: R-19" style="width:100%;padding:10px 12px;border:1px solid #dde3ee;border-radius:10px;font-size:15px;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+         </div>
+         <div style="flex:1;min-width:120px;">
+           <label style="font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;display:block;margin-bottom:4px;">Lote</label>
+           <input type="text" id="r15lote" placeholder="ej: 388 Mi" style="width:100%;padding:10px 12px;border:1px solid #dde3ee;border-radius:10px;font-size:15px;">
+         </div>
+       </div>
+       <div style="display:flex;gap:8px;flex-wrap:wrap;">
+         <button onclick="previsualizarR15()" style="flex:1;background:#1e2a44;color:#fff;border:none;padding:12px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">👁️ Previsualizar</button>
+         <button onclick="imprimirR15()" style="flex:1;background:#00a9e0;color:#fff;border:none;padding:12px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">🖨️ Imprimir 14</button>
+       </div>
+       <!-- Previsualización -->
+       <div id="r15preview" style="margin-top:14px;display:none;">
+         <div style="font-size:11px;color:#7f8c8d;margin-bottom:6px;">Vista previa (1 etiqueta):</div>
+         <div id="r15previewEt" style="border:1px dashed #dde3ee;border-radius:8px;overflow:hidden;width:105mm;"></div>
+       </div>
+     </div>
+
      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7f8c8d;margin-bottom:10px;">📂 Crudo</div>
      <div class="modulos-container" style="gap:8px;margin-bottom:16px;">
        <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Crudo/psf_aduana_pabilos_rayon_algodon_crudo.pdf')">
@@ -632,7 +656,63 @@ window.imprimirSemana = function(){
     document.getElementById('bloque-psf').style.display    = (tipo==='psf')    ? 'block':'none';
     if (tipo==='semana'){ precargarSemanaActual(); renderSemana(); }
   }
-  function volver(){
+  // ── ETIQUETAS ROLLOS 15KG ──
+function etR15HTML(modelo, lote){
+  return `<div style="width:105mm;height:42.4mm;box-sizing:border-box;display:flex;align-items:stretch;font-family:Arial,sans-serif;border:1px solid #ccc;">
+    <!-- Logo vertical izquierda -->
+    <div style="width:14mm;background:#fff;display:flex;align-items:center;justify-content:center;border-right:1px solid #ccc;flex-shrink:0;">
+      <img src="logo-vespi.jpg" alt="VESPI" style="height:38mm;width:auto;transform:rotate(-90deg);transform-origin:center;object-fit:contain;">
+    </div>
+    <!-- Contenido derecha -->
+    <div style="flex:1;padding:3mm 4mm;display:flex;flex-direction:column;justify-content:space-between;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="font-size:11px;">FECHA____________</div>
+        <div style="font-size:${modelo.length>4?'22px':'28px'};font-weight:bold;line-height:1;">${modelo}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:11px;">LOTE: ${lote}</div>
+        <div style="font-size:11px;">OPER:</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:11px;">MAQUINA: ____</div>
+        <div style="font-size:11px;">HORA:________</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function previsualizarR15(){
+  const modelo = document.getElementById('r15modelo').value.trim().toUpperCase() || 'R-19';
+  const lote   = document.getElementById('r15lote').value.trim() || '388 Mi';
+  document.getElementById('r15preview').style.display = 'block';
+  document.getElementById('r15previewEt').innerHTML = etR15HTML(modelo, lote);
+}
+
+function imprimirR15(){
+  const modelo = document.getElementById('r15modelo').value.trim().toUpperCase() || 'R-19';
+  const lote   = document.getElementById('r15lote').value.trim() || '388 Mi';
+  let html = '';
+  for(let i=0; i<14; i++){
+    html += etR15HTML(modelo, lote);
+  }
+  // Buscar el printArea o usar window.print con zona dedicada
+  const pa = document.getElementById('printArea') || document.createElement('div');
+  pa.id = 'printArea';
+  pa.style.cssText = 'display:grid;grid-template-columns:repeat(2,105mm);grid-template-rows:repeat(7,42.4mm);width:210mm;height:297mm;overflow:hidden;';
+  pa.innerHTML = html;
+  if(!document.getElementById('printArea')) document.body.appendChild(pa);
+  // Ocultar todo y mostrar solo el grid
+  const bloquePsf = document.getElementById('bloque-psf');
+  bloquePsf.style.display = 'none';
+  document.body.appendChild(pa);
+  window.print();
+  setTimeout(()=>{
+    pa.remove();
+    bloquePsf.style.display = '';
+  }, 1500);
+}
+
+function volver(){
     document.getElementById('bloque-selector').style.display='flex';
     document.getElementById('bloque-rollos').style.display='none';
     document.getElementById('bloque-cono').style.display='none';
@@ -1000,7 +1080,63 @@ window.imprimirSemana = function(){
     document.getElementById('bloque-semana').style.display = (tipo==='semana') ? 'block':'none';
     if (tipo==='semana'){ precargarSemanaActual(); renderSemana(); }
   }
-  function volver(){
+  // ── ETIQUETAS ROLLOS 15KG ──
+function etR15HTML(modelo, lote){
+  return `<div style="width:105mm;height:42.4mm;box-sizing:border-box;display:flex;align-items:stretch;font-family:Arial,sans-serif;border:1px solid #ccc;">
+    <!-- Logo vertical izquierda -->
+    <div style="width:14mm;background:#fff;display:flex;align-items:center;justify-content:center;border-right:1px solid #ccc;flex-shrink:0;">
+      <img src="logo-vespi.jpg" alt="VESPI" style="height:38mm;width:auto;transform:rotate(-90deg);transform-origin:center;object-fit:contain;">
+    </div>
+    <!-- Contenido derecha -->
+    <div style="flex:1;padding:3mm 4mm;display:flex;flex-direction:column;justify-content:space-between;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="font-size:11px;">FECHA____________</div>
+        <div style="font-size:${modelo.length>4?'22px':'28px'};font-weight:bold;line-height:1;">${modelo}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:11px;">LOTE: ${lote}</div>
+        <div style="font-size:11px;">OPER:</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:11px;">MAQUINA: ____</div>
+        <div style="font-size:11px;">HORA:________</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function previsualizarR15(){
+  const modelo = document.getElementById('r15modelo').value.trim().toUpperCase() || 'R-19';
+  const lote   = document.getElementById('r15lote').value.trim() || '388 Mi';
+  document.getElementById('r15preview').style.display = 'block';
+  document.getElementById('r15previewEt').innerHTML = etR15HTML(modelo, lote);
+}
+
+function imprimirR15(){
+  const modelo = document.getElementById('r15modelo').value.trim().toUpperCase() || 'R-19';
+  const lote   = document.getElementById('r15lote').value.trim() || '388 Mi';
+  let html = '';
+  for(let i=0; i<14; i++){
+    html += etR15HTML(modelo, lote);
+  }
+  // Buscar el printArea o usar window.print con zona dedicada
+  const pa = document.getElementById('printArea') || document.createElement('div');
+  pa.id = 'printArea';
+  pa.style.cssText = 'display:grid;grid-template-columns:repeat(2,105mm);grid-template-rows:repeat(7,42.4mm);width:210mm;height:297mm;overflow:hidden;';
+  pa.innerHTML = html;
+  if(!document.getElementById('printArea')) document.body.appendChild(pa);
+  // Ocultar todo y mostrar solo el grid
+  const bloquePsf = document.getElementById('bloque-psf');
+  bloquePsf.style.display = 'none';
+  document.body.appendChild(pa);
+  window.print();
+  setTimeout(()=>{
+    pa.remove();
+    bloquePsf.style.display = '';
+  }, 1500);
+}
+
+function volver(){
     document.getElementById('bloque-selector').style.display='flex';
     document.getElementById('bloque-rollos').style.display='none';
     document.getElementById('bloque-cono').style.display='none';
