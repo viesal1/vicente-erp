@@ -520,30 +520,47 @@ async function guardarSemana(){
 async function imprimirAlmacen(){
   const snap=await colLotes.get();
   const lotes=snap.docs.map(d=>d.data()).filter(l=>l.estado!=='agotado');
-  const grupos={};
+
+  // Orden fijo de materias dentro de FIBRAS
+  const ORDEN_FIBRAS=['ALG-30','ALG-50','ALG-22','RAYÓN 600','RAYÓN 450','RAYÓN 1200','PAPEL BLANCO','PAPEL MARRON'];
+  // Grupos: FIBRAS separado, luego RESTO todo junto
+  const fibras={}, resto={};
   lotes.forEach(l=>{
-    const cat=l.categoria||'OTROS';
     const mat=l.material||'—';
-    if(!grupos[cat]) grupos[cat]={};
-    if(!grupos[cat][mat]) grupos[cat][mat]={enUso:[],almacen:[]};
-    grupos[cat][mat][l.estado==='en_uso'?'enUso':'almacen'].push(l);
+    const cat=l.categoria||'OTROS';
+    const target = cat==='FIBRAS' ? fibras : resto;
+    if(!target[mat]) target[mat]={enUso:[],almacen:[]};
+    target[mat][l.estado==='en_uso'?'enUso':'almacen'].push(l);
   });
-  const ORDEN=['FIBRAS','PORTAMECHAS','PARAFINA','COLORANTE','OTROS'];
-  const cats=ORDEN.filter(c=>grupos[c]);
-  const filas=cats.map(cat=>
-    Object.entries(grupos[cat]).map(([mat,ls])=>{
-      const enUso=ls.enUso[0];
-      const almStr=ls.almacen.map(l=>`${l.cantidad?l.cantidad+' ':''}`+l.lote).join('<br>');
-      const sig=ls.almacen[0]?.lote||'';
-      return `<tr>
-        <td style="padding:4px 8px;border:1px solid #999;font-weight:600;font-size:10px">${mat}</td>
-        <td style="padding:4px 8px;border:1px solid #999;text-align:center;font-size:9px">${enUso?.cantidad||''}</td>
-        <td style="padding:4px 8px;border:1px solid #999;font-family:monospace;font-size:9px">${almStr||'—'}</td>
-        <td style="padding:4px 8px;border:1px solid #999;font-family:monospace;font-size:10px;font-weight:600">${enUso?.lote||'—'}</td>
-        <td style="padding:4px 8px;border:1px solid #999;font-family:monospace;font-size:9px">${sig}</td>
-      </tr>`;
-    }).join('')
-  ).join('');
+
+  const buildFila=(mat,ls)=>{
+    const enUso=ls.enUso[0];
+    const almStr=ls.almacen.map(l=>`${l.cantidad?l.cantidad+' ':''}`+l.lote).join('<br>');
+    const sig=ls.almacen[0]?.lote||'';
+    return `<tr>
+      <td style="padding:4px 8px;border:1px solid #999;font-weight:600;font-size:10px">${mat}</td>
+      <td style="padding:4px 8px;border:1px solid #999;text-align:center;font-size:9px">${enUso?.cantidad||''}</td>
+      <td style="padding:4px 8px;border:1px solid #999;font-family:monospace;font-size:9px">${almStr||'—'}</td>
+      <td style="padding:4px 8px;border:1px solid #999;font-family:monospace;font-size:10px;font-weight:600">${enUso?.lote||'—'}</td>
+      <td style="padding:4px 8px;border:1px solid #999;font-family:monospace;font-size:9px">${sig}</td>
+    </tr>`;
+  };
+
+  // Ordenar fibras según ORDEN_FIBRAS, luego el resto alfabético
+  const fibrasMats=[
+    ...ORDEN_FIBRAS.filter(m=>fibras[m]),
+    ...Object.keys(fibras).filter(m=>!ORDEN_FIBRAS.includes(m)).sort()
+  ];
+  const restoMats=Object.keys(resto).sort();
+
+  const sepFibras=`<tr><td colspan="5" style="padding:4px 8px;background:#1e2a44;color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase">FIBRAS</td></tr>`;
+  const sepResto=`<tr><td colspan="5" style="padding:4px 8px;background:#555;color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase">PORTAMECHAS / PARAFINAS / COLORANTES / OTROS</td></tr>`;
+
+  const filas=
+    sepFibras +
+    fibrasMats.map(m=>buildFila(m,fibras[m])).join('') +
+    (restoMats.length ? sepResto + restoMats.map(m=>buildFila(m,resto[m])).join('') : '');
+
   document.getElementById('print-area').innerHTML=`
     <style>@page{margin:8mm;size:A4 portrait;}</style>
     <div style="font-family:Arial,sans-serif;font-size:10px;">
@@ -684,30 +701,34 @@ function imprimirSemana(){
 // ── IMPRIMIR PIÑOS ──
 function imprimirPinos(){
   const num=document.getElementById('pinoSemNum').value||getSemana();
-  const trVacios=Array(18).fill(`<tr>
-    <td style="padding:11px 8px;border:1px solid #aaa;text-align:center"></td>
+  // 20 filas que ocupan toda la hoja A4 horizontal
+  // A4 landscape: 297x210mm. Margen 8mm. Cabecera ~20mm. Resto ~170mm / 20 filas = 8.5mm por fila
+  const trVacios=Array(20).fill(`<tr style="height:8.5mm">
+    <td style="border:1px solid #aaa;text-align:center;font-size:11px"></td>
     <td style="border:1px solid #aaa"></td>
-    <td style="border:1px solid #aaa;text-align:center"></td>
-    <td style="border:1px solid #aaa;text-align:center"></td>
+    <td style="border:1px solid #aaa;text-align:center;font-size:11px"></td>
+    <td style="border:1px solid #aaa;text-align:center;font-size:11px"></td>
     <td style="border:1px solid #aaa"></td>
     <td style="border:1px solid #aaa"></td>
   </tr>`).join('');
   document.getElementById('print-area').innerHTML=`
-    <style>@page{margin:0;size:A4 landscape;}body{margin:0;}</style>
-    <div style="font-family:Arial,sans-serif;font-size:10px;width:277mm;box-sizing:border-box;padding:8mm;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5mm;border-bottom:2px solid #000;padding-bottom:3mm;">
-        <div><div style="font-size:16px;font-weight:bold">CONTROL CAMBIO DE PIÑOS</div>
-        <div style="font-size:11px;margin-top:2px">SEMANA ${num}</div></div>
-        <img src="logo-vespi.jpg" style="height:14mm;width:auto">
+    <style>@page{margin:8mm;size:A4 landscape;}body{margin:0;}</style>
+    <div style="font-family:Arial,sans-serif;font-size:11px;width:281mm;height:194mm;box-sizing:border-box;display:flex;flex-direction:column;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4mm;border-bottom:2px solid #000;padding-bottom:3mm;">
+        <div>
+          <div style="font-size:18px;font-weight:bold">CONTROL CAMBIO DE PIÑOS</div>
+          <div style="font-size:12px;margin-top:1mm">SEMANA ${num}</div>
+        </div>
+        <img src="logo-vespi.jpg" style="height:16mm;width:auto">
       </div>
-      <table style="width:100%;border-collapse:collapse;">
+      <table style="width:100%;border-collapse:collapse;flex:1;table-layout:fixed;">
         <thead><tr>
-          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:10px;text-align:center;width:50px">Nº MÁQUINA</th>
-          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:10px;text-align:left">MECHA</th>
-          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:10px;text-align:center;width:60px">PIÑOS</th>
-          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:10px;text-align:center;width:70px">FECHA</th>
-          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:10px;text-align:left">TRABAJADOR CAMBIA</th>
-          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:10px;text-align:left">TRABAJADOR COMPRUEBA</th>
+          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:center;width:55px">Nº MÁQUINA</th>
+          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:left">MECHA</th>
+          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:center;width:65px">PIÑOS</th>
+          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:center;width:75px">FECHA</th>
+          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:left">TRABAJADOR CAMBIA</th>
+          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:11px;text-align:left">TRABAJADOR COMPRUEBA</th>
         </tr></thead>
         <tbody>${trVacios}</tbody>
       </table>
