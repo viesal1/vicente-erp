@@ -6,7 +6,6 @@
    Etiquetas V. ESPI
   </title>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <link rel="stylesheet" href="css/estilos_odoo.css">
   <!-- === RETOQUES 2025-09-09 === -->
   <!-- === RETOQUES 2025-09-09 (v3) === -->
   <!-- === RETOQUES 2025-09-09 (v4) === -->
@@ -120,6 +119,7 @@ window.imprimirSemana = function(){
   <style>
    :root{ --azul:#00a9e0; --fondo:#f6f7fb; --borde:#cfd6e4; }
     @page{ size:A4 portrait; margin:0; }
+  #outputCono{ position:absolute; top:0; left:0; margin:0 !important; padding:0 !important; }
     html,body{ margin:0; padding:0; background:var(--fondo); font-family:system-ui, Arial, sans-serif; }
 
     .selector{ display:flex; gap:30px; justify-content:center; margin:80px 16px 24px; flex-wrap:wrap; }
@@ -342,131 +342,23 @@ window.imprimirSemana = function(){
   #bloque-semana .etiqueta.etiqueta-semana .logo img{
     height: 80%; width: auto; display:block;
   }
-  
-  /* ── UI FORMULARIOS ── */
-  .no-print.formulario, .formulario.no-print {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 16px;
-  }
-  .formulario h2 {
-    font-size: .85em;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #00a9e0;
-    margin-bottom: 14px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #f4f7fa;
-  }
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  .row input {
-    flex: 1;
-    min-width: 120px;
-    padding: 11px 13px;
-    border: 1px solid #dde3ee;
-    border-radius: 10px;
-    font-size: 15px;
-    font-family: inherit;
-  }
-  .row input:focus { outline: none; border-color: #00a9e0; }
-  .btn-primary {
-    background: #00a9e0;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .btn-primary:hover { background: #0090c0; }
-  .btn-secondary {
-    background: #f4f7fa;
-    color: #1e2a44;
-    border: 1px solid #dde3ee;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .btn-secondary:hover { background: #e8ecf1; }
-  .preview-area {
-    max-width: 600px;
-    margin: 16px auto;
-    padding: 16px;
-    background: white;
-    border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-  }
-  /* PSF lista */
-  .psf-lista {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .psf-item {
-    background: white;
-    border-radius: 12px;
-    padding: 16px 18px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-left: 4px solid #00a9e0;
-  }
-  .psf-item span { font-weight: 600; color: #1e2a44; }
-  .psf-item button {
-    background: #00a9e0;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  @media(max-width:600px){
-    .row { flex-direction: column; }
-  }
-</style>
+  </style>
  </head>
  <body>
-  <!-- HEADER -->
-  <div class="header no-print">
-    <button class="back-btn" onclick="location.href='inicio-vicente.html'">← Volver</button>
-    <h1 style="color:white;font-size:1.1em">🏷️ Etiquetas — V.ESPI</h1>
-    <div style="width:80px"></div>
-  </div>
-
   <!-- Selector -->
-  <div class="no-print" id="bloque-selector" style="max-width:500px;margin:24px auto;padding:0 16px;">
-    <div class="modulos-container">
-      <div class="modulo" onclick="abrirFormulario('rollos')">
-        <h3>🏷️ Etiquetas Rollos</h3>
-        <p>14 etiquetas por hoja A4</p>
-      </div>
-      <div class="modulo" onclick="abrirFormulario('cono')">
-        <h3>🧵 Etiquetas Cono</h3>
-        <p>24 etiquetas por hoja A4</p>
-      </div>
-      <div class="modulo" onclick="abrirFormulario('semana')">
-        <h3>📅 Etiquetas Semana</h3>
-        <p>40 etiquetas por hoja A4</p>
-      </div>
-      <div class="modulo" onclick="abrirFormulario('psf')">
-        <h3>📁 PSF</h3>
-        <p>Carpeta de PDFs</p>
-      </div>
-    </div>
+  <div class="selector no-print" id="bloque-selector">
+   <div class="card" onclick="abrirFormulario('rollos')">
+    🏷️ Etiquetas Rollos
+   </div>
+   <div class="card" onclick="abrirFormulario('cono')">
+    🧵 Etiquetas Cono
+   </div>
+   <div class="card" onclick="abrirFormulario('semana')">
+    📅 Etiquetas de la Semana
+   </div>
+   <div class="card" onclick="abrirFormulario('psf')">
+    📁 PSF
+   </div>
   </div>
   <!-- ROLLOS -->
   <div id="bloque-rollos" style="display:none;">
@@ -505,7 +397,7 @@ window.imprimirSemana = function(){
   <div id="bloque-cono" style="display:none;">
    <div class="formulario no-print">
     <h2>
-     Etiquetas Cono (24 por hoja)
+     Etiquetas Cono (20 por hoja)
     </h2>
     <input id="textoCono" placeholder="MECHA"/>
     <div class="row">
@@ -521,7 +413,7 @@ window.imprimirSemana = function(){
     </div>
    </div>
    <!-- 24 por hoja: 2×12 -->
-   <div class="etiqueta-sheet" id="outputCono" style="display:grid; grid-template-columns:repeat(2,105mm); grid-template-rows:repeat(12,25mm); width:210mm; height:297mm; overflow:hidden;">
+   <div class="etiqueta-sheet" id="outputCono" style="display:grid; grid-template-columns:repeat(2,105mm); grid-template-rows:repeat(10,29.7mm); width:210mm; height:297mm; overflow:hidden;">
    </div>
   </div>
   <!-- SEMANA -->
@@ -554,43 +446,43 @@ window.imprimirSemana = function(){
   
   <!-- PSF -->
   <div id="bloque-psf" style="display:none;">
-   <div class="no-print" style="max-width:500px;margin:16px auto;padding:0 16px;">
+   <div class="formulario no-print">
+    <h2>PSF</h2>
 
-     <div style="font-size:.85em;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#00a9e0;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #f4f7fa;">
-       📁 Carpeta PSF
-     </div>
+    <h3>📂 Crudo</h3>
+    <div class="selector">
+      <div class="card" onclick="imprimirPDF('psf/Crudo/psf_aduana_pabilos_rayon_algodon_crudo.pdf')">
+        🖨️ 1. Cono Rayón + Algodón Crudo
+      </div>
+      <div class="card" onclick="imprimirPDF('psf/Crudo/psf_aduana_pabilos_rayon_cono_sin_encerar.pdf')">
+        🖨️ 2. Cono Rayón Crudo
+      </div>
+    </div>
 
-     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7f8c8d;margin-bottom:10px;">📂 Crudo</div>
-     <div class="modulos-container" style="gap:8px;margin-bottom:16px;">
-       <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Crudo/psf_aduana_pabilos_rayon_algodon_crudo.pdf')">
-         <h3 style="font-size:1em;">🖨️ Cono Rayón + Algodón Crudo</h3>
-       </div>
-       <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Crudo/psf_aduana_pabilos_rayon_cono_sin_encerar.pdf')">
-         <h3 style="font-size:1em;">🖨️ Cono Rayón Crudo</h3>
-       </div>
-     </div>
+    <h3>📂 Encerado</h3>
+    <div class="selector">
+      <div class="card" onclick="imprimirPDF('psf/Encerado/psf_aduana_pabilo_encerado.pdf')">
+        🖨️ 3. Pabilo Encerado 100% Rayón
+      </div>
+      <div class="card" onclick="imprimirPDF('psf/Encerado/psf_aduana_pabilo_encerado_rayon_algodon.pdf')">
+        🖨️ 4. Pabilo Encerado Rayón + Algodón
+      </div>
+    </div>
 
-     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7f8c8d;margin-bottom:10px;">📂 Encerado</div>
-     <div class="modulos-container" style="gap:8px;margin-bottom:16px;">
-       <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Encerado/psf_aduana_pabilo_encerado.pdf')">
-         <h3 style="font-size:1em;">🖨️ Pabilo Encerado 100% Rayón</h3>
-       </div>
-       <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Encerado/psf_aduana_pabilo_encerado_rayon_algodon.pdf')">
-         <h3 style="font-size:1em;">🖨️ Pabilo Encerado Rayón + Algodón</h3>
-       </div>
-     </div>
+    <h3>📂 Ensamblado</h3>
+    <div class="selector">
+      <div class="card" onclick="imprimirPDF('psf/Ensamblado/psf_aduana_pabilos_ensamblados.pdf')">
+        🖨️ 5. Pabilo Ensamblado
+      </div>
+      <div class="card" onclick="imprimirPDF('psf/Ensamblado/psf_40_caguama.pdf')">
+        🖨️ 6. R-23 13cm · Caguama
+      </div>
+    </div>
 
-     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7f8c8d;margin-bottom:10px;">📂 Ensamblado</div>
-     <div class="modulos-container" style="gap:8px;margin-bottom:20px;">
-       <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Ensamblado/psf_aduana_pabilos_ensamblados.pdf')">
-         <h3 style="font-size:1em;">🖨️ Pabilo Ensamblado</h3>
-       </div>
-       <div class="modulo" style="text-align:left;padding:14px 18px;" onclick="imprimirPDF('psf/Ensamblado/psf_40_caguama.pdf')">
-         <h3 style="font-size:1em;">🖨️ R-23 13cm · Caguama</h3>
-       </div>
-     </div>
+    <div class="row">
+      <button class="btn-secondary" onclick="volver()" type="button">Volver</button>
+    </div>
 
-     <button class="btn-secondary" onclick="volver()" type="button" style="width:100%;padding:13px;">← Volver</button>
    </div>
   </div>
 <!-- Modal Rollos -->
@@ -826,11 +718,11 @@ Encerado para : ${encerado}`;
     out.style.height  = "297mm";
     out.style.border  = "none";
     out.style.gridTemplateColumns = "repeat(2,105mm)";
-    out.style.gridTemplateRows    = "repeat(12,25mm)";
+    out.style.gridTemplateRows    = "repeat(10,29.7mm)";
     out.style.overflow = "hidden";
 
     let html = "";
-    for(let i=0;i<24;i++){
+    for(let i=0;i<20;i++){
       html += `<div class="etiqueta etiqueta-cono" style="padding:${PAD};">${texto}</div>`;
     }
     out.innerHTML = html;
@@ -872,11 +764,11 @@ Encerado para : ${encerado}`;
     out.style.height  = "297mm";
     out.style.border  = "none";
     out.style.gridTemplateColumns = "repeat(2,105mm)";
-    out.style.gridTemplateRows    = "repeat(12,25mm)";
+    out.style.gridTemplateRows    = "repeat(10,29.7mm)";
     out.style.overflow = "hidden";
 
     let html = "";
-    for(let i=0;i<24;i++){
+    for(let i=0;i<20;i++){
       html += `<div class="etiqueta etiqueta-cono" style="padding:${PAD};">${texto}</div>`;
     }
     out.innerHTML = html;
@@ -1170,11 +1062,11 @@ Encerado para : ${encerado}`;
     out.style.height  = "297mm";
     out.style.border  = "none";
     out.style.gridTemplateColumns = "repeat(2,105mm)";
-    out.style.gridTemplateRows    = "repeat(12,25mm)";
+    out.style.gridTemplateRows    = "repeat(10,29.7mm)";
     out.style.overflow = "hidden";
 
     let html = "";
-    for(let i=0;i<24;i++){
+    for(let i=0;i<20;i++){
       html += `<div class="etiqueta etiqueta-cono" style="padding:${PAD};">${texto}</div>`;
     }
     out.innerHTML = html;
@@ -1214,11 +1106,11 @@ Encerado para : ${encerado}`;
     out.style.height  = "297mm";
     out.style.border  = "none";
     out.style.gridTemplateColumns = "repeat(2,105mm)";
-    out.style.gridTemplateRows    = "repeat(12,25mm)";
+    out.style.gridTemplateRows    = "repeat(10,29.7mm)";
     out.style.overflow = "hidden";
 
     let html = "";
-    for(let i=0;i<24;i++){
+    for(let i=0;i<20;i++){
       html += `<div class="etiqueta etiqueta-cono" style="padding:${PAD};">${texto}</div>`;
     }
     out.innerHTML = html;
