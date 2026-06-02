@@ -126,9 +126,10 @@
 
   <!-- ══ TAB LOTES ══ -->
   <div id="tab-lotes">
-    <button class="btn-fab" onclick="abrirRecepcion()" style="background:#00a9e0;color:#fff;border:none;padding:14px 22px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:8px;box-shadow:0 3px 10px rgba(0,169,224,.3);">
-      ＋ Nueva Recepción
-    </button>
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <button onclick="abrirRecepcion()" style="background:#00a9e0;color:#fff;border:none;padding:14px 22px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 3px 10px rgba(0,169,224,.3);">＋ Nueva Recepción</button>
+      <button onclick="imprimirLotes()" style="background:#f39c12;color:#fff;border:none;padding:14px 22px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">🖨️ Imprimir Lotes</button>
+    </div>
     <div id="lotes-container">
       <div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div>
     </div>
@@ -180,6 +181,7 @@
   <div id="tab-pinos" style="display:none">
     <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
       <button onclick="abrirPino()" style="background:#1e2a44;color:#fff;border:none;padding:12px 20px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;">＋ Nuevo cambio</button>
+      <button onclick="imprimirPinos()" style="background:#f39c12;color:#fff;border:none;padding:12px 20px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;">🖨️ Imprimir Piños</button>
       <select id="filtroPinoSemana" onchange="cargarPinos()" style="padding:10px 14px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;background:#fff;">
         <option value="">Todas las semanas</option>
       </select>
@@ -217,15 +219,15 @@
     <div class="fg">
       <label>Proveedor</label>
       <select id="recProveedor" onchange="generarLote()">
-        <option value="CO">COLOURNOU (CO)</option>
-        <option value="MI">MIMCORD (MI)</option>
-        <option value="RI">RIMAFILE (RI)</option>
-        <option value="BE">BESTWAX (BE)</option>
-        <option value="ANIC">ANIC (ANIC)</option>
-        <option value="JOE">JOE/STC (JOE)</option>
-        <option value="IB">IBERCERAS (IB)</option>
-        <option value="LUX">LUXCHEM (LUX)</option>
-        <option value="AM">AMWAX (AM)</option>
+        <option value="CO">COLOURNOU</option>
+        <option value="MI">MIMCORD</option>
+        <option value="RI">RIMAFIL</option>
+        <option value="BE">BESTWAX</option>
+        <option value="ANIC">ANIC</option>
+        <option value="JOE">JOE</option>
+        <option value="IB">IBERCERAS</option>
+        <option value="LUX">LUXCHEM</option>
+        <option value="AM">AMWAX</option>
       </select>
     </div>
     <div class="fg">
@@ -383,7 +385,7 @@ function setTab(nombre) {
 async function cargarLotes() {
   const cont = document.getElementById('lotes-container');
   try {
-    const snap = await colLotes.orderBy('categoria').orderBy('material').get();
+    const snap = await colLotes.get();
     if (snap.empty) {
       cont.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>Sin lotes. Registra la primera recepción.</p></div>';
       return;
@@ -614,7 +616,8 @@ async function cargarSemana() {
 
   try {
     // Cargar lotes en uso actuales
-    const snap = await colLotes.where('estado','==','en_uso').get();
+    const snapTodos = await colLotes.get();
+    const snap = { docs: snapTodos.docs.filter(d => d.data().estado === 'en_uso') };
     const lotesEnUso = {};
     snap.docs.forEach(d => {
       const d2 = d.data();
@@ -678,48 +681,91 @@ function imprimirSemana() {
   const filas = window._semMaterias.map(mat => {
     const el = document.getElementById('sem-'+mat.replace(/[^a-zA-Z0-9]/g,'_'));
     const lote = el ? el.value : '—';
-    return `<tr><td style="padding:6px 10px;border:1px solid #ccc;font-weight:600">${mat}</td><td style="padding:6px 10px;border:1px solid #ccc;font-family:monospace">${lote}</td><td style="padding:6px 10px;border:1px solid #ccc"></td></tr>`;
+    return `<tr>
+      <td style="padding:7px 10px;border:1px solid #ccc;font-weight:600">${mat}</td>
+      <td style="padding:7px 10px;border:1px solid #ccc;font-family:monospace;font-size:11px">${lote}</td>
+      <td style="padding:7px 10px;border:1px solid #ccc"></td>
+    </tr>`;
   }).join('');
 
-  const html = `
-    <div style="font-family:Arial,sans-serif;font-size:11px;padding:8mm;width:210mm;box-sizing:border-box;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6mm;border-bottom:2px solid #000;padding-bottom:3mm;">
+  // Tipos de control del Excel
+  const TIPOS_CONTROL = [
+    '1. COMPROBACIÓN MATERIA PRIMA',
+    '2. CONTROL VELOCIDAD MÁQUINA (PIÑOS)',
+    '3. COMPROBACIÓN Nº DE HILOS',
+    '4. CONTROL CALIDAD DEL TRENZADO',
+    '5. COMPROBAR LA TENSIÓN DE LAS TRENZADORAS',
+    '6. COMPROBAR EL GROSOR DEL ENCERADO',
+    '7. COMPROBAR CALIDAD DEL ENCERADO',
+    '8. COMPROBAR TENSIÓN DE LAS ENCERADORAS',
+    '9. CONTROL MEDIDA DE LAS ENSAMBLADAS',
+    '10. COMPROBACIÓN MEDIDAS DEL PORTAMECHAS',
+    '11. COMPROBACIÓN SUJECIÓN PORTAMECHAS'
+  ];
+
+  // HOJA 1 — Materias primas
+  const hoja1 = `
+    <div style="font-family:Arial,sans-serif;font-size:11px;padding:8mm;width:210mm;min-height:297mm;box-sizing:border-box;page-break-after:always;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5mm;border-bottom:2px solid #000;padding-bottom:3mm;">
         <div>
-          <div style="font-size:14px;font-weight:bold">MATERIAS PRIMAS UTILIZADAS</div>
-          <div style="font-size:11px;color:#555">SEMANA ${num} ${periodo?'— '+periodo:''}</div>
+          <div style="font-size:13px;font-weight:bold">MATERIAS PRIMAS UTILIZADAS</div>
+          <div style="font-size:10px;color:#555">SEMANA ${num} ${periodo?'— '+periodo:''} &nbsp;&nbsp; REV.01</div>
         </div>
         <img src="logo-vespi.jpg" style="height:14mm;width:auto">
       </div>
-      <table style="width:100%;border-collapse:collapse;margin-bottom:6mm;">
+      <table style="width:100%;border-collapse:collapse;margin-bottom:8mm;">
         <thead><tr>
-          <th style="padding:6px 10px;border:1px solid #ccc;background:#f0f0f0;text-align:left">MATERIA PRIMA</th>
-          <th style="padding:6px 10px;border:1px solid #ccc;background:#f0f0f0;text-align:left">LOTE</th>
-          <th style="padding:6px 10px;border:1px solid #ccc;background:#f0f0f0;text-align:left">LOTE 2</th>
+          <th style="padding:6px 10px;border:1px solid #ccc;background:#f0f0f0;text-align:left;font-size:10px">MATERIA PRIMA</th>
+          <th style="padding:6px 10px;border:1px solid #ccc;background:#f0f0f0;text-align:left;font-size:10px">LOTE</th>
+          <th style="padding:6px 10px;border:1px solid #ccc;background:#f0f0f0;text-align:left;font-size:10px">LOTE 2</th>
         </tr></thead>
         <tbody>${filas}</tbody>
       </table>
       <div style="margin-top:6mm;">
+        <div style="font-size:10px;font-weight:bold;margin-bottom:3mm;">Tipo de control:</div>
         <table style="width:100%;border-collapse:collapse;">
-          <thead><tr>
-            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">TIPO DE CONTROL</th>
-            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">OPERARIO</th>
-            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">FECHA</th>
-            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">MECHA</th>
-            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">CONTROL</th>
-            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">SI</th>
-            <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">NO</th>
-          </tr></thead>
           <tbody>
-            ${['TRENZADO','ENCERADO','ENSAMBLADO'].map(tipo => `
-            <tr><td colspan="7" style="padding:4px 8px;border:1px solid #ccc;font-weight:bold;background:#fafafa;font-size:9px">CONTROLES ${tipo}</td></tr>
-            <tr><td style="padding:12px 8px;border:1px solid #ccc"></td><td style="padding:12px 8px;border:1px solid #ccc"></td><td style="padding:12px 8px;border:1px solid #ccc"></td><td style="padding:12px 8px;border:1px solid #ccc"></td><td style="padding:12px 8px;border:1px solid #ccc"></td><td style="padding:12px 8px;border:1px solid #ccc"></td><td style="padding:12px 8px;border:1px solid #ccc"></td></tr>
-            `).join('')}
+            ${TIPOS_CONTROL.map(t => `<tr><td style="padding:5px 8px;border:1px solid #ccc;font-size:10px">${t}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
+      <div style="margin-top:8mm;font-size:10px;color:#555">Revisado: _____________ &nbsp;&nbsp; Fecha: _____________</div>
     </div>`;
 
-  document.getElementById('print-area').innerHTML = html;
+  // HOJA 2 — Controles operarios
+  const filasControlVacia = Array(4).fill('').map(() =>
+    `<tr><td style="padding:12px 8px;border:1px solid #ccc;min-width:60px"></td><td style="padding:12px 8px;border:1px solid #ccc;min-width:40px"></td><td style="padding:12px 8px;border:1px solid #ccc;min-width:80px"></td><td style="padding:12px 8px;border:1px solid #ccc;min-width:60px"></td><td style="padding:12px 8px;border:1px solid #ccc;min-width:30px"></td><td style="padding:12px 8px;border:1px solid #ccc;min-width:30px"></td><td style="padding:12px 8px;border:1px solid #ccc;min-width:60px"></td></tr>`
+  ).join('');
+
+  const hoja2 = `
+    <div style="font-family:Arial,sans-serif;font-size:11px;padding:8mm;width:210mm;min-height:297mm;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5mm;border-bottom:2px solid #000;padding-bottom:3mm;">
+        <div>
+          <div style="font-size:13px;font-weight:bold">CONTROLES DE PRODUCCIÓN</div>
+          <div style="font-size:10px;color:#555">SEMANA ${num} ${periodo?'— '+periodo:''}</div>
+        </div>
+        <img src="logo-vespi.jpg" style="height:14mm;width:auto">
+      </div>
+      ${['TRENZADO','ENCERADO','ENSAMBLADO'].map(tipo => `
+        <div style="margin-bottom:6mm;">
+          <div style="font-size:11px;font-weight:bold;background:#1e2a44;color:#fff;padding:4px 8px;margin-bottom:2mm;">CONTROLES ${tipo}</div>
+          <table style="width:100%;border-collapse:collapse;">
+            <thead><tr>
+              <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px;text-align:left">OPERARIO</th>
+              <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px;text-align:left">FECHA</th>
+              <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px;text-align:left">MECHA</th>
+              <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px;text-align:left">CONTROL</th>
+              <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px;text-align:center">SI</th>
+              <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px;text-align:center">NO</th>
+              <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px;text-align:left">OBSERVACIÓN</th>
+            </tr></thead>
+            <tbody>${filasControlVacia}</tbody>
+          </table>
+        </div>`).join('')}
+      <div style="margin-top:6mm;font-size:10px;color:#555">Revisado: _____________ &nbsp;&nbsp; Fecha: _____________</div>
+    </div>`;
+
+  document.getElementById('print-area').innerHTML = hoja1 + hoja2;
   setTimeout(() => {
     window.print();
     setTimeout(() => { document.getElementById('print-area').innerHTML = ''; }, 1500);
@@ -801,6 +847,120 @@ async function confirmarPino() {
     cerrarModal('modalPino');
     cargarPinos();
   } catch(e) { toast('❌ Error: '+e.message, 'err'); }
+}
+
+// ══════════════════════════════════════════
+// IMPRIMIR LOTES
+// ══════════════════════════════════════════
+async function imprimirLotes() {
+  const snap = await colLotes.get();
+  if (snap.empty) { toast('⚠️ No hay lotes', 'err'); return; }
+
+  // Agrupar por categoria y material
+  const grupos = {};
+  snap.docs.forEach(d => {
+    const l = d.data();
+    if (l.estado === 'agotado') return;
+    if (!grupos[l.categoria]) grupos[l.categoria] = {};
+    if (!grupos[l.categoria][l.material]) grupos[l.categoria][l.material] = { enUso:[], almacen:[] };
+    if (l.estado === 'en_uso') grupos[l.categoria][l.material].enUso.push(l);
+    else grupos[l.categoria][l.material].almacen.push(l);
+  });
+
+  const filasHTML = Object.entries(grupos).map(([cat, mats]) => {
+    const catRows = Object.entries(mats).map(([mat, lotes]) => {
+      const enUsoStr = lotes.enUso.map(l => l.lote).join(', ') || '—';
+      const almStr   = lotes.almacen.map(l => l.lote).join(', ') || '—';
+      const cantStr  = [...lotes.enUso, ...lotes.almacen].map(l => l.cantidad).filter(Boolean).join(' / ') || '—';
+      return `<tr>
+        <td style="padding:6px 8px;border:1px solid #ccc;font-weight:600">${mat}</td>
+        <td style="padding:6px 8px;border:1px solid #ccc;font-family:monospace;font-size:11px">${enUsoStr}</td>
+        <td style="padding:6px 8px;border:1px solid #ccc;font-family:monospace;font-size:11px">${almStr}</td>
+        <td style="padding:6px 8px;border:1px solid #ccc;font-size:11px">${cantStr}</td>
+      </tr>`;
+    }).join('');
+    return `<tr><td colspan="4" style="padding:6px 8px;border:1px solid #ccc;font-weight:700;background:#1e2a44;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:1px">${cat}</td></tr>${catRows}`;
+  }).join('');
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;font-size:11px;padding:8mm;width:210mm;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6mm;border-bottom:2px solid #000;padding-bottom:3mm;">
+        <div>
+          <div style="font-size:14px;font-weight:bold">ALMACÉN VICENTE ESPI, S.L.</div>
+          <div style="font-size:11px;color:#555">CONTROL DE LOTES — ${fechaES(new Date().toISOString().split('T')[0])}</div>
+        </div>
+        <img src="logo-vespi.jpg" style="height:14mm;width:auto">
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr>
+          <th style="padding:6px 8px;border:1px solid #ccc;background:#f0f0f0;text-align:left">MATERIA PRIMA</th>
+          <th style="padding:6px 8px;border:1px solid #ccc;background:#f0f0f0;text-align:left">LOTE EN USO</th>
+          <th style="padding:6px 8px;border:1px solid #ccc;background:#f0f0f0;text-align:left">LOTE ALMACÉN</th>
+          <th style="padding:6px 8px;border:1px solid #ccc;background:#f0f0f0;text-align:left">CANTIDAD</th>
+        </tr></thead>
+        <tbody>${filasHTML}</tbody>
+      </table>
+    </div>`;
+
+  document.getElementById('print-area').innerHTML = html;
+  setTimeout(() => { window.print(); setTimeout(() => { document.getElementById('print-area').innerHTML = ''; }, 1500); }, 200);
+}
+
+// ══════════════════════════════════════════
+// IMPRIMIR PIÑOS
+// ══════════════════════════════════════════
+async function imprimirPinos() {
+  const semFiltro = document.getElementById('filtroPinoSemana').value;
+  let query = colPinos.orderBy('semana','desc');
+  if (semFiltro) query = colPinos.where('semana','==',parseInt(semFiltro));
+  const snap = await query.get();
+  if (snap.empty) { toast('⚠️ No hay registros de piños', 'err'); return; }
+
+  const grupos = {};
+  snap.docs.forEach(d => {
+    const p = d.data();
+    if (!grupos[p.semana]) grupos[p.semana] = [];
+    grupos[p.semana].push(p);
+  });
+
+  const tablasHTML = Object.entries(grupos).sort((a,b)=>b[0]-a[0]).map(([sem, items]) => `
+    <div style="margin-bottom:8mm;">
+      <div style="font-size:12px;font-weight:bold;background:#1e2a44;color:#fff;padding:4px 8px;margin-bottom:2mm;">SEMANA ${sem} — CONTROL CAMBIO DE PIÑOS</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr>
+          <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">Nº MÁQUINA</th>
+          <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">MECHA</th>
+          <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">PIÑOS</th>
+          <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">FECHA</th>
+          <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">TRABAJADOR CAMBIA</th>
+          <th style="padding:5px 8px;border:1px solid #ccc;background:#f0f0f0;font-size:9px">TRABAJADOR COMPRUEBA</th>
+        </tr></thead>
+        <tbody>
+          ${items.map(p => `<tr>
+            <td style="padding:6px 8px;border:1px solid #ccc;font-weight:700;text-align:center">${p.maquina}</td>
+            <td style="padding:6px 8px;border:1px solid #ccc">${p.mecha}</td>
+            <td style="padding:6px 8px;border:1px solid #ccc;text-align:center">${p.pinos}</td>
+            <td style="padding:6px 8px;border:1px solid #ccc;text-align:center">${fechaES(p.fecha)}</td>
+            <td style="padding:6px 8px;border:1px solid #ccc">${p.cambia||''}</td>
+            <td style="padding:6px 8px;border:1px solid #ccc">${p.comprueba||''}</td>
+          </tr>`).join('')}
+          <!-- Filas vacías para rellenar -->
+          ${Array(5).fill('<tr><td style="padding:10px 8px;border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td></tr>').join('')}
+        </tbody>
+      </table>
+    </div>`).join('');
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;font-size:11px;padding:8mm;width:210mm;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6mm;border-bottom:2px solid #000;padding-bottom:3mm;">
+        <div style="font-size:14px;font-weight:bold">CONTROL CAMBIO DE PIÑOS</div>
+        <img src="logo-vespi.jpg" style="height:14mm;width:auto">
+      </div>
+      ${tablasHTML}
+    </div>`;
+
+  document.getElementById('print-area').innerHTML = html;
+  setTimeout(() => { window.print(); setTimeout(() => { document.getElementById('print-area').innerHTML = ''; }, 1500); }, 200);
 }
 
 // ══════════════════════════════════════════
