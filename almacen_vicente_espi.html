@@ -437,37 +437,37 @@ async function eliminarRec(id){
   }catch(e){ toast('❌ '+e.message,'err'); }
 }
 
-// ── ETIQUETA LOTE — igual que PDF ──
+// ── ETIQUETA LOTE — 4 por hoja (2x2), formato PDF ──
 function impEtLote(lote,mat,fecha,n){
-  // Formato del PDF: recuadros izq + lote vertical centro + logo+fecha derecha
   let html='';
+  const fechaStr = fecha ? fechaES(fecha.split('T')[0]||fecha) : new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'});
   for(let i=0;i<n;i++){
-    html+=`<div style="width:190mm;height:130mm;box-sizing:border-box;font-family:Arial,sans-serif;display:flex;border:1px solid #ccc;overflow:hidden;">
-      <!-- Izquierda: dos recuadros -->
-      <div style="width:50mm;display:flex;flex-direction:column;border-right:1px solid #ccc;">
-        <div style="flex:1;border-bottom:1px solid #ccc;padding:4mm;">
-          <div style="font-size:9px;color:#555;margin-bottom:2mm;">Referencia:</div>
-          <div style="font-size:16px;font-weight:700;">${mat}</div>
+    html+=`<div style="width:105mm;height:148.5mm;box-sizing:border-box;font-family:Arial,sans-serif;display:flex;border:1px solid #ccc;overflow:hidden;">
+      <!-- Izquierda: Referencia + Lote -->
+      <div style="width:38mm;display:flex;flex-direction:column;border-right:1px solid #ccc;flex-shrink:0;">
+        <div style="flex:1;border-bottom:1px solid #ccc;padding:4mm 3mm;">
+          <div style="font-size:8px;color:#555;margin-bottom:2mm;">Referencia:</div>
+          <div style="font-size:13px;font-weight:700;word-break:break-all;">${mat}</div>
         </div>
-        <div style="flex:1;padding:4mm;">
-          <div style="font-size:9px;color:#555;margin-bottom:2mm;">LOTE:</div>
-          <div style="font-size:11px;font-family:monospace;font-weight:700;">${lote}</div>
+        <div style="flex:1;padding:4mm 3mm;">
+          <div style="font-size:8px;color:#555;margin-bottom:2mm;">LOTE:</div>
+          <div style="font-size:9px;font-family:monospace;font-weight:700;word-break:break-all;">${lote}</div>
         </div>
       </div>
       <!-- Centro: lote vertical grande -->
-      <div style="flex:1;display:flex;align-items:center;justify-content:center;border-right:1px solid #ccc;padding:4mm;">
-        <div style="font-size:36px;font-weight:bold;writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);letter-spacing:2px;line-height:1;">${lote}</div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;border-right:1px solid #ccc;overflow:hidden;">
+        <div style="font-size:22px;font-weight:bold;writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:1px;white-space:nowrap;">${lote}</div>
       </div>
-      <!-- Derecha: logo arriba + fecha abajo -->
-      <div style="width:55mm;display:flex;flex-direction:column;justify-content:space-between;padding:6mm;">
-        <img src="logo-vespi.jpg" style="max-width:45mm;max-height:30mm;width:auto;display:block;">
-        <div style="font-size:12px;font-weight:600;">${fecha ? fechaES(fecha) : new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'})}</div>
+      <!-- Derecha: logo + fecha -->
+      <div style="width:36mm;display:flex;flex-direction:column;justify-content:space-between;padding:4mm 3mm;flex-shrink:0;">
+        <img src="logo-vespi.jpg" style="max-width:30mm;height:auto;display:block;">
+        <div style="font-size:9px;font-weight:600;">${fechaStr}</div>
       </div>
     </div>`;
   }
   document.getElementById('print-area').innerHTML=`
-    <style>@page{margin:10mm;size:A4;}</style>
-    <div style="display:flex;flex-direction:column;gap:8mm;">${html}</div>`;
+    <style>@page{margin:0;size:A4;}</style>
+    <div style="display:grid;grid-template-columns:repeat(2,105mm);grid-template-rows:repeat(2,148.5mm);width:210mm;height:297mm;overflow:hidden;">${html}</div>`;
   setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
 }
 
