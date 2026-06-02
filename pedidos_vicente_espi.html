@@ -531,17 +531,52 @@ function cerrarVisor(){
   document.getElementById('print-area').innerHTML='';
 }
 
-function imprimirVisor(){
-  const contenido = document.getElementById('visorContenido').innerHTML;
-  // En todos los casos: copiar al print-area y lanzar print
-  // NO ocultar el modal — en móvil ocultarlo causa que vuelva atrás
-  document.getElementById('print-area').innerHTML = contenido;
-  setTimeout(()=>{
-    window.print();
+async function imprimirVisor(){
+  const esMovil = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+                  || window.matchMedia('(display-mode: standalone)').matches;
+
+  if(!esMovil){
+    // ORDENADOR → imprimir directamente
+    document.getElementById('print-area').innerHTML = document.getElementById('visorContenido').innerHTML;
     setTimeout(()=>{
-      document.getElementById('print-area').innerHTML = '';
-    }, 1500);
-  }, 150);
+      window.print();
+      setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; }, 1500);
+    }, 150);
+    return;
+  }
+
+  // MÓVIL/PWA → generar PDF con jsPDF para descargar y AirPrint
+  const { jsPDF } = window.jspdf;
+  const contenido = document.getElementById('visorContenido');
+  const titulo = document.getElementById('visorTitulo').textContent;
+  const btn = document.querySelector('#modalVisor button[onclick="imprimirVisor()"]');
+  if(btn){ btn.textContent='⏳ Generando...'; btn.disabled=true; }
+
+  try {
+    const paginas = contenido.querySelectorAll('.cert-page, .pag1, .et-sheet');
+    const elementos = paginas.length > 0 ? Array.from(paginas) : [contenido];
+    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+
+    for(let i=0; i<elementos.length; i++){
+      if(i>0) pdf.addPage();
+      const canvas = await html2canvas(elementos[i], {
+        scale:2, useCORS:true, backgroundColor:'#ffffff'
+      });
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      const A4W=210, A4H=297;
+      const ratio = Math.min(A4W/canvas.width, A4H/canvas.height);
+      const iW = canvas.width*ratio;
+      const iH = canvas.height*ratio;
+      pdf.addImage(imgData,'JPEG',(A4W-iW)/2,(A4H-iH)/2,iW,iH);
+    }
+
+    const nombre = titulo.replace(/[^\w\s-áéíóúÁÉÍÓÚñÑ]/g,'').trim().replace(/\s+/g,'_');
+    pdf.save((nombre||'documento')+'.pdf');
+  } catch(e){
+    toast('❌ Error: '+e.message,'err');
+  } finally {
+    if(btn){ btn.textContent='🖨️ Imprimir'; btn.disabled=false; }
+  }
 }
 
 function imprimirEt(){
