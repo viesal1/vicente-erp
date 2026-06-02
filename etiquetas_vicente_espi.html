@@ -658,24 +658,22 @@ window.imprimirSemana = function(){
   }
   // ── ETIQUETAS ROLLOS 15KG ──
 function etR15HTML(modelo, lote){
-  const fs = modelo.length > 5 ? '20px' : modelo.length > 3 ? '24px' : '28px';
-  return `<div style="width:105mm;height:42.4mm;box-sizing:border-box;display:flex;align-items:stretch;font-family:Arial,sans-serif;overflow:hidden;">
-    <!-- Logo vertical izquierda -->
-    <div style="width:13mm;flex-shrink:0;overflow:hidden;position:relative;">
-      <img src="logo-vespi.jpg" alt="VESPI" style="position:absolute;top:50%;left:50%;width:28mm;height:auto;transform:translate(-50%,-50%) rotate(-90deg);">
+  const fs = modelo.length > 5 ? '28px' : modelo.length > 3 ? '32px' : '36px';
+  return `<div style="width:105mm;height:42.4mm;box-sizing:border-box;display:flex;align-items:stretch;font-family:Arial,sans-serif;overflow:hidden;padding:4mm;">
+    <div style="width:12mm;flex-shrink:0;overflow:hidden;position:relative;margin-right:4mm;">
+      <img src="logo-vespi.jpg" alt="VESPI" style="position:absolute;top:50%;left:50%;width:24mm;height:auto;transform:translate(-50%,-50%) rotate(-90deg);">
     </div>
-    <!-- 3 filas iguales -->
-    <div style="flex:1;display:flex;flex-direction:column;box-sizing:border-box;">
-      <div style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:0 4mm;">
-        <span style="font-size:11px;">FECHA____________</span>
-        <span style="font-size:${fs};font-weight:bold;">${modelo}</span>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:13px;">FECHA____________</span>
+        <span style="font-size:${fs};font-weight:bold;line-height:1">${modelo}</span>
       </div>
-      <div style="flex:1;display:flex;align-items:center;padding:0 4mm;">
-        <span style="font-size:11px;">LOTE: ${lote} &nbsp;&nbsp;&nbsp; OPER:</span>
+      <div style="display:flex;align-items:center;">
+        <span style="font-size:13px;">LOTE: ${lote} &nbsp;&nbsp;&nbsp; OPER:</span>
       </div>
-      <div style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:0 4mm;">
-        <span style="font-size:11px;">MAQUINA: ____</span>
-        <span style="font-size:11px;">HORA:________</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:13px;">MAQUINA: ____</span>
+        <span style="font-size:13px;">HORA:________</span>
       </div>
     </div>
   </div>`;
@@ -1082,24 +1080,22 @@ window.imprimirSemana = function(){
   }
   // ── ETIQUETAS ROLLOS 15KG ──
 function etR15HTML(modelo, lote){
-  const fs = modelo.length > 5 ? '20px' : modelo.length > 3 ? '24px' : '28px';
-  return `<div style="width:105mm;height:42.4mm;box-sizing:border-box;display:flex;align-items:stretch;font-family:Arial,sans-serif;overflow:hidden;">
-    <!-- Logo vertical izquierda -->
-    <div style="width:13mm;flex-shrink:0;overflow:hidden;position:relative;">
-      <img src="logo-vespi.jpg" alt="VESPI" style="position:absolute;top:50%;left:50%;width:28mm;height:auto;transform:translate(-50%,-50%) rotate(-90deg);">
+  const fs = modelo.length > 5 ? '28px' : modelo.length > 3 ? '32px' : '36px';
+  return `<div style="width:105mm;height:42.4mm;box-sizing:border-box;display:flex;align-items:stretch;font-family:Arial,sans-serif;overflow:hidden;padding:4mm;">
+    <div style="width:12mm;flex-shrink:0;overflow:hidden;position:relative;margin-right:4mm;">
+      <img src="logo-vespi.jpg" alt="VESPI" style="position:absolute;top:50%;left:50%;width:24mm;height:auto;transform:translate(-50%,-50%) rotate(-90deg);">
     </div>
-    <!-- 3 filas iguales -->
-    <div style="flex:1;display:flex;flex-direction:column;box-sizing:border-box;">
-      <div style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:0 4mm;">
-        <span style="font-size:11px;">FECHA____________</span>
-        <span style="font-size:${fs};font-weight:bold;">${modelo}</span>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:13px;">FECHA____________</span>
+        <span style="font-size:${fs};font-weight:bold;line-height:1">${modelo}</span>
       </div>
-      <div style="flex:1;display:flex;align-items:center;padding:0 4mm;">
-        <span style="font-size:11px;">LOTE: ${lote} &nbsp;&nbsp;&nbsp; OPER:</span>
+      <div style="display:flex;align-items:center;">
+        <span style="font-size:13px;">LOTE: ${lote} &nbsp;&nbsp;&nbsp; OPER:</span>
       </div>
-      <div style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:0 4mm;">
-        <span style="font-size:11px;">MAQUINA: ____</span>
-        <span style="font-size:11px;">HORA:________</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:13px;">MAQUINA: ____</span>
+        <span style="font-size:13px;">HORA:________</span>
       </div>
     </div>
   </div>`;
