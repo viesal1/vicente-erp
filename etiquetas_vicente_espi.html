@@ -119,7 +119,6 @@ window.imprimirSemana = function(){
   <style>
    :root{ --azul:#00a9e0; --fondo:#f6f7fb; --borde:#cfd6e4; }
     @page{ size:A4 portrait; margin:0; }
-  #outputCono{ position:absolute; top:0; left:0; margin:0 !important; padding:0 !important; }
     html,body{ margin:0; padding:0; background:var(--fondo); font-family:system-ui, Arial, sans-serif; }
 
     .selector{ display:flex; gap:30px; justify-content:center; margin:80px 16px 24px; flex-wrap:wrap; }
@@ -412,8 +411,8 @@ window.imprimirSemana = function(){
      </button>
     </div>
    </div>
-   <!-- 24 por hoja: 2×12 -->
-   <div class="etiqueta-sheet" id="outputCono" style="display:grid; grid-template-columns:repeat(2,105mm); grid-template-rows:repeat(10,29.7mm); width:210mm; height:297mm; overflow:hidden;">
+   <!-- 20 por hoja: 2×12 -->
+   <div class="etiqueta-sheet" id="outputCono" style="display:grid; grid-template-columns:repeat(2,105mm); grid-template-rows:repeat(10,29mm); width:210mm; height:297mm; overflow:hidden;">
    </div>
   </div>
   <!-- SEMANA -->
@@ -622,7 +621,7 @@ Encerado para : ${encerado}`;
 
     let html = "";
 
-    for(let i=0;i<24;i++){
+    for(let i=0;i<20;i++){
       html += `
         <div class="etiqueta" style="display:flex;">
           <div style="width:50%;"></div>
@@ -718,7 +717,7 @@ Encerado para : ${encerado}`;
     out.style.height  = "297mm";
     out.style.border  = "none";
     out.style.gridTemplateColumns = "repeat(2,105mm)";
-    out.style.gridTemplateRows    = "repeat(10,29.7mm)";
+    out.style.gridTemplateRows    = "repeat(10,29mm)";
     out.style.overflow = "hidden";
 
     let html = "";
@@ -764,7 +763,7 @@ Encerado para : ${encerado}`;
     out.style.height  = "297mm";
     out.style.border  = "none";
     out.style.gridTemplateColumns = "repeat(2,105mm)";
-    out.style.gridTemplateRows    = "repeat(10,29.7mm)";
+    out.style.gridTemplateRows    = "repeat(10,29mm)";
     out.style.overflow = "hidden";
 
     let html = "";
@@ -968,7 +967,7 @@ Encerado para : ${encerado}`;
 
     let html = "";
 
-    for(let i=0;i<24;i++){
+    for(let i=0;i<20;i++){
       html += `
         <div class="etiqueta" style="display:flex;">
           <div style="width:50%;"></div>
@@ -1062,7 +1061,7 @@ Encerado para : ${encerado}`;
     out.style.height  = "297mm";
     out.style.border  = "none";
     out.style.gridTemplateColumns = "repeat(2,105mm)";
-    out.style.gridTemplateRows    = "repeat(10,29.7mm)";
+    out.style.gridTemplateRows    = "repeat(10,29mm)";
     out.style.overflow = "hidden";
 
     let html = "";
@@ -1106,7 +1105,7 @@ Encerado para : ${encerado}`;
     out.style.height  = "297mm";
     out.style.border  = "none";
     out.style.gridTemplateColumns = "repeat(2,105mm)";
-    out.style.gridTemplateRows    = "repeat(10,29.7mm)";
+    out.style.gridTemplateRows    = "repeat(10,29mm)";
     out.style.overflow = "hidden";
 
     let html = "";
