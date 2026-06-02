@@ -566,7 +566,7 @@ async function imprimirVisor(){
     const A4W = 210, A4H = 297;
 
     // Buscar páginas dentro del wrapper
-    const paginas = wrapper.querySelectorAll('.cert-page, .pag1');
+    const paginas = wrapper.querySelectorAll('.cert-page, .pag1, .pag2');
     const elementos = paginas.length > 0 ? Array.from(paginas) : [wrapper];
 
     for(let i=0; i<elementos.length; i++){
@@ -758,7 +758,7 @@ function imprimirPedido() {
 
   // Página 2: campos de control
   const pag2 = `
-    <div style="page-break-before:always;font-family:Arial,sans-serif;font-size:11px;width:210mm;box-sizing:border-box;padding:6mm;display:flex;flex-direction:column;gap:4mm;">
+    <div class="pag2" style="page-break-before:always;font-family:Arial,sans-serif;font-size:11px;width:210mm;box-sizing:border-box;padding:6mm;display:flex;flex-direction:column;gap:4mm;">
 
       <!-- FILA SUPERIOR: BOBINAS (50%) + espacio + ARILLOS (50%) -->
       <div style="display:flex;gap:4mm;">
