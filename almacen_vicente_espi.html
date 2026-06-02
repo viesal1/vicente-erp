@@ -410,9 +410,10 @@ async function confirmarRec(){
     if(editId){
       // Editar
       await colRec.doc(editId).update(datos);
-      // Actualizar también en lotes si existe
-      const loteSnap=await colLotes.where('lote','==',lote).get();
-      if(!loteSnap.empty) await colLotes.doc(loteSnap.docs[0].id).update(datos);
+      // Actualizar en lotes si existe (sin where para evitar índice)
+      const todoLotes=await colLotes.get();
+      const loteDoc=todoLotes.docs.find(d=>d.data().lote===lote);
+      if(loteDoc) await colLotes.doc(loteDoc.id).update(datos);
       toast('✅ Recepción actualizada','ok');
     } else {
       // Nueva
@@ -421,9 +422,6 @@ async function confirmarRec(){
       await colRec.add(datos);
       const enUso=lotesCache.filter(l=>l.material===mat&&l.estado==='en_uso');
       await colLotes.add({...datos,estado:enUso.length?'almacen':'en_uso'});
-      // Imprimir etiquetas
-      const nEt=parseInt(document.getElementById('rEtiquetas').value)||1;
-      impEtLote(lote,mat,datos.fechaEntrada,nEt);
       toast('✅ Recepción registrada','ok');
     }
     cerrarModal('modalRec');
