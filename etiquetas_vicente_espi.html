@@ -658,28 +658,24 @@ window.imprimirSemana = function(){
   }
   // ── ETIQUETAS ROLLOS 15KG ──
 function etR15HTML(modelo, lote){
-  const fs = modelo.length > 5 ? '18px' : modelo.length > 3 ? '22px' : '26px';
+  const fs = modelo.length > 5 ? '20px' : modelo.length > 3 ? '24px' : '28px';
   return `<div style="width:105mm;height:42.4mm;box-sizing:border-box;display:flex;align-items:stretch;font-family:Arial,sans-serif;border:1px solid #ccc;overflow:hidden;">
-    <!-- Logo tira fina vertical izquierda -->
-    <div style="width:10mm;display:flex;align-items:center;justify-content:center;border-right:1px solid #ddd;flex-shrink:0;overflow:hidden;background:#fff;">
-      <img src="logo-vespi.jpg" alt="VESPI" style="width:36mm;height:auto;transform:rotate(-90deg);transform-origin:center;">
+    <!-- Logo vertical izquierda — ocupa toda la altura, ancho fijo -->
+    <div style="width:13mm;flex-shrink:0;overflow:hidden;position:relative;border-right:1px solid #ddd;">
+      <img src="logo-vespi.jpg" alt="VESPI" style="position:absolute;top:50%;left:50%;width:40mm;height:auto;transform:translate(-50%,-50%) rotate(-90deg);transform-origin:center;">
     </div>
-    <!-- Contenido: 3 líneas bien espaciadas -->
-    <div style="flex:1;padding:2.5mm 3mm;display:flex;flex-direction:column;justify-content:space-between;">
-      <!-- Línea 1: FECHA + MODELO grande -->
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-size:10.5px;">FECHA____________</div>
+    <!-- Contenido: 3 líneas que llenan toda la altura -->
+    <div style="flex:1;padding:3mm 4mm;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex:1;padding-bottom:2mm;border-bottom:1px solid #e0e0e0;">
+        <div style="font-size:11px;">FECHA____________</div>
         <div style="font-size:${fs};font-weight:bold;line-height:1;">${modelo}</div>
       </div>
-      <!-- Línea 2: LOTE a la izq + OPER con espacio para escribir -->
-      <div style="display:flex;align-items:center;gap:4mm;">
-        <div style="font-size:10.5px;white-space:nowrap;">LOTE: ${lote}</div>
-        <div style="font-size:10.5px;white-space:nowrap;">OPER:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+      <div style="display:flex;align-items:center;flex:1;padding:2mm 0;border-bottom:1px solid #e0e0e0;">
+        <div style="font-size:11px;">LOTE: ${lote} &nbsp;&nbsp; OPER:</div>
       </div>
-      <!-- Línea 3: MAQUINA + HORA -->
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-size:10.5px;">MAQUINA: ____</div>
-        <div style="font-size:10.5px;">HORA:________</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex:1;padding-top:2mm;">
+        <div style="font-size:11px;">MAQUINA: ____</div>
+        <div style="font-size:11px;">HORA:________</div>
       </div>
     </div>
   </div>`;
@@ -1086,28 +1082,24 @@ window.imprimirSemana = function(){
   }
   // ── ETIQUETAS ROLLOS 15KG ──
 function etR15HTML(modelo, lote){
-  const fs = modelo.length > 5 ? '18px' : modelo.length > 3 ? '22px' : '26px';
+  const fs = modelo.length > 5 ? '20px' : modelo.length > 3 ? '24px' : '28px';
   return `<div style="width:105mm;height:42.4mm;box-sizing:border-box;display:flex;align-items:stretch;font-family:Arial,sans-serif;border:1px solid #ccc;overflow:hidden;">
-    <!-- Logo tira fina vertical izquierda -->
-    <div style="width:10mm;display:flex;align-items:center;justify-content:center;border-right:1px solid #ddd;flex-shrink:0;overflow:hidden;background:#fff;">
-      <img src="logo-vespi.jpg" alt="VESPI" style="width:36mm;height:auto;transform:rotate(-90deg);transform-origin:center;">
+    <!-- Logo vertical izquierda — ocupa toda la altura, ancho fijo -->
+    <div style="width:13mm;flex-shrink:0;overflow:hidden;position:relative;border-right:1px solid #ddd;">
+      <img src="logo-vespi.jpg" alt="VESPI" style="position:absolute;top:50%;left:50%;width:40mm;height:auto;transform:translate(-50%,-50%) rotate(-90deg);transform-origin:center;">
     </div>
-    <!-- Contenido: 3 líneas bien espaciadas -->
-    <div style="flex:1;padding:2.5mm 3mm;display:flex;flex-direction:column;justify-content:space-between;">
-      <!-- Línea 1: FECHA + MODELO grande -->
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-size:10.5px;">FECHA____________</div>
+    <!-- Contenido: 3 líneas que llenan toda la altura -->
+    <div style="flex:1;padding:3mm 4mm;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex:1;padding-bottom:2mm;border-bottom:1px solid #e0e0e0;">
+        <div style="font-size:11px;">FECHA____________</div>
         <div style="font-size:${fs};font-weight:bold;line-height:1;">${modelo}</div>
       </div>
-      <!-- Línea 2: LOTE a la izq + OPER con espacio para escribir -->
-      <div style="display:flex;align-items:center;gap:4mm;">
-        <div style="font-size:10.5px;white-space:nowrap;">LOTE: ${lote}</div>
-        <div style="font-size:10.5px;white-space:nowrap;">OPER:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+      <div style="display:flex;align-items:center;flex:1;padding:2mm 0;border-bottom:1px solid #e0e0e0;">
+        <div style="font-size:11px;">LOTE: ${lote} &nbsp;&nbsp; OPER:</div>
       </div>
-      <!-- Línea 3: MAQUINA + HORA -->
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-size:10.5px;">MAQUINA: ____</div>
-        <div style="font-size:10.5px;">HORA:________</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex:1;padding-top:2mm;">
+        <div style="font-size:11px;">MAQUINA: ____</div>
+        <div style="font-size:11px;">HORA:________</div>
       </div>
     </div>
   </div>`;
