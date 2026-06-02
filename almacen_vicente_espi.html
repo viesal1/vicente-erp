@@ -10,12 +10,12 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   <script>
     firebase.initializeApp({
-      apiKey: "AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
-      authDomain: "etiquetadora-vespi.firebaseapp.com",
-      projectId: "etiquetadora-vespi",
-      storageBucket: "etiquetadora-vespi.firebasestorage.app",
-      messagingSenderId: "714344837885",
-      appId: "1:714344837885:web:d80abbd7a0898e1d1ec494"
+      apiKey:"AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
+      authDomain:"etiquetadora-vespi.firebaseapp.com",
+      projectId:"etiquetadora-vespi",
+      storageBucket:"etiquetadora-vespi.firebasestorage.app",
+      messagingSenderId:"714344837885",
+      appId:"1:714344837885:web:d80abbd7a0898e1d1ec494"
     });
   </script>
   <style>
@@ -37,9 +37,14 @@
     .btn-agotar{background:#fdecea;color:#e74c3c;}
     .btn-fab{background:#00a9e0;color:#fff;border:none;padding:12px 20px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 3px 10px rgba(0,169,224,.3);}
     .btn-print{background:#f39c12;color:#fff;border:none;padding:12px 20px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;}
-    .rec-card{background:#fff;border-radius:12px;padding:12px 18px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid #00a9e0;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;}
-    .rec-lote{font-family:monospace;font-weight:700;color:#1e2a44;font-size:13px;}
-    .rec-info{font-size:12px;color:#7f8c8d;margin-top:2px;}
+    .btn-danger{background:#fdecea;color:#e74c3c;border:none;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;}
+    .btn-edit{background:#f4f7fa;color:#1e2a44;border:none;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;}
+    /* Tabla recepciones */
+    .rec-tabla{width:100%;border-collapse:collapse;font-size:13px;}
+    .rec-tabla th{background:#1e2a44;color:#fff;padding:8px 10px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+    .rec-tabla td{padding:8px 10px;border-bottom:1px solid #f4f7fa;vertical-align:middle;}
+    .rec-tabla tr:hover td{background:#f9fafc;}
+    /* Modal */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;justify-content:center;align-items:flex-start;padding-top:50px;}
     .modal-overlay.activo{display:flex;}
     .modal-box{background:#fff;border-radius:16px;padding:22px;width:92%;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:88vh;overflow-y:auto;}
@@ -62,7 +67,8 @@
     }
     .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e2a44;color:#fff;padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:999;transition:transform .3s ease;pointer-events:none;}
     .toast.show{transform:translateX(-50%) translateY(0);}
-    .toast.ok{background:#27ae60;} .toast.err{background:#e74c3c;}
+    .toast.ok{background:#27ae60;}.toast.err{background:#e74c3c;}
+    @media(max-width:600px){.rec-tabla{font-size:11px;}.rec-tabla th,.rec-tabla td{padding:6px 6px;}}
   </style>
 </head>
 <body>
@@ -75,6 +81,7 @@
 <div class="container">
   <div class="tabs">
     <button class="tab activo" onclick="setTab('lotes')">📦 Lotes</button>
+    <button class="tab" onclick="setTab('recepciones')">📥 Recepciones</button>
     <button class="tab" onclick="setTab('semana')">📋 Semana</button>
     <button class="tab" onclick="setTab('pinos')">⚙️ Piños</button>
   </div>
@@ -82,28 +89,45 @@
   <!-- TAB LOTES -->
   <div id="tab-lotes">
     <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-      <button class="btn-fab" onclick="abrirRecepcion()">＋ Nueva Recepción</button>
       <button class="btn-print" onclick="imprimirAlmacen()">🖨️ Imprimir Almacén</button>
     </div>
     <div id="lotes-container"><div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div></div>
-    <div style="margin-top:20px;">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7f8c8d;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #f4f7fa;">📥 Historial de Recepciones</div>
-      <div class="filtros">
-        <input type="text" id="buscarRec" placeholder="🔍 Buscar lote, material…" oninput="filtrarRec()">
-        <select id="filtrocat" onchange="filtrarRec()">
-          <option value="">Todas</option>
-          <option value="FIBRAS">Fibras</option>
-          <option value="PARAFINA">Parafina</option>
-          <option value="PORTAMECHAS">Portamechas</option>
-          <option value="COLORANTE">Colorante</option>
-          <option value="OTROS">Otros</option>
-        </select>
-      </div>
-      <div id="recepciones-container"><div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div></div>
-    </div>
   </div>
 
-
+  <!-- TAB RECEPCIONES -->
+  <div id="tab-recepciones" style="display:none">
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <button class="btn-fab" onclick="abrirRecepcion(null)">＋ Nueva Recepción</button>
+      <button class="btn-print" onclick="imprimirRecepciones()">🖨️ Imprimir</button>
+    </div>
+    <div class="filtros">
+      <input type="text" id="buscarRec" placeholder="🔍 Buscar lote, material…" oninput="filtrarRec()">
+      <select id="filtrocat" onchange="filtrarRec()">
+        <option value="">Todas las categorías</option>
+        <option value="FIBRAS">Fibras</option>
+        <option value="PARAFINA">Parafina</option>
+        <option value="PORTAMECHAS">Portamechas</option>
+        <option value="COLORANTE">Colorante</option>
+        <option value="OTROS">Otros</option>
+      </select>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="rec-tabla">
+        <thead><tr>
+          <th>Fecha</th>
+          <th>Proveedor</th>
+          <th>Material</th>
+          <th>Lote</th>
+          <th>Cantidad</th>
+          <th>Albarán</th>
+          <th>Control</th>
+          <th>Operario</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="recTablaBody"><tr><td colspan="9" style="text-align:center;padding:20px;color:#aaa">Cargando…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
 
   <!-- TAB SEMANA -->
   <div id="tab-semana" style="display:none">
@@ -137,7 +161,7 @@
       <button onclick="imprimirPinos()" class="btn-print" style="margin-top:20px;">🖨️ Imprimir Piños</button>
     </div>
     <p style="font-size:13px;color:#7f8c8d;background:#fff;padding:14px 18px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
-      La hoja de piños se imprime en blanco para que los operarios la rellenen a mano. Introduce el número de semana y pulsa Imprimir.
+      Hoja en blanco para que los operarios rellenen a mano. Introduce el número de semana y pulsa Imprimir.
     </p>
   </div>
 </div>
@@ -145,7 +169,8 @@
 <!-- MODAL RECEPCIÓN -->
 <div class="modal-overlay" id="modalRec">
   <div class="modal-box">
-    <h3>📥 Nueva Recepción</h3>
+    <h3 id="modalRecTitulo">📥 Nueva Recepción</h3>
+    <input type="hidden" id="recEditId">
     <div style="display:flex;gap:8px;">
       <div class="fg" style="flex:1"><label>Fecha</label><input type="date" id="rFecha"></div>
       <div class="fg" style="flex:1"><label>Operario</label><input type="text" id="rOperario" value="TINO"></div>
@@ -186,7 +211,7 @@
     </div>
     <div class="fg"><label>Observaciones</label><input type="text" id="rObs"></div>
     <div class="modal-actions">
-      <button class="btn-ok" onclick="confirmarRec()">✅ Registrar + Etiqueta</button>
+      <button class="btn-ok" onclick="confirmarRec()">✅ Guardar</button>
       <button class="btn-cancel" onclick="cerrarModal('modalRec')">Cancelar</button>
     </div>
   </div>
@@ -200,19 +225,18 @@ let lotesCache=[], recCache=[], semMaterias=[], semId=null;
 
 firebase.auth().onAuthStateChanged(u=>{
   if(!u){ location.href='index.html'; return; }
-  db       = firebase.firestore();
-  colLotes = db.collection('almacen_lotes_vespi');
-  colRec   = db.collection('almacen_recepciones_vespi');
-  colSem   = db.collection('almacen_semanas_vespi');
+  db=firebase.firestore();
+  colLotes=db.collection('almacen_lotes_vespi');
+  colRec=db.collection('almacen_recepciones_vespi');
+  colSem=db.collection('almacen_semanas_vespi');
   init();
 });
 
 function init(){
   const hoy=new Date().toISOString().split('T')[0];
   document.getElementById('rFecha').value=hoy;
-  const sem=getSemana();
-  document.getElementById('semNum').value=sem;
-  document.getElementById('pinoSemNum').value=sem;
+  document.getElementById('semNum').value=getSemana();
+  document.getElementById('pinoSemNum').value=getSemana();
   document.getElementById('semPeriodo').value=getPeriodo();
   cargarLotes();
   cargarRecepciones();
@@ -220,11 +244,11 @@ function init(){
 
 // ── TABS ──
 function setTab(n){
-  ['lotes','semana','pinos'].forEach(t=>{
+  ['lotes','recepciones','semana','pinos'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===n?'':'none';
   });
   document.querySelectorAll('.tab').forEach((el,i)=>{
-    el.classList.toggle('activo',['lotes','semana','pinos'][i]===n);
+    el.classList.toggle('activo',['lotes','recepciones','semana','pinos'][i]===n);
   });
 }
 
@@ -240,7 +264,7 @@ async function cargarLotes(){
 
 function renderLotes(){
   const cont=document.getElementById('lotes-container');
-  if(!lotesCache.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📦</div><p>Sin lotes. Importa o añade una recepción.</p></div>'; return; }
+  if(!lotesCache.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📦</div><p>Sin lotes. Añade una recepción.</p></div>'; return; }
   const grupos={};
   lotesCache.forEach(l=>{
     const cat=l.categoria||'OTROS';
@@ -271,7 +295,7 @@ function renderLotes(){
                   <span class="${l.estado==='en_uso'?'badge-uso':'badge-alm'}">${l.estado==='en_uso'?'EN USO':'ALMACÉN'}</span>
                   ${l.estado==='almacen'?`<button class="btn-sm btn-usar" onclick="marcarUso('${l.id}','${mat}')">▶ Usar</button>`:''}
                   <button class="btn-sm btn-agotar" onclick="marcarAgotado('${l.id}','${mat}')">✓ Agotado</button>
-                  <button class="btn-sm" style="background:#f4f7fa;color:#1e2a44;" onclick="impEtEx('${l.lote}','${mat}')">🏷️</button>
+                  <button class="btn-sm" style="background:#f4f7fa;color:#1e2a44;" onclick="impEtLote('${l.lote}','${mat}','${l.fechaEntrada||''}',2)">🏷️</button>
                 </div>
               </div>`).join('')}
           </div>
@@ -309,39 +333,58 @@ async function cargarRecepciones(){
     const snap=await colRec.get();
     recCache=snap.docs.map(d=>({id:d.id,...d.data()}));
     recCache.sort((a,b)=>(b.fechaEntrada||'').localeCompare(a.fechaEntrada||''));
-    renderRec(recCache);
-  }catch(e){ document.getElementById('recepciones-container').innerHTML='<div class="empty-state"><div class="icon">❌</div><p>Error</p></div>'; }
+    renderRec();
+  }catch(e){ console.log('Error recepciones',e); }
 }
 
-function renderRec(lista){
-  const cont=document.getElementById('recepciones-container');
+function renderRec(){
+  const tbody=document.getElementById('recTablaBody');
   const q=document.getElementById('buscarRec').value.toLowerCase();
   const cat=document.getElementById('filtrocat').value;
-  const f=lista.filter(r=>(!q||(r.lote||'').toLowerCase().includes(q)||(r.material||'').toLowerCase().includes(q))&&(!cat||r.categoria===cat));
-  if(!f.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin recepciones.</p></div>'; return; }
-  cont.innerHTML=f.map(r=>`
-    <div class="rec-card">
-      <div style="flex:1">
-        <div class="rec-lote">${r.lote}</div>
-        <div class="rec-info">${r.material} · ${r.cantidad||''} · ${r.proveedor||''} ${r.albaran?'· Alb: '+r.albaran:''}</div>
-      </div>
-      <div style="text-align:right;font-size:12px;color:#aaa">
-        <div>${fechaES(r.fechaEntrada?.split('T')[0]||r.fechaEntrada)}</div>
-        <span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:${r.controlVisual==='OK'?'#d1f5e0':'#fdecea'};color:${r.controlVisual==='OK'?'#1a7a40':'#e74c3c'}">${r.controlVisual||'OK'}</span>
-      </div>
-    </div>`).join('');
+  const f=recCache.filter(r=>
+    (!q||(r.lote||'').toLowerCase().includes(q)||(r.material||'').toLowerCase().includes(q)||(r.proveedor||'').toLowerCase().includes(q))
+    &&(!cat||r.categoria===cat)
+  );
+  if(!f.length){ tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;color:#aaa">Sin recepciones.</td></tr>'; return; }
+  tbody.innerHTML=f.map(r=>`<tr>
+    <td>${fechaES(r.fechaEntrada?.split('T')[0]||r.fechaEntrada)}</td>
+    <td>${r.proveedor||'—'}</td>
+    <td style="font-weight:600">${r.material||'—'}</td>
+    <td style="font-family:monospace;font-size:12px">${r.lote||'—'}</td>
+    <td>${r.cantidad||'—'}</td>
+    <td>${r.albaran||'—'}</td>
+    <td><span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:${r.controlVisual==='OK'?'#d1f5e0':'#fdecea'};color:${r.controlVisual==='OK'?'#1a7a40':'#e74c3c'}">${r.controlVisual||'OK'}</span></td>
+    <td>${r.operario||'—'}</td>
+    <td style="white-space:nowrap">
+      <button class="btn-edit" onclick="abrirRecepcion('${r.id}')">✏️</button>
+      <button class="btn-danger" onclick="eliminarRec('${r.id}')">🗑️</button>
+    </td>
+  </tr>`).join('');
 }
-function filtrarRec(){ renderRec(recCache); }
+function filtrarRec(){ renderRec(); }
 
 // ── MODAL RECEPCIÓN ──
-function abrirRecepcion(){
-  document.getElementById('rFecha').value=new Date().toISOString().split('T')[0];
-  ['rMaterial','rLote','rCantidad','rAlbaran','rObs'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('rEtiquetas').value='1';
+function abrirRecepcion(id){
+  const rec = id ? recCache.find(r=>r.id===id) : null;
+  document.getElementById('recEditId').value = id||'';
+  document.getElementById('modalRecTitulo').textContent = id ? '✏️ Editar Recepción' : '📥 Nueva Recepción';
+  document.getElementById('rFecha').value = rec?.fechaEntrada||new Date().toISOString().split('T')[0];
+  document.getElementById('rOperario').value = rec?.operario||'TINO';
+  document.getElementById('rCategoria').value = rec?.categoria||'FIBRAS';
+  document.getElementById('rProveedor').value = rec?.proveedor||'CO';
+  document.getElementById('rMaterial').value = rec?.material||'';
+  document.getElementById('rLote').value = rec?.lote||'';
+  document.getElementById('rCantidad').value = rec?.cantidad||'';
+  document.getElementById('rEtiquetas').value = '1';
+  document.getElementById('rAlbaran').value = rec?.albaran||'';
+  document.getElementById('rControl').value = rec?.controlVisual||'OK';
+  document.getElementById('rObs').value = rec?.obs||'';
   document.getElementById('modalRec').classList.add('activo');
 }
 
 function generarLote(){
+  const editId=document.getElementById('recEditId').value;
+  if(editId) return; // No regenerar en edición
   const prov=document.getElementById('rProveedor').value;
   const fecha=document.getElementById('rFecha').value;
   const mat=document.getElementById('rMaterial').value.trim().toUpperCase().replace(/\s+/g,'-');
@@ -351,6 +394,7 @@ function generarLote(){
 }
 
 async function confirmarRec(){
+  const editId=document.getElementById('recEditId').value;
   const lote=document.getElementById('rLote').value.trim().toUpperCase();
   const mat=document.getElementById('rMaterial').value.trim().toUpperCase();
   const cat=document.getElementById('rCategoria').value;
@@ -364,36 +408,59 @@ async function confirmarRec(){
     albaran:document.getElementById('rAlbaran').value,
     controlVisual:document.getElementById('rControl').value,
     obs:document.getElementById('rObs').value,
-    estado:'almacen',createdAt:new Date().toISOString()
   };
   try{
-    await colRec.add(datos);
-    const enUso=lotesCache.filter(l=>l.material===mat&&l.estado==='en_uso');
-    await colLotes.add({...datos,estado:enUso.length?'almacen':'en_uso'});
-    toast('✅ Recepción registrada','ok');
-    impEtLote(lote,mat,datos.fechaEntrada,parseInt(document.getElementById('rEtiquetas').value)||1);
-    cerrarModal('modalRec'); cargarLotes(); cargarRecepciones();
+    if(editId){
+      // Editar
+      await colRec.doc(editId).update(datos);
+      // Actualizar también en lotes si existe
+      const loteSnap=await colLotes.where('lote','==',lote).get();
+      if(!loteSnap.empty) await colLotes.doc(loteSnap.docs[0].id).update(datos);
+      toast('✅ Recepción actualizada','ok');
+    } else {
+      // Nueva
+      datos.estado='almacen';
+      datos.createdAt=new Date().toISOString();
+      await colRec.add(datos);
+      const enUso=lotesCache.filter(l=>l.material===mat&&l.estado==='en_uso');
+      await colLotes.add({...datos,estado:enUso.length?'almacen':'en_uso'});
+      // Imprimir etiquetas
+      const nEt=parseInt(document.getElementById('rEtiquetas').value)||1;
+      impEtLote(lote,mat,datos.fechaEntrada,nEt);
+      toast('✅ Recepción registrada','ok');
+    }
+    cerrarModal('modalRec');
+    cargarLotes(); cargarRecepciones();
   }catch(e){ toast('❌ '+e.message,'err'); }
 }
 
-// ── ETIQUETAS ──
+async function eliminarRec(id){
+  if(!confirm('¿Eliminar esta recepción del historial?')) return;
+  try{
+    await colRec.doc(id).delete();
+    toast('✅ Eliminada','ok'); cargarRecepciones();
+  }catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+// ── ETIQUETA LOTE (2x2 = 4 por hoja) ──
 function impEtLote(lote,mat,fecha,n){
   let html='';
   for(let i=0;i<n;i++){
-    html+=`<div style="width:105mm;padding:8mm;box-sizing:border-box;border:1px dashed #ccc;font-family:Arial,sans-serif;">
-      <img src="logo-vespi.jpg" style="max-height:18mm;width:auto;display:block;margin-bottom:4mm">
-      <div style="font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:1mm">Referencia:</div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:3mm">${mat}</div>
-      <div style="font-size:24px;font-weight:bold;line-height:1.1;margin-bottom:3mm">${lote}</div>
-      <div style="font-size:10px;color:#555">${fechaES(fecha)}</div>
+    html+=`<div style="width:105mm;height:148.5mm;box-sizing:border-box;padding:10mm;font-family:Arial,sans-serif;display:flex;flex-direction:column;justify-content:space-between;">
+      <img src="logo-vespi.jpg" style="max-height:25mm;width:auto;display:block;">
+      <div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:2mm">Referencia:</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:4mm">${mat}</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:2mm">Lote:</div>
+        <div style="font-size:32px;font-weight:bold;line-height:1.1;margin-bottom:4mm">${lote}</div>
+        <div style="font-size:12px;color:#555">${fechaES(fecha)}</div>
+      </div>
     </div>`;
   }
-  document.getElementById('print-area').innerHTML=`<style>@page{margin:0;size:A4;}</style><div style="display:grid;grid-template-columns:repeat(2,105mm);width:210mm;font-family:Arial,sans-serif;">${html}</div>`;
+  document.getElementById('print-area').innerHTML=`
+    <style>@page{margin:0;size:A4;}</style>
+    <div style="display:grid;grid-template-columns:repeat(2,105mm);grid-template-rows:repeat(2,148.5mm);width:210mm;height:297mm;overflow:hidden;">${html}</div>`;
   setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
-}
-function impEtEx(lote,mat){
-  const n=parseInt(prompt('¿Cuántas etiquetas?','1'))||1;
-  impEtLote(lote,mat,'',n);
 }
 
 // ── SEMANA ──
@@ -419,7 +486,7 @@ async function cargarSemana(){
     semMaterias=mats;
     if(!mats.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin materias en inventario.</p></div>'; return; }
     cont.innerHTML=`
-      <div style="font-size:12px;color:#7f8c8d;margin-bottom:10px;">Lotes en uso automáticos — edita si hay cambios durante la semana:</div>
+      <div style="font-size:12px;color:#7f8c8d;margin-bottom:10px;">Lotes en uso automáticos — edita si hay cambios:</div>
       ${mats.map(mat=>{
         const loteAuto=enUso[mat]?.enUso[0]||'';
         const loteGuardado=semData.materias?.[mat]||loteAuto;
@@ -449,7 +516,7 @@ async function guardarSemana(){
   }catch(e){ toast('❌ '+e.message,'err'); }
 }
 
-// ── IMPRIMIR ALMACÉN (vertical A4) ──
+// ── IMPRIMIR ALMACÉN ──
 async function imprimirAlmacen(){
   const snap=await colLotes.get();
   const lotes=snap.docs.map(d=>d.data()).filter(l=>l.estado!=='agotado');
@@ -477,10 +544,9 @@ async function imprimirAlmacen(){
       </tr>`;
     }).join('')
   ).join('');
-
   document.getElementById('print-area').innerHTML=`
     <style>@page{margin:8mm;size:A4 portrait;}</style>
-    <div style="font-family:Arial,sans-serif;font-size:10px;width:100%;box-sizing:border-box;">
+    <div style="font-family:Arial,sans-serif;font-size:10px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5mm;border-bottom:2px solid #000;padding-bottom:3mm;">
         <div><div style="font-size:14px;font-weight:bold">ALMACEN VICENTE ESPI, S.L.</div>
         <div style="font-size:10px;color:#555">${fechaES(new Date().toISOString().split('T')[0])}</div></div>
@@ -500,103 +566,96 @@ async function imprimirAlmacen(){
   setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
 }
 
-// ── IMPRIMIR SEMANA (horizontal, 2 hojas, igual que PDF) ──
+// ── IMPRIMIR RECEPCIONES ──
+async function imprimirRecepciones(){
+  const snap=await colRec.get();
+  const recs=snap.docs.map(d=>d.data()).sort((a,b)=>(b.fechaEntrada||'').localeCompare(a.fechaEntrada||''));
+  const filas=recs.map(r=>`<tr>
+    <td style="padding:4px 6px;border:1px solid #ccc;font-size:9px">${fechaES(r.fechaEntrada?.split('T')[0]||r.fechaEntrada)}</td>
+    <td style="padding:4px 6px;border:1px solid #ccc;font-size:9px">${r.proveedor||''}</td>
+    <td style="padding:4px 6px;border:1px solid #ccc;font-size:9px;font-weight:600">${r.material||''}</td>
+    <td style="padding:4px 6px;border:1px solid #ccc;font-family:monospace;font-size:8px">${r.lote||''}</td>
+    <td style="padding:4px 6px;border:1px solid #ccc;font-size:9px">${r.cantidad||''}</td>
+    <td style="padding:4px 6px;border:1px solid #ccc;font-size:9px">${r.albaran||''}</td>
+    <td style="padding:4px 6px;border:1px solid #ccc;font-size:9px;text-align:center">${r.controlVisual||'OK'}</td>
+    <td style="padding:4px 6px;border:1px solid #ccc;font-size:9px">${r.operario||''}</td>
+  </tr>`).join('');
+  document.getElementById('print-area').innerHTML=`
+    <style>@page{margin:8mm;size:A4 portrait;}</style>
+    <div style="font-family:Arial,sans-serif;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5mm;border-bottom:2px solid #000;padding-bottom:3mm;">
+        <div style="font-size:14px;font-weight:bold">CONTROL DE RECEPCIONES — V.ESPI</div>
+        <img src="logo-vespi.jpg" style="height:12mm;width:auto">
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr>
+          <th style="padding:5px 6px;border:1px solid #999;background:#ddd;font-size:9px">FECHA</th>
+          <th style="padding:5px 6px;border:1px solid #999;background:#ddd;font-size:9px">PROVEEDOR</th>
+          <th style="padding:5px 6px;border:1px solid #999;background:#ddd;font-size:9px">MATERIAL</th>
+          <th style="padding:5px 6px;border:1px solid #999;background:#ddd;font-size:9px">LOTE</th>
+          <th style="padding:5px 6px;border:1px solid #999;background:#ddd;font-size:9px">CANTIDAD</th>
+          <th style="padding:5px 6px;border:1px solid #999;background:#ddd;font-size:9px">ALBARÁN</th>
+          <th style="padding:5px 6px;border:1px solid #999;background:#ddd;font-size:9px">CONTROL</th>
+          <th style="padding:5px 6px;border:1px solid #999;background:#ddd;font-size:9px">OPERARIO</th>
+        </tr></thead>
+        <tbody>${filas}</tbody>
+      </table>
+    </div>`;
+  setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
+}
+
+// ── IMPRIMIR SEMANA ──
 function imprimirSemana(){
   const num=document.getElementById('semNum').value;
   const periodo=document.getElementById('semPeriodo').value;
   if(!semMaterias.length){ toast('⚠️ Carga primero una semana','err'); return; }
-
-  // Separar materias en 2 grupos: Fibras arriba, resto abajo
-  const getCat = mat => {
-    const l = lotesCache.find(x=>x.material===mat);
-    return l ? l.categoria : 'OTROS';
-  };
-  const fibras     = semMaterias.filter(m => getCat(m)==='FIBRAS');
-  const otrosMats  = semMaterias.filter(m => getCat(m)!=='FIBRAS');
-
-  const buildFilas = (mats) => mats.map(mat => {
-    const el = document.getElementById('sem-'+mat.replace(/[^a-zA-Z0-9]/g,'_'));
-    const lote = el ? el.value : '';
+  const ORDEN_MAT=['FIBRAS','PORTAMECHAS','PARAFINA','COLORANTE','OTROS'];
+  const getCat=mat=>{ const l=lotesCache.find(x=>x.material===mat); return l?l.categoria:'OTROS'; };
+  const fibras=semMaterias.filter(m=>getCat(m)==='FIBRAS');
+  const otros=semMaterias.filter(m=>getCat(m)!=='FIBRAS');
+  const buildFilas=mats=>mats.map(mat=>{
+    const el=document.getElementById('sem-'+mat.replace(/[^a-zA-Z0-9]/g,'_'));
     return `<tr>
       <td style="padding:4px 8px;border:1px solid #aaa;font-size:10px">${mat}</td>
-      <td style="padding:4px 8px;border:1px solid #aaa;font-family:monospace;font-size:10px;min-width:38mm">${lote}</td>
+      <td style="padding:4px 8px;border:1px solid #aaa;font-family:monospace;font-size:10px;min-width:38mm">${el?el.value:''}</td>
       <td style="padding:4px 8px;border:1px solid #aaa;min-width:38mm"></td>
     </tr>`;
   }).join('');
-
-  const CONTROLES=[
-    '1&nbsp;&nbsp; COMPROBACIÓN MATERIA PRIMA',
-    '2&nbsp;&nbsp; CONTROL VELOCIDAD MÁQUINA (PIÑOS)',
-    '3&nbsp;&nbsp; COMPROBACIÓN Nº DE HILOS',
-    '4&nbsp;&nbsp; CONTROL CALIDAD DEL TRENZADO',
-    '5&nbsp;&nbsp; COMPROBAR LA TENSIÓN DE LAS TRENZADORAS',
-    '6&nbsp;&nbsp; COMPROBAR EL GROSOR DEL ENCERADO',
-    '7&nbsp;&nbsp; COMPROBAR CALIDAD DEL ENCERADO',
-    '8&nbsp;&nbsp; COMPROBAR TENSIÓN DE LAS ENCERADORAS',
-    '9&nbsp;&nbsp; CONTROL MEDIDA DE LAS ENSAMBLADAS',
-    '10 COMPROBACIÓN MEDIDAS DEL PORTAMECHAS',
-    '11 COMPROBACIÓN SUJECIÓN PORTAMECHAS'
-  ];
-
-  const thControl = `<tr>
+  const CONTROLES=['1&nbsp;&nbsp; COMPROBACIÓN MATERIA PRIMA','2&nbsp;&nbsp; CONTROL VELOCIDAD MÁQUINA (PIÑOS)','3&nbsp;&nbsp; COMPROBACIÓN Nº DE HILOS','4&nbsp;&nbsp; CONTROL CALIDAD DEL TRENZADO','5&nbsp;&nbsp; COMPROBAR LA TENSIÓN DE LAS TRENZADORAS','6&nbsp;&nbsp; COMPROBAR EL GROSOR DEL ENCERADO','7&nbsp;&nbsp; COMPROBAR CALIDAD DEL ENCERADO','8&nbsp;&nbsp; COMPROBAR TENSIÓN DE LAS ENCERADORAS','9&nbsp;&nbsp; CONTROL MEDIDA DE LAS ENSAMBLADAS','10 COMPROBACIÓN MEDIDAS DEL PORTAMECHAS','11 COMPROBACIÓN SUJECIÓN PORTAMECHAS'];
+  const thCtrl=`<tr>
     <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;text-align:left;width:30mm">OPERARIO</th>
-    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;text-align:left;width:22mm">FECHA</th>
-    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;text-align:left;width:25mm">MECHA</th>
+    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;width:22mm">FECHA</th>
+    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;width:25mm">MECHA</th>
     <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;text-align:center;width:20mm">CONTROL</th>
     <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;text-align:center;width:12mm">SI</th>
     <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;text-align:center;width:12mm">NO</th>
-    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px;text-align:left">OBSERVACIÓN</th>
+    <th style="padding:5px 8px;border:1px solid #aaa;background:#e8e8e8;font-size:9px">OBSERVACIÓN</th>
   </tr>`;
-
-  const trVacios = Array(12).fill(`<tr>
-    <td style="padding:9px 8px;border:1px solid #aaa"></td>
-    <td style="border:1px solid #aaa"></td>
-    <td style="border:1px solid #aaa"></td>
-    <td style="border:1px solid #aaa;text-align:center;font-size:8px;color:#aaa">CONFORME</td>
-    <td style="border:1px solid #aaa"></td>
-    <td style="border:1px solid #aaa"></td>
-    <td style="border:1px solid #aaa"></td>
+  const trVacios=Array(12).fill(`<tr>
+    <td style="padding:9px 8px;border:1px solid #aaa"></td><td style="border:1px solid #aaa"></td>
+    <td style="border:1px solid #aaa"></td><td style="border:1px solid #aaa;text-align:center;font-size:8px;color:#aaa">CONFORME</td>
+    <td style="border:1px solid #aaa"></td><td style="border:1px solid #aaa"></td><td style="border:1px solid #aaa"></td>
   </tr>`).join('');
-
-  const cabHoja = `<div style="display:flex;align-items:baseline;gap:10mm;margin-bottom:5mm;border-bottom:1px solid #000;padding-bottom:3mm;">
+  const cabHoja=`<div style="display:flex;align-items:baseline;gap:10mm;margin-bottom:5mm;border-bottom:1px solid #000;padding-bottom:3mm;">
     <div style="font-size:18px;font-weight:bold">SEMANA ${num}</div>
     <div style="font-size:11px">${periodo}</div>
-    <div style="font-size:10px;color:#555;margin-left:auto">REV.01 &nbsp; 01/12/2022</div>
+    <div style="font-size:10px;color:#555;margin-left:auto">REV.01</div>
   </div>`;
-
-  const bloqueMateria = (titulo, mats) => `
-    <div style="margin-bottom:3mm;">
-      <div style="font-size:9px;font-weight:bold;background:#e8e8e8;padding:3px 8px;border:1px solid #aaa;border-bottom:none;">${titulo}</div>
-      <table style="width:100%;border-collapse:collapse;">
-        <thead><tr>
-          <th style="padding:3px 8px;border:1px solid #aaa;text-align:left;font-size:9px;background:#f0f0f0"></th>
-          <th style="padding:3px 8px;border:1px solid #aaa;text-align:left;font-size:9px;background:#f0f0f0">Lote</th>
-          <th style="padding:3px 8px;border:1px solid #aaa;text-align:left;font-size:9px;background:#f0f0f0">Lote</th>
-        </tr></thead>
-        <tbody>${buildFilas(mats)}</tbody>
-      </table>
-    </div>`;
-
-  const bloqueControl = (titulo) => `
-    <div style="margin-bottom:3mm;">
-      <div style="display:flex;align-items:center;gap:10mm;margin-bottom:1mm;">
-        <div style="font-size:10px;font-weight:bold">${titulo}</div>
-        <div style="font-size:10px">CONFORME</div>
-      </div>
-      <table style="width:100%;border-collapse:collapse;">
-        <thead>${thControl}</thead>
-        <tbody>${trVacios}</tbody>
-      </table>
-    </div>`;
-
-  // HOJA 1
-  const hoja1 = `<div style="font-family:Arial,sans-serif;font-size:10px;width:277mm;box-sizing:border-box;padding:8mm;page-break-after:always;">
+  const bloqMat=(titulo,mats)=>`<div style="margin-bottom:3mm;">
+    <div style="font-size:9px;font-weight:bold;background:#e8e8e8;padding:3px 8px;border:1px solid #aaa;border-bottom:none;">${titulo}</div>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr>
+        <th style="padding:3px 8px;border:1px solid #aaa;text-align:left;font-size:9px;background:#f0f0f0"></th>
+        <th style="padding:3px 8px;border:1px solid #aaa;text-align:left;font-size:9px;background:#f0f0f0">Lote</th>
+        <th style="padding:3px 8px;border:1px solid #aaa;text-align:left;font-size:9px;background:#f0f0f0">Lote 2</th>
+      </tr></thead>
+      <tbody>${buildFilas(mats)}</tbody>
+    </table>
+  </div>`;
+  const hoja1=`<div style="font-family:Arial,sans-serif;font-size:10px;width:277mm;box-sizing:border-box;padding:8mm;page-break-after:always;">
     ${cabHoja}
     <div style="display:flex;gap:8mm;">
-      <div style="flex:0 0 140mm;">
-        ${bloqueMateria('MATERIAS PRIMAS UTILIZADAS', fibras)}
-        ${otrosMats.length ? bloqueMateria('MATERIAS PRIMAS UTILIZADAS', otrosMats) : ''}
-      </div>
+      <div style="flex:0 0 140mm;">${bloqMat('MATERIAS PRIMAS UTILIZADAS',fibras)}${otros.length?bloqMat('MATERIAS PRIMAS UTILIZADAS',otros):''}</div>
       <div style="flex:1;">
         <div style="font-size:10px;font-weight:bold;margin-bottom:3mm;">Tipo de control:</div>
         <table style="width:100%;border-collapse:collapse;margin-bottom:5mm;">
@@ -606,32 +665,33 @@ function imprimirSemana(){
         <div style="text-align:center;font-size:11px;font-weight:bold;color:#2c5fa3;margin-top:2mm;">Wicks for Candles</div>
       </div>
     </div>
-    <div style="margin-top:4mm;">${bloqueControl('CONTROLES TRENZADO')}</div>
+    <div style="margin-top:4mm;">
+      <div style="font-size:10px;font-weight:bold;background:#ddd;padding:4px 8px;border:1px solid #aaa;border-bottom:none;">CONTROLES TRENZADO &nbsp;&nbsp; CONFORME</div>
+      <table style="width:100%;border-collapse:collapse;"><thead>${thCtrl}</thead><tbody>${trVacios}</tbody></table>
+    </div>
   </div>`;
-
-  // HOJA 2
-  const hoja2 = `<div style="font-family:Arial,sans-serif;font-size:10px;width:277mm;box-sizing:border-box;padding:8mm;">
+  const hoja2=`<div style="font-family:Arial,sans-serif;font-size:10px;width:277mm;box-sizing:border-box;padding:8mm;">
     ${cabHoja}
-    ${bloqueControl('CONTROLES ENCERADO')}
-    ${bloqueControl('CONTROLES ENSAMBLADO')}
+    <div style="font-size:10px;font-weight:bold;background:#ddd;padding:4px 8px;border:1px solid #aaa;border-bottom:none;margin-bottom:0;">CONTROLES ENCERADO &nbsp;&nbsp; CONFORME</div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:5mm;"><thead>${thCtrl}</thead><tbody>${trVacios}</tbody></table>
+    <div style="font-size:10px;font-weight:bold;background:#ddd;padding:4px 8px;border:1px solid #aaa;border-bottom:none;margin-bottom:0;">CONTROLES ENSAMBLADO &nbsp;&nbsp; CONFORME</div>
+    <table style="width:100%;border-collapse:collapse;"><thead>${thCtrl}</thead><tbody>${trVacios}</tbody></table>
   </div>`;
-
   document.getElementById('print-area').innerHTML=`<style>@page{margin:0;size:A4 landscape;}body{margin:0;}</style>${hoja1}${hoja2}`;
   setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
 }
 
-// ── IMPRIMIR PIÑOS (horizontal, hoja en blanco) ──
+// ── IMPRIMIR PIÑOS ──
 function imprimirPinos(){
   const num=document.getElementById('pinoSemNum').value||getSemana();
-  const trVacios=Array(15).fill(`<tr>
-    <td style="padding:10px 8px;border:1px solid #999;text-align:center"></td>
-    <td style="border:1px solid #999"></td>
-    <td style="border:1px solid #999;text-align:center"></td>
-    <td style="border:1px solid #999;text-align:center"></td>
-    <td style="border:1px solid #999"></td>
-    <td style="border:1px solid #999"></td>
+  const trVacios=Array(18).fill(`<tr>
+    <td style="padding:11px 8px;border:1px solid #aaa;text-align:center"></td>
+    <td style="border:1px solid #aaa"></td>
+    <td style="border:1px solid #aaa;text-align:center"></td>
+    <td style="border:1px solid #aaa;text-align:center"></td>
+    <td style="border:1px solid #aaa"></td>
+    <td style="border:1px solid #aaa"></td>
   </tr>`).join('');
-
   document.getElementById('print-area').innerHTML=`
     <style>@page{margin:0;size:A4 landscape;}body{margin:0;}</style>
     <div style="font-family:Arial,sans-serif;font-size:10px;width:277mm;box-sizing:border-box;padding:8mm;">
@@ -642,12 +702,12 @@ function imprimirPinos(){
       </div>
       <table style="width:100%;border-collapse:collapse;">
         <thead><tr>
-          <th style="padding:6px 8px;border:1px solid #999;background:#ddd;font-size:10px;text-align:center;width:60px">Nº MÁQUINA</th>
-          <th style="padding:6px 8px;border:1px solid #999;background:#ddd;font-size:10px;text-align:left">MECHA</th>
-          <th style="padding:6px 8px;border:1px solid #999;background:#ddd;font-size:10px;text-align:center;width:60px">PIÑOS</th>
-          <th style="padding:6px 8px;border:1px solid #999;background:#ddd;font-size:10px;text-align:center;width:70px">FECHA</th>
-          <th style="padding:6px 8px;border:1px solid #999;background:#ddd;font-size:10px;text-align:left">TRABAJADOR CAMBIA</th>
-          <th style="padding:6px 8px;border:1px solid #999;background:#ddd;font-size:10px;text-align:left">TRABAJADOR COMPRUEBA</th>
+          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:10px;text-align:center;width:50px">Nº MÁQUINA</th>
+          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:10px;text-align:left">MECHA</th>
+          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:10px;text-align:center;width:60px">PIÑOS</th>
+          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:10px;text-align:center;width:70px">FECHA</th>
+          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:10px;text-align:left">TRABAJADOR CAMBIA</th>
+          <th style="padding:6px 8px;border:1px solid #aaa;background:#ddd;font-size:10px;text-align:left">TRABAJADOR COMPRUEBA</th>
         </tr></thead>
         <tbody>${trVacios}</tbody>
       </table>
