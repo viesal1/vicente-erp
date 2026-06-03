@@ -88,8 +88,24 @@
 
   <!-- TAB LOTES -->
   <div id="tab-lotes">
-    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
       <button class="btn-print" onclick="imprimirAlmacen()">🖨️ Imprimir Almacén</button>
+    </div>
+    <div class="filtros">
+      <input type="text" id="buscarLote" placeholder="🔍 Buscar material o lote…" oninput="filtrarLotes()">
+      <select id="filtroLoteCat" onchange="filtrarLotes()">
+        <option value="">Todas las categorías</option>
+        <option value="FIBRAS">Fibras</option>
+        <option value="PARAFINA">Parafina</option>
+        <option value="PORTAMECHAS">Portamechas</option>
+        <option value="COLORANTE">Colorante</option>
+        <option value="OTROS">Otros</option>
+      </select>
+      <select id="filtroLoteEstado" onchange="filtrarLotes()">
+        <option value="">Todos los estados</option>
+        <option value="en_uso">En uso</option>
+        <option value="almacen">Almacén</option>
+      </select>
     </div>
     <div id="lotes-container"><div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div></div>
   </div>
@@ -147,6 +163,9 @@
           <button onclick="imprimirSemana()" class="btn-print" style="padding:11px 16px;font-size:14px;">🖨️ Imprimir</button>
         </div>
       </div>
+    </div>
+    <div class="filtros" id="filtroSemana" style="display:none;">
+      <input type="text" id="buscarSem" placeholder="🔍 Buscar material…" oninput="filtrarSemana()">
     </div>
     <div id="semana-container"><div class="empty-state"><div class="icon">📋</div><p>Carga una semana.</p></div></div>
   </div>
@@ -260,6 +279,11 @@ async function cargarLotes(){
 }
 
 function renderLotes(){
+  // Aplicar filtros si hay valores
+  const q = document.getElementById('buscarLote')?.value?.toLowerCase()||'';
+  const cat = document.getElementById('filtroLoteCat')?.value||'';
+  const estado = document.getElementById('filtroLoteEstado')?.value||'';
+  if(q||cat||estado){ filtrarLotes(); return; }
   const cont=document.getElementById('lotes-container');
   if(!lotesCache.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📦</div><p>Sin lotes. Añade una recepción.</p></div>'; return; }
   const grupos={};
@@ -506,6 +530,7 @@ async function cargarSemana(){
     const mats=Object.keys(enUso).sort();
     semMaterias=mats;
     if(!mats.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin materias en inventario.</p></div>'; return; }
+    document.getElementById('filtroSemana').style.display='';
     cont.innerHTML=`
       <div style="font-size:12px;color:#7f8c8d;margin-bottom:10px;">Lotes en uso automáticos — edita si hay cambios:</div>
       ${mats.map(mat=>{
@@ -830,6 +855,71 @@ function imprimirPinos(){
       </table>
     </div>`;
   setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
+}
+
+// ── FILTRAR LOTES ──
+function filtrarLotes(){
+  const q = document.getElementById('buscarLote').value.toLowerCase();
+  const cat = document.getElementById('filtroLoteCat').value;
+  const estado = document.getElementById('filtroLoteEstado').value;
+  const filtered = lotesCache.filter(l=>{
+    const mq = !q || (l.material||'').toLowerCase().includes(q) || (l.lote||'').toLowerCase().includes(q);
+    const mc = !cat || (l.categoria||'').toUpperCase() === cat;
+    const me = !estado || l.estado === estado;
+    return mq && mc && me;
+  });
+  renderLotesFiltrados(filtered);
+}
+
+function renderLotesFiltrados(lotes){
+  const cont = document.getElementById('lotes-container');
+  if(!lotes.length){ cont.innerHTML='<div class="empty-state"><div class="icon">🔍</div><p>Sin resultados.</p></div>'; return; }
+  const grupos={};
+  lotes.forEach(l=>{
+    const cat=l.categoria||'OTROS';
+    const mat=l.material||'—';
+    if(!grupos[cat]) grupos[cat]={};
+    if(!grupos[cat][mat]) grupos[cat][mat]=[];
+    grupos[cat][mat].push(l);
+  });
+  const ORDEN=['FIBRAS','PORTAMECHAS','PARAFINA','COLORANTE','OTROS'];
+  const cats=ORDEN.filter(c=>grupos[c]).concat(Object.keys(grupos).filter(c=>!ORDEN.includes(c)));
+  cont.innerHTML=cats.map(cat=>`
+    <div style="margin-bottom:18px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7f8c8d;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #f4f7fa;">${cat}</div>
+      ${Object.entries(grupos[cat]).map(([mat,ls])=>`
+        <div class="materia-card">
+          <div class="mat-header">
+            <div class="mat-nombre">${mat}</div>
+            <div style="font-size:11px;color:#7f8c8d">${ls.filter(l=>l.estado==='en_uso').length} en uso · ${ls.filter(l=>l.estado==='almacen').length} en almacén</div>
+          </div>
+          <div class="mat-body">
+            ${ls.sort((a,b)=>a.estado==='en_uso'?-1:1).map(l=>`
+              <div class="lote-row">
+                <div style="flex:1">
+                  <div class="lote-cod">${l.lote}</div>
+                  <div class="lote-det">${l.cantidad||''} ${l.albaran?'· Alb: '+l.albaran:''}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                  <span class="${l.estado==='en_uso'?'badge-uso':'badge-alm'}">${l.estado==='en_uso'?'EN USO':'ALMACÉN'}</span>
+                  ${l.estado==='almacen'?`<button class="btn-sm btn-usar" onclick="marcarUso('${l.id}','${l.material}')">▶ Usar</button>`:''}
+                  <button class="btn-sm btn-agotar" onclick="marcarAgotado('${l.id}','${l.material}')">✓ Agotado</button>
+                  <button class="btn-sm" style="background:#f4f7fa;color:#1e2a44;" onclick="preguntarEtiquetas('${l.lote}','${l.material}','${l.fechaEntrada||''}')">🏷️</button>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+// ── FILTRAR SEMANA ──
+function filtrarSemana(){
+  const q = document.getElementById('buscarSem').value.toLowerCase();
+  const items = document.querySelectorAll('#semana-container > div > div');
+  items.forEach(item=>{
+    const mat = item.querySelector('div')?.textContent?.toLowerCase()||'';
+    item.style.display = !q || mat.includes(q) ? '' : 'none';
+  });
 }
 
 // ── HELPERS ──
