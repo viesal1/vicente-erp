@@ -718,7 +718,7 @@ function imprimirSemana(){
     </div>`;
 
   // HOJA 1
-  const hoja1=`<div style="font-family:Arial,sans-serif;font-size:10px;width:277mm;box-sizing:border-box;padding:8mm;page-break-after:always;">
+  const hoja1=`<div style="font-family:Arial,sans-serif;font-size:10px;">
     ${cab}
     <div style="display:flex;gap:6mm;">
       <div style="flex:0 0 130mm;">
@@ -738,7 +738,7 @@ function imprimirSemana(){
   </div>`;
 
   // HOJA 2
-  const hoja2=`<div style="font-family:Arial,sans-serif;font-size:10px;width:277mm;box-sizing:border-box;padding:8mm;">
+  const hoja2=`<div style="font-family:Arial,sans-serif;font-size:10px;">
     ${cab}
     ${bloqControl('CONTROLES ENCERADO')}
     ${bloqControl('CONTROLES ENSAMBLADO')}
@@ -748,9 +748,11 @@ function imprimirSemana(){
     <style>
       @page{margin:0;size:A4 landscape;}
       body{margin:0;}
-      .page-break{page-break-after:always;}
+      .hoja-land{width:297mm;height:210mm;overflow:hidden;box-sizing:border-box;padding:8mm;page-break-after:always;page-break-inside:avoid;}
+      .hoja-land:last-child{page-break-after:auto;}
     </style>
-    ${hoja1}${hoja2}`;
+    <div class="hoja-land">${hoja1}</div>
+    <div class="hoja-land">${hoja2}</div>`;
   setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
 }
 
