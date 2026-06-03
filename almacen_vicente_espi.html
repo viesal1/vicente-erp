@@ -95,7 +95,9 @@
       <input type="text" id="buscarLote" placeholder="🔍 Buscar material o lote…" oninput="filtrarLotes()">
       <select id="filtroLoteCat" onchange="filtrarLotes()">
         <option value="">Todas las categorías</option>
-        <option value="FIBRAS">Fibras</option>
+        <option value="ALGODON">Algodón</option>
+        <option value="RAYON">Rayón</option>
+        <option value="PAPEL">Papel</option>
         <option value="PARAFINA">Parafina</option>
         <option value="PORTAMECHAS">Portamechas</option>
         <option value="COLORANTE">Colorante</option>
@@ -862,9 +864,16 @@ function filtrarLotes(){
   const q = document.getElementById('buscarLote').value.toLowerCase();
   const cat = document.getElementById('filtroLoteCat').value;
   const estado = document.getElementById('filtroLoteEstado').value;
+  const getSubcat = mat => {
+    if(['ALG-30','ALG-50','ALG-22'].includes(mat)) return 'ALGODON';
+    if(['RAYÓN 600','RAYÓN 450','RAYÓN 1200'].includes(mat)) return 'RAYON';
+    if(['PAPEL BLANCO','PAPEL MARRON'].includes(mat)) return 'PAPEL';
+    return null;
+  };
   const filtered = lotesCache.filter(l=>{
     const mq = !q || (l.material||'').toLowerCase().includes(q) || (l.lote||'').toLowerCase().includes(q);
-    const mc = !cat || (l.categoria||'').toUpperCase() === cat;
+    const subcat = getSubcat(l.material||'');
+    const mc = !cat || (subcat===cat) || (!subcat && (l.categoria||'').toUpperCase()===cat);
     const me = !estado || l.estado === estado;
     return mq && mc && me;
   });
