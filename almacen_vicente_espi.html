@@ -288,9 +288,11 @@ function renderLotes(){
   const estado = document.getElementById('filtroLoteEstado')?.value||'';
   if(q||cat||estado){ filtrarLotes(); return; }
   const cont=document.getElementById('lotes-container');
-  if(!lotesCache.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📦</div><p>Sin lotes. Añade una recepción.</p></div>'; return; }
+  const EXCLUIR_LOTES = ['PARAFINA AM6264','MICRO AN4058'];
+  const lotesFiltrados = lotesCache.filter(l=>!EXCLUIR_LOTES.includes(l.material||''));
+  if(!lotesFiltrados.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📦</div><p>Sin lotes. Añade una recepción.</p></div>'; return; }
   const grupos={};
-  lotesCache.forEach(l=>{
+  lotesFiltrados.forEach(l=>{
     const cat=l.categoria||'OTROS';
     const mat=l.material||'—';
     if(!grupos[cat]) grupos[cat]={};
@@ -530,7 +532,8 @@ async function cargarSemana(){
     const semDocs=semSnap.docs.filter(d=>d.data().semana===parseInt(num));
     const semData=semDocs.length?semDocs[0].data():{};
     semId=semDocs.length?semDocs[0].id:null;
-    const mats=Object.keys(enUso).sort();
+    const EXCLUIR_SEMANA=['PARAFINA AM6264','MICRO AN4058','A30'];
+    const mats=Object.keys(enUso).filter(m=>!EXCLUIR_SEMANA.includes(m)).sort();
     semMaterias=mats;
     if(!mats.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin materias en inventario.</p></div>'; return; }
     document.getElementById('filtroSemana').style.display='';
@@ -948,6 +951,27 @@ async function migrarA30(){
   }
   toast(`✅ ${ok} documentos renombrados`,'ok');
   cargarLotes();
+}
+
+// ── ELIMINAR OBSOLETOS ──
+async function eliminarObsoletos(){
+  if(!confirm('¿Eliminar definitivamente PARAFINA AM6264 y MICRO AN4058 de Firestore?')) return;
+  const OBSOLETOS = ['PARAFINA AM6264','MICRO AN4058'];
+  let ok=0;
+  const cols=['almacen_lotes_vespi','almacen_recepciones_vespi'];
+  for(const col of cols){
+    const snap=await db.collection(col).get();
+    for(const doc of snap.docs){
+      if(OBSOLETOS.includes(doc.data().material)){
+        await db.collection(col).doc(doc.id).delete();
+        ok++;
+      }
+    }
+  }
+  toast(`✅ ${ok} documentos eliminados`,'ok');
+  document.querySelector('[onclick="eliminarObsoletos()"]').remove();
+  cargarLotes();
+  cargarRecepciones();
 }
 
 // ── HELPERS ──
