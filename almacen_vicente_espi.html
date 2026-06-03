@@ -292,7 +292,7 @@ function renderLotes(){
                   <span class="${l.estado==='en_uso'?'badge-uso':'badge-alm'}">${l.estado==='en_uso'?'EN USO':'ALMACÉN'}</span>
                   ${l.estado==='almacen'?`<button class="btn-sm btn-usar" onclick="marcarUso('${l.id}','${mat}')">▶ Usar</button>`:''}
                   <button class="btn-sm btn-agotar" onclick="marcarAgotado('${l.id}','${mat}')">✓ Agotado</button>
-                  <button class="btn-sm" style="background:#f4f7fa;color:#1e2a44;" onclick="impEtLote('${l.lote}','${mat}','${l.fechaEntrada||''}',2)">🏷️</button>
+                  <button class="btn-sm" style="background:#f4f7fa;color:#1e2a44;" onclick="preguntarEtiquetas('${l.lote}','${mat}','${l.fechaEntrada||''}')">🏷️</button>
                 </div>
               </div>`).join('')}
           </div>
@@ -438,6 +438,12 @@ async function eliminarRec(id){
 }
 
 // ── ETIQUETA LOTE — 4 por hoja (2x2), formato PDF ──
+function preguntarEtiquetas(lote,mat,fecha){
+  const n=parseInt(prompt('¿Cuántas etiquetas imprimir?','4'));
+  if(!n||isNaN(n)||n<1) return;
+  impEtLote(lote,mat,fecha,n);
+}
+
 function impEtLote(lote,mat,fecha,n){
   let html='';
   const fechaStr = fecha ? fechaES(fecha.split('T')[0]||fecha) : new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'});
