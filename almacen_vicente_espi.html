@@ -641,51 +641,83 @@ async function imprimirRecepciones(){
 function imprimirSemana(){
   const num=document.getElementById('semNum').value;
   const periodo=document.getElementById('semPeriodo').value;
-  if(!semMaterias.length){ toast('⚠️ Carga primero una semana','err'); return; }
 
-  // Separar materias: fibras arriba, resto abajo (igual que PDF)
-  const ORDEN_FIBRAS=['ALG-30','ALG-50','ALG-22','RAYÓN 600','RAYÓN 450','PAPEL MARRON','PAPEL BLANCO'];
-  const getCat=mat=>{const l=lotesCache.find(x=>x.material===mat);return l?l.categoria:'OTROS';};
-  const fibras=semMaterias.filter(m=>getCat(m)==='FIBRAS');
-  const otros=semMaterias.filter(m=>getCat(m)!=='FIBRAS');
-
-  // Ordenar fibras
-  const fibrasSorted=[
-    ...ORDEN_FIBRAS.filter(m=>fibras.includes(m)),
-    ...fibras.filter(m=>!ORDEN_FIBRAS.includes(m))
+  // Nombres fijos con mapeo a material en Firestore
+  const BLOQUE1 = [
+    { nombre:'Alg 30/2',       mat:'ALG-30' },
+    { nombre:'Alg 50/2',       mat:'ALG-50' },
+    { nombre:'Alg 22/1',       mat:'ALG-22' },
+    { nombre:'R-600',          mat:'RAYÓN 600' },
+    { nombre:'R-450',          mat:'RAYÓN 450' },
+    { nombre:'Pap-600 marron', mat:'PAPEL MARRON' },
+    { nombre:'Pap-600 blanc',  mat:'PAPEL BLANCO' },
+  ];
+  const BLOQUE2 = [
+    { nombre:'Parafina',          mat:'PARAFINA MACRO' },
+    { nombre:'Micro SP',          mat:'PARAFINA MICRO' },
+    { nombre:'Vybar',             mat:'VYBAR' },
+    { nombre:'colorante rojo-rosa',mat:'COLORANTE ROJO' },
+    { nombre:'Colorante azul',    mat:'COLORANTE AZUL' },
+    { nombre:'3,0x3,4x14,5',     mat:'PORTAMECHAS 3034' },
+    { nombre:'2,5x3,4x14,5',     mat:'PORTAMECHAS 2534' },
+    { nombre:'3,0x6,4x14,5',     mat:'PORTAMECHAS 3064' },
   ];
 
-  const buildFilas=mats=>mats.map(mat=>{
-    const el=document.getElementById('sem-'+mat.replace(/[^a-zA-Z0-9]/g,'_'));
+  // Buscar lotes en uso desde lotesCache
+  const getLote = mat => {
+    const l = lotesCache.find(x=>x.material===mat && x.estado==='en_uso');
+    return l ? l.lote : '';
+  };
+
+  const buildFilas = bloque => bloque.map(item => {
+    const lote = getLote(item.mat);
     return `<tr>
-      <td style="padding:2px 6px;border:1px solid #aaa;font-size:9px">${mat}</td>
-      <td style="padding:2px 6px;border:1px solid #aaa;font-family:monospace;font-size:9px;min-width:30mm">${el?el.value:''}</td>
-      <td style="padding:2px 6px;border:1px solid #aaa;min-width:25mm"></td>
+      <td style="padding:3px 6px;border:1px solid #aaa;font-size:9px">${item.nombre}</td>
+      <td style="padding:3px 6px;border:1px solid #aaa;font-family:monospace;font-size:9px;min-width:32mm">${lote}</td>
+      <td style="padding:3px 6px;border:1px solid #aaa;min-width:25mm"></td>
     </tr>`;
   }).join('');
+
+  const bloqMat = (bloque) => `
+    <div style="margin-bottom:2mm;">
+      <div style="font-size:8px;font-weight:bold;padding:2px 6px;border:1px solid #aaa;border-bottom:none;background:#f0f0f0">MATERIAS PRIMAS UTILIZADAS</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr>
+          <th style="padding:2px 6px;border:1px solid #aaa;font-size:8px;background:#f8f8f8;text-align:left;width:35mm"></th>
+          <th style="padding:2px 6px;border:1px solid #aaa;font-size:8px;background:#f8f8f8;text-align:center">Lote</th>
+          <th style="padding:2px 6px;border:1px solid #aaa;font-size:8px;background:#f8f8f8;text-align:center">Lote</th>
+        </tr></thead>
+        <tbody>${buildFilas(bloque)}</tbody>
+      </table>
+    </div>`;
 
   const CONTROLES=['1&nbsp; COMPROBACIÓN MATERIA PRIMA','2&nbsp; CONTROL VELOCIDAD MÁQUINA (PIÑOS)','3&nbsp; COMPROBACIÓN Nº DE HILOS','4&nbsp; CONTROL CALIDAD DEL TRENZADO','5&nbsp; COMPROBAR LA TENSIÓN DE LAS TRENZADORAS','6&nbsp; COMPROBAR EL GROSOR DEL ENCERADO','7&nbsp; COMPROBAR CALIDAD DEL ENCERADO','8&nbsp; COMPROBAR TENSIÓN DE LAS ENCERADORAS','9&nbsp; CONTROL MEDIDA DE LAS ENSAMBLADAS','10 COMPROBACIÓN MEDIDAS DEL PORTAMECHAS','11 COMPROBACIÓN SUJECIÓN PORTAMECHAS'];
 
   const thCtrl=`<tr>
-    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:left;width:28mm">OPERARIO</th>
-    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;width:20mm">FECHA</th>
-    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;width:22mm">MECHA</th>
-    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center">CONTROL</th>
-    <th colspan="2" style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center;width:20mm">CONFORME</th>
-    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px">OBSERVACIÓN</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:left;width:28mm" rowspan="2">OPERARIO</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;width:20mm" rowspan="2">FECHA</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;width:22mm" rowspan="2">MECHA</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center" rowspan="2">CONTROL</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center" colspan="2">CONFORME</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px" rowspan="2">OBSERVACIÓN</th>
   </tr>
   <tr>
-    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:8px"></th>
-    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:8px"></th>
-    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:8px"></th>
-    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:8px"></th>
-    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:9px;text-align:center">SI</th>
-    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:9px;text-align:center">NO</th>
-    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:8px"></th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center;width:10mm">SI</th>
+    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center;width:10mm">NO</th>
   </tr>`;
 
-  const trVacios=Array(8).fill(`<tr>
+  const trVacios=Array(12).fill(`<tr>
     <td style="padding:12px 6px;border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;"></td>
+    <td style="border:1px solid #aaa;"></td>
+  </tr>`).join('');
+
+  const trVacios2=Array(9).fill(`<tr>
+    <td style="padding:14px 6px;border:1px solid #aaa;"></td>
     <td style="border:1px solid #aaa;"></td>
     <td style="border:1px solid #aaa;"></td>
     <td style="border:1px solid #aaa;"></td>
@@ -700,87 +732,48 @@ function imprimirSemana(){
     <span style="font-size:9px;color:#555;margin-left:auto">REV.01 &nbsp; 01/12/2022</span>
   </div>`;
 
-  const bloqMat=(mats)=>`
-    <div style="margin-bottom:2mm;">
-      <div style="font-size:8px;font-weight:bold;padding:2px 6px;border:1px solid #aaa;border-bottom:none;background:#f0f0f0">MATERIAS PRIMAS UTILIZADAS</div>
-      <table style="width:100%;border-collapse:collapse;">
-        <thead><tr>
-          <th style="padding:2px 6px;border:1px solid #aaa;font-size:9px;text-align:left;background:#f8f8f8;width:40mm"></th>
-          <th style="padding:2px 6px;border:1px solid #aaa;font-size:9px;text-align:center;background:#f8f8f8">Lote</th>
-          <th style="padding:2px 6px;border:1px solid #aaa;font-size:9px;text-align:center;background:#f8f8f8">Lote</th>
-        </tr></thead>
-        <tbody>${buildFilas(mats)}</tbody>
-      </table>
-    </div>`;
-
-  const trVacios2=Array(9).fill(`<tr>
-    <td style="padding:14px 6px;border:1px solid #aaa;"></td>
-    <td style="border:1px solid #aaa;"></td>
-    <td style="border:1px solid #aaa;"></td>
-    <td style="border:1px solid #aaa;"></td>
-    <td style="border:1px solid #aaa;"></td>
-    <td style="border:1px solid #aaa;"></td>
-    <td style="border:1px solid #aaa;"></td>
-  </tr>`).join('');
-
-  const bloqControl2=(titulo)=>`
-    <div style="margin-bottom:4mm;">
+  const bloqControl=(titulo,filas)=>`
+    <div style="margin-bottom:3mm;">
       <div style="display:flex;align-items:center;gap:8mm;margin-bottom:1mm;">
-        <span style="font-size:11px;font-weight:bold">${titulo}</span>
-        <span style="font-size:11px">CONFORME</span>
-      </div>
-      <table style="width:100%;border-collapse:collapse;">
-        <thead>${thCtrl}</thead>
-        <tbody>${trVacios2}</tbody>
-      </table>
-    </div>`;
-
-  const bloqControl=(titulo)=>`
-    <div style="margin-bottom:4mm;">
-      <div style="margin-bottom:1mm;">
         <span style="font-size:10px;font-weight:bold">${titulo}</span>
       </div>
       <table style="width:100%;border-collapse:collapse;">
         <thead>${thCtrl}</thead>
-        <tbody>${trVacios}</tbody>
+        <tbody>${filas}</tbody>
       </table>
     </div>`;
 
-  // HOJA 1
   const hoja1=`<div style="font-family:Arial,sans-serif;font-size:9px;width:277mm;padding:5mm;box-sizing:border-box;display:block;page-break-after:always;break-after:page;">
     ${cab}
     <div style="display:flex;gap:6mm;">
-      <div style="flex:0 0 130mm;">
-        ${bloqMat(fibrasSorted)}
-        ${otros.length?bloqMat(otros):''}
+      <div style="flex:0 0 125mm;">
+        ${bloqMat(BLOQUE1)}
+        ${bloqMat(BLOQUE2)}
       </div>
       <div style="flex:1;">
         <div style="font-size:9px;font-weight:bold;margin-bottom:2mm;">Tipo de control:</div>
         <table style="width:100%;border-collapse:collapse;margin-bottom:4mm;">
           ${CONTROLES.map(c=>`<tr><td style="padding:3px 6px;border:1px solid #aaa;font-size:9px">${c}</td></tr>`).join('')}
         </table>
-        <img src="logo-vespi.jpg" style="max-width:40mm;height:auto;display:block;margin:0 auto 2mm auto;">
+        <img src="logo-vespi.jpg" style="max-width:38mm;height:auto;display:block;margin:0 auto 2mm auto;">
         <div style="text-align:center;font-size:10px;font-weight:bold;color:#2c5fa3;">Wicks for Candles</div>
       </div>
     </div>
-    <div style="margin-top:3mm;">${bloqControl('CONTROLES TRENZADO')}</div>
+    <div style="margin-top:3mm;">${bloqControl('CONTROLES TRENZADO',trVacios)}</div>
   </div>`;
 
-  // HOJA 2
-  const hoja2=`<div style="font-family:Arial,sans-serif;font-size:10px;width:277mm;padding:8mm;box-sizing:border-box;display:block;">
+  const hoja2=`<div style="font-family:Arial,sans-serif;font-size:9px;width:277mm;padding:5mm;box-sizing:border-box;display:block;">
     ${cab}
-    ${bloqControl2('CONTROLES ENCERADO')}
-    ${bloqControl2('CONTROLES ENSAMBLADO')}
+    ${bloqControl('CONTROLES ENCERADO',trVacios2)}
+    ${bloqControl('CONTROLES ENSAMBLADO',trVacios2)}
   </div>`;
 
   document.getElementById('print-area').innerHTML=`
     <style>
       @page{margin:0;size:A4 landscape;}
       body{margin:0;}
-
     </style>
-    ${hoja1}
-    ${hoja2}`;
+    ${hoja1}${hoja2}`;
   setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
 }
 
