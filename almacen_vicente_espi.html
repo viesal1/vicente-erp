@@ -488,7 +488,10 @@ async function cargarSemana(){
   const cont=document.getElementById('semana-container');
   cont.innerHTML='<div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div>';
   try{
-    const snap=await colLotes.get();
+    // Recargar lotes frescos de Firestore
+    const snapFresh=await colLotes.get();
+    lotesCache=snapFresh.docs.map(d=>({id:d.id,...d.data()})).filter(l=>l.estado!=='agotado');
+    const snap=snapFresh;
     const enUso={};
     snap.docs.forEach(d=>{
       const l=d.data();
