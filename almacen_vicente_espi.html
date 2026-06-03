@@ -90,6 +90,7 @@
   <div id="tab-lotes">
     <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
       <button class="btn-print" onclick="imprimirAlmacen()">🖨️ Imprimir Almacén</button>
+      <button onclick="migrarA30()" style="background:#7f8c8d;color:#fff;border:none;padding:12px 16px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;">🔄 Renombrar A30→ALG-30</button>
     </div>
     <div class="filtros">
       <input type="text" id="buscarLote" placeholder="🔍 Buscar material o lote…" oninput="filtrarLotes()">
@@ -929,6 +930,24 @@ function filtrarSemana(){
     const mat = item.querySelector('div')?.textContent?.toLowerCase()||'';
     item.style.display = !q || mat.includes(q) ? '' : 'none';
   });
+}
+
+// ── MIGRAR A30 ──
+async function migrarA30(){
+  if(!confirm('¿Renombrar todos los lotes "A30" a "ALG-30" en Firestore?')) return;
+  let ok=0;
+  const cols=['almacen_lotes_vespi','almacen_recepciones_vespi'];
+  for(const col of cols){
+    const snap=await db.collection(col).get();
+    for(const doc of snap.docs){
+      if(doc.data().material==='A30'){
+        await db.collection(col).doc(doc.id).update({material:'ALG-30',categoria:'FIBRAS'});
+        ok++;
+      }
+    }
+  }
+  toast(`✅ ${ok} documentos renombrados`,'ok');
+  cargarLotes();
 }
 
 // ── HELPERS ──
