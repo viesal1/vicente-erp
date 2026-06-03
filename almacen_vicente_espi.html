@@ -671,16 +671,24 @@ function imprimirSemana(){
     <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;width:20mm">FECHA</th>
     <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;width:22mm">MECHA</th>
     <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center">CONTROL</th>
-    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center;width:10mm">SI</th>
-    <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center;width:10mm">NO</th>
+    <th colspan="2" style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:center;width:20mm">CONFORME</th>
     <th style="padding:5px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px">OBSERVACIÓN</th>
+  </tr>
+  <tr>
+    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:8px"></th>
+    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:8px"></th>
+    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:8px"></th>
+    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:8px"></th>
+    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:9px;text-align:center">SI</th>
+    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:9px;text-align:center">NO</th>
+    <th style="border:1px solid #aaa;background:#f0f0f0;font-size:8px"></th>
   </tr>`;
 
-  const trVacios=Array(12).fill(`<tr>
-    <td style="padding:8px 6px;border:1px solid #aaa;"></td>
+  const trVacios=Array(8).fill(`<tr>
+    <td style="padding:5px 6px;border:1px solid #aaa;"></td>
     <td style="border:1px solid #aaa;"></td>
     <td style="border:1px solid #aaa;"></td>
-    <td style="border:1px solid #aaa;text-align:center;font-size:8px;color:#bbb">CONFORME</td>
+    <td style="border:1px solid #aaa;"></td>
     <td style="border:1px solid #aaa;"></td>
     <td style="border:1px solid #aaa;"></td>
     <td style="border:1px solid #aaa;"></td>
@@ -707,9 +715,8 @@ function imprimirSemana(){
 
   const bloqControl=(titulo)=>`
     <div style="margin-bottom:4mm;">
-      <div style="display:flex;align-items:center;gap:8mm;margin-bottom:1mm;">
+      <div style="margin-bottom:1mm;">
         <span style="font-size:10px;font-weight:bold">${titulo}</span>
-        <span style="font-size:10px">CONFORME</span>
       </div>
       <table style="width:100%;border-collapse:collapse;">
         <thead>${thCtrl}</thead>
@@ -718,7 +725,7 @@ function imprimirSemana(){
     </div>`;
 
   // HOJA 1
-  const hoja1=`<div style="font-family:Arial,sans-serif;font-size:10px;width:277mm;padding:8mm;box-sizing:border-box;display:block;page-break-after:always;break-after:page;">
+  const hoja1=`<div style="font-family:Arial,sans-serif;font-size:9px;width:277mm;padding:5mm;box-sizing:border-box;display:block;page-break-after:always;break-after:page;">
     ${cab}
     <div style="display:flex;gap:6mm;">
       <div style="flex:0 0 130mm;">
