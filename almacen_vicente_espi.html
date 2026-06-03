@@ -168,6 +168,15 @@
     </div>
     <div class="filtros" id="filtroSemana" style="display:none;">
       <input type="text" id="buscarSem" placeholder="🔍 Buscar material…" oninput="filtrarSemana()">
+      <select id="filtroSemCat" onchange="filtrarSemana()">
+        <option value="">Todas las categorías</option>
+        <option value="ALGODON">Algodón</option>
+        <option value="RAYON">Rayón</option>
+        <option value="PAPEL">Papel</option>
+        <option value="PARAFINA">Parafina</option>
+        <option value="PORTAMECHAS">Portamechas</option>
+        <option value="COLORANTE">Colorante</option>
+      </select>
     </div>
     <div id="semana-container"><div class="empty-state"><div class="icon">📋</div><p>Carga una semana.</p></div></div>
   </div>
@@ -926,30 +935,27 @@ function renderLotesFiltrados(lotes){
 // ── FILTRAR SEMANA ──
 function filtrarSemana(){
   const q = document.getElementById('buscarSem').value.toLowerCase();
+  const cat = document.getElementById('filtroSemCat')?.value||'';
+  const getSubcatSem = mat => {
+    if(['ALG-30','ALG-50','ALG-22'].includes(mat)) return 'ALGODON';
+    if(['RAYÓN 600','RAYÓN 450','RAYÓN 1200'].includes(mat)) return 'RAYON';
+    if(['PAPEL BLANCO','PAPEL MARRON'].includes(mat)) return 'PAPEL';
+    if(mat.startsWith('PARAFINA')||mat==='VYBAR') return 'PARAFINA';
+    if(mat.startsWith('PORTAMECHAS')) return 'PORTAMECHAS';
+    if(mat.startsWith('COLORANTE')) return 'COLORANTE';
+    return '';
+  };
   const items = document.querySelectorAll('#semana-container > div > div');
   items.forEach(item=>{
-    const mat = item.querySelector('div')?.textContent?.toLowerCase()||'';
-    item.style.display = !q || mat.includes(q) ? '' : 'none';
+    const mat = item.querySelector('div')?.textContent?.trim()||'';
+    const mq = !q || mat.toLowerCase().includes(q);
+    const mc = !cat || getSubcatSem(mat)===cat;
+    item.style.display = mq && mc ? '' : 'none';
   });
 }
 
 // ── MIGRAR A30 ──
-async function migrarA30(){
-  if(!confirm('¿Renombrar todos los lotes "A30" a "ALG-30" en Firestore?')) return;
-  let ok=0;
-  const cols=['almacen_lotes_vespi','almacen_recepciones_vespi'];
-  for(const col of cols){
-    const snap=await db.collection(col).get();
-    for(const doc of snap.docs){
-      if(doc.data().material==='A30'){
-        await db.collection(col).doc(doc.id).update({material:'ALG-30',categoria:'FIBRAS'});
-        ok++;
-      }
-    }
-  }
-  toast(`✅ ${ok} documentos renombrados`,'ok');
-  cargarLotes();
-}
+
 
 // ── MIGRAR OBSOLETOS AL ARRANCAR ──
 async function migrarObsoletos(){
