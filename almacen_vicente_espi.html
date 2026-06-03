@@ -321,6 +321,10 @@ async function marcarAgotado(id,mat){
       }
     } else toast('⚠️ Sin más lotes para '+mat,'ok');
     cargarLotes();
+    // Si la pestaña semana está visible, recargarla automáticamente
+    if(document.getElementById('tab-semana').style.display !== 'none' && document.getElementById('semNum').value){
+      cargarSemana();
+    }
   }catch(e){ toast('❌ '+e.message,'err'); }
 }
 
