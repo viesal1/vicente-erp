@@ -647,23 +647,23 @@ async function imprimirSemana(){
 
   // Nombres fijos con mapeo a material en Firestore
   const BLOQUE1 = [
-    { nombre:'Alg 30/2',       mat:'ALG-30' },
-    { nombre:'Alg 50/2',       mat:'ALG-50' },
-    { nombre:'Alg 22/1',       mat:'ALG-22' },
-    { nombre:'R-600',          mat:'RAYÓN 600' },
-    { nombre:'R-450',          mat:'RAYÓN 450' },
-    { nombre:'Pap-600 marron', mat:'PAPEL MARRON' },
-    { nombre:'Pap-600 blanc',  mat:'PAPEL BLANCO' },
+    { nombre:'ALG-30',       mat:'ALG-30' },
+    { nombre:'ALG-50',       mat:'ALG-50' },
+    { nombre:'ALG-22',       mat:'ALG-22' },
+    { nombre:'RAYÓN 600',    mat:'RAYÓN 600' },
+    { nombre:'RAYÓN 450',    mat:'RAYÓN 450' },
+    { nombre:'PAPEL MARRON', mat:'PAPEL MARRON' },
+    { nombre:'PAPEL BLANCO', mat:'PAPEL BLANCO' },
   ];
   const BLOQUE2 = [
-    { nombre:'Parafina',          mat:'PARAFINA MACRO' },
-    { nombre:'Micro SP',          mat:'PARAFINA MICRO' },
-    { nombre:'Vybar',             mat:'VYBAR' },
-    { nombre:'colorante rojo-rosa',mat:'COLORANTE ROJO' },
-    { nombre:'Colorante azul',    mat:'COLORANTE AZUL' },
-    { nombre:'3,0x3,4x14,5',     mat:'PORTAMECHAS 3034' },
-    { nombre:'2,5x3,4x14,5',     mat:'PORTAMECHAS 2534' },
-    { nombre:'3,0x6,4x14,5',     mat:'PORTAMECHAS 3064' },
+    { nombre:'PARAFINA MACRO',   mat:'PARAFINA MACRO' },
+    { nombre:'PARAFINA MICRO',   mat:'PARAFINA MICRO' },
+    { nombre:'VYBAR',            mat:'VYBAR' },
+    { nombre:'COLORANTE ROJO',   mat:'COLORANTE ROJO' },
+    { nombre:'COLORANTE AZUL',   mat:'COLORANTE AZUL' },
+    { nombre:'PORTAMECHAS 3034', mat:'PORTAMECHAS 3034' },
+    { nombre:'PORTAMECHAS 2534', mat:'PORTAMECHAS 2534' },
+    { nombre:'PORTAMECHAS 3064', mat:'PORTAMECHAS 3064' },
   ];
 
   // Buscar lotes en uso desde lotesCache
@@ -765,8 +765,7 @@ async function imprimirSemana(){
         <table style="width:100%;border-collapse:collapse;margin-bottom:4mm;">
           ${CONTROLES.map(c=>`<tr><td style="padding:3px 6px;border:1px solid #aaa;font-size:9px">${c}</td></tr>`).join('')}
         </table>
-        <img src="logo-vespi.jpg" style="max-width:38mm;height:auto;display:block;margin:0 auto 2mm auto;">
-        <div style="text-align:center;font-size:10px;font-weight:bold;color:#2c5fa3;">Wicks for Candles</div>
+        <img src="logo-vespi.jpg" style="max-width:38mm;height:auto;display:block;margin:0 auto;">
       </div>
     </div>
     <div style="margin-top:3mm;">${bloqControl('CONTROLES TRENZADO',trVacios)}</div>
