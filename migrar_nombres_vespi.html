@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Migrar Nombres — V.ESPI</title>
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:"AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
+      authDomain:"etiquetadora-vespi.firebaseapp.com",
+      projectId:"etiquetadora-vespi",
+      storageBucket:"etiquetadora-vespi.firebasestorage.app",
+      messagingSenderId:"714344837885",
+      appId:"1:714344837885:web:d80abbd7a0898e1d1ec494"
+    });
+  </script>
+  <style>
+    .item { background:#fff; border-radius:10px; padding:12px 18px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,.06); display:flex; justify-content:space-between; align-items:center; }
+    .old { font-family:monospace; color:#e74c3c; }
+    .new { font-family:monospace; color:#27ae60; font-weight:700; }
+    .progress { height:8px; background:#f4f7fa; border-radius:4px; margin:10px 0; overflow:hidden; }
+    .progress-fill { height:100%; background:#00a9e0; border-radius:4px; transition:width .3s; }
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e2a44;color:#fff;padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px;z-index:999;transition:transform .3s ease;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .toast.ok{background:#27ae60;}.toast.err{background:#e74c3c;}
+  </style>
+</head>
+<body>
+<div class="header">
+  <button class="back-btn" onclick="location.href='almacen_vicente_espi.html'">← Volver</button>
+  <h1 style="color:white;font-size:1.1em">🔄 Migrar Nombres — V.ESPI</h1>
+  <div style="width:80px"></div>
+</div>
+<div class="container">
+  <div class="form-section">
+    <h3>⚠️ Usar solo una vez</h3>
+    <p style="font-size:14px;color:#555;margin-bottom:16px;">Renombra los materiales en Firestore (lotes, recepciones y semanas).</p>
+    <div class="progress"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+    <div id="progText" style="font-size:13px;color:#7f8c8d;margin-bottom:16px;">Listo para migrar</div>
+    <button onclick="migrar()" id="btnMig" style="background:#00a9e0;color:#fff;border:none;padding:14px 28px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;">🚀 Migrar nombres</button>
+  </div>
+
+  <div style="margin-top:20px;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7f8c8d;margin-bottom:10px;">Cambios que se aplicarán:</div>
+    <div id="lista"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// Mapa de renombrado: viejo → nuevo
+const MAPA = {
+  'PARAFINA 5658':  'PARAFINA MACRO',
+  'MICRO SP AN73':  'PARAFINA MICRO',
+  'VYBAR VY103':    'VYBAR',
+  // Estos ya están bien pero por si acaso
+  'ALG-30':         'ALG-30',
+  'ALG-50':         'ALG-50',
+  'ALG-22':         'ALG-22',
+  'RAYÓN 600':      'RAYÓN 600',
+  'RAYÓN 450':      'RAYÓN 450',
+  'PAPEL MARRON':   'PAPEL MARRON',
+  'PAPEL BLANCO':   'PAPEL BLANCO',
+  'PORTAMECHAS 3034':'PORTAMECHAS 3034',
+  'PORTAMECHAS 2534':'PORTAMECHAS 2534',
+  'PORTAMECHAS 3064':'PORTAMECHAS 3064',
+  'PORTAMECHAS 3010':'PORTAMECHAS 3010',
+  'COLORANTE ROJO': 'COLORANTE ROJO',
+  'COLORANTE AZUL': 'COLORANTE AZUL',
+};
+
+// Solo los que cambian
+const CAMBIOS = Object.entries(MAPA).filter(([v,n])=>v!==n);
+
+let db;
+firebase.auth().onAuthStateChanged(u=>{
+  if(!u){ location.href='index.html'; return; }
+  db = firebase.firestore();
+  renderLista();
+});
+
+function renderLista(){
+  document.getElementById('lista').innerHTML = CAMBIOS.map(([v,n])=>`
+    <div class="item">
+      <span class="old">❌ ${v}</span>
+      <span style="color:#aaa;margin:0 10px">→</span>
+      <span class="new">✅ ${n}</span>
+    </div>`).join('');
+}
+
+async function migrar(){
+  const btn = document.getElementById('btnMig');
+  btn.disabled = true; btn.textContent = '⏳ Migrando…';
+
+  const colecciones = ['almacen_lotes_vespi','almacen_recepciones_vespi'];
+  let total = 0, ok = 0;
+
+  for(const col of colecciones){
+    const snap = await db.collection(col).get();
+    total += snap.docs.length;
+    for(const doc of snap.docs){
+      const mat = doc.data().material;
+      if(mat && MAPA[mat] && MAPA[mat] !== mat){
+        await db.collection(col).doc(doc.id).update({ material: MAPA[mat] });
+      }
+      ok++;
+      document.getElementById('prog').style.width = Math.round(ok/total*100)+'%';
+      document.getElementById('progText').textContent = `Procesando ${ok} de ${total}…`;
+    }
+  }
+
+  // Actualizar también semanas guardadas
+  const semSnap = await db.collection('almacen_semanas_vespi').get();
+  for(const doc of semSnap.docs){
+    const materias = doc.data().materias || {};
+    let changed = false;
+    const newMaterias = {};
+    Object.entries(materias).forEach(([mat,lote])=>{
+      const newMat = MAPA[mat] && MAPA[mat]!==mat ? MAPA[mat] : mat;
+      newMaterias[newMat] = lote;
+      if(newMat !== mat) changed = true;
+    });
+    if(changed) await db.collection('almacen_semanas_vespi').doc(doc.id).update({ materias: newMaterias });
+  }
+
+  document.getElementById('progText').textContent = '✅ Migración completada';
+  btn.textContent = '✅ Completado';
+  btn.style.background = '#27ae60';
+  toast('✅ Nombres migrados correctamente','ok');
+}
+
+function toast(msg,tipo=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast '+(tipo==='ok'?'ok':tipo==='err'?'err':'');
+  el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),4000);
+}
+</script>
+</body>
+</html>
