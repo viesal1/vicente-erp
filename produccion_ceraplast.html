@@ -3,281 +3,154 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Producción - Ceraplast</title>
+  <title>Producción — Ceraplast</title>
   <link rel="stylesheet" href="css/estilos_odoo.css">
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     firebase.initializeApp({
-      apiKey: "AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
-      authDomain: "etiquetadora-vespi.firebaseapp.com",
-      projectId: "etiquetadora-vespi",
-      storageBucket: "etiquetadora-vespi.firebasestorage.app",
-      messagingSenderId: "714344837885",
-      appId: "1:714344837885:web:d80abbd7a0898e1d1ec494"
+      apiKey:"AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
+      authDomain:"etiquetadora-vespi.firebaseapp.com",
+      projectId:"etiquetadora-vespi",
+      storageBucket:"etiquetadora-vespi.firebasestorage.app",
+      messagingSenderId:"714344837885",
+      appId:"1:714344837885:web:d80abbd7a0898e1d1ec494"
     });
   </script>
   <style>
-    :root {
-      --rojo:    #e74c3c;
-      --natural: #2c3e50;
-      --amarillo:#f39c12;
-      --verde:   #27ae60;
-      --azul:    #2980b9;
-      --violeta: #8e44ad;
+    /* TABS */
+    .tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+    .tab{padding:10px 18px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:#f4f7fa;color:#7f8c8d;transition:all .2s;}
+    .tab.activo{background:#1e2a44;color:#fff;}
+
+    /* TABLA PRODUCCIÓN */
+    .prod-tabla{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;}
+    .prod-tabla th{background:#1e2a44;color:#fff;padding:6px 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+    .prod-tabla td{padding:4px 6px;border:1px solid #dde3ee;vertical-align:middle;}
+    .prod-tabla tr:hover td{background:#f9fafc;}
+    .prod-tabla [contenteditable]{outline:none;min-width:30px;cursor:text;}
+    .prod-tabla [contenteditable]:focus{background:#fffde7;border-radius:4px;}
+
+    /* MÁQUINA CARD */
+    .maq-card{background:#fff;border-radius:14px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;}
+    .maq-header{background:#1e2a44;color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;}
+    .maq-header h3{font-size:1em;font-weight:700;margin:0;}
+    .maq-nota{font-size:11px;color:rgba(255,255,255,.7);}
+    .maq-body{padding:12px;}
+
+    /* CASILLAS */
+    .casillas{display:flex;gap:2px;}
+    .casilla{width:18px;height:18px;border:1px solid #aaa;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+    .casilla.tachada{background:#1e2a44;color:#fff;}
+
+    /* BOTONES */
+    .btn-add-linea{background:none;border:1px dashed #00a9e0;color:#00a9e0;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;width:100%;margin-top:6px;}
+    .btn-add-linea:hover{background:#e8f7fd;}
+    .btn-del{background:none;border:none;color:#e74c3c;font-size:16px;cursor:pointer;padding:2px 6px;}
+
+    /* NOTA EDITABLE */
+    .nota-maq{font-size:12px;color:#e74c3c;font-weight:700;padding:4px 8px;background:none;border:none;width:100%;outline:none;cursor:text;}
+    .nota-maq:focus{background:#fff5f5;border-radius:6px;}
+
+    /* REFERENCIAS */
+    .ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+    .ref-card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 2px 6px rgba(0,0,0,.06);cursor:pointer;border:2px solid transparent;}
+    .ref-card:hover{border-color:#00a9e0;}
+    .ref-card h4{font-size:1.1em;color:#1e2a44;margin:0 0 6px;}
+    .ref-card p{font-size:11px;color:#7f8c8d;margin:2px 0;}
+
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;justify-content:center;align-items:flex-start;padding-top:60px;}
+    .modal-overlay.activo{display:flex;}
+    .modal-box{background:#fff;border-radius:16px;padding:22px;width:92%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:88vh;overflow-y:auto;}
+    .modal-box h3{font-size:1.05em;color:#1e2a44;margin-bottom:14px;}
+    .fg{display:flex;flex-direction:column;margin-bottom:10px;}
+    .fg label{font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+    .fg input,.fg select{padding:10px 12px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;}
+    .fg input:focus{outline:none;border-color:#00a9e0;}
+    .modal-actions{display:flex;gap:10px;margin-top:14px;}
+    .modal-actions button{flex:1;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;}
+    .btn-ok{background:#00a9e0;color:#fff;}
+    .btn-cancel{background:#f4f7fa;color:#1e2a44;}
+    .btn-del-ref{background:#fdecea;color:#e74c3c;}
+
+    /* PRINT */
+    #print-area{display:none;}
+    @media print{
+      *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
+      body > *{display:none !important;}
+      #print-area{display:block !important;}
+      @page{margin:8mm;size:A4 portrait;}
     }
 
-    /* ── HEADER ── */
-    .header { background:#1e2a44; color:#fff; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,.2); }
-    .header h1 { font-size:1.1em; font-weight:600; }
-    .back-btn { background:rgba(255,255,255,.15); border:none; color:#fff; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:14px; }
+    /* TOAST */
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e2a44;color:#fff;padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:999;transition:transform .3s ease;pointer-events:none;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .toast.ok{background:#27ae60;}.toast.err{background:#e74c3c;}
 
-    /* ── VISTAS ── */
-    .vista { display:none; }
-    .vista.activa { display:block; }
-    .container { max-width:900px; margin:0 auto; padding:16px 14px 60px; }
-
-    /* ── TABS ── */
-    .tabs { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
-    .tab { padding:10px 18px; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; background:#f4f7fa; color:#7f8c8d; transition:all .2s; }
-    .tab.activo { background:#1e2a44; color:#fff; }
-
-    /* ── CHAT INPUT ── */
-    .chat-box { background:#fff; border-radius:14px; padding:18px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:16px; }
-    .chat-box h3 { font-size:.85em; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#00a9e0; margin-bottom:12px; }
-    .chat-input-row { display:flex; gap:10px; }
-    .chat-input { flex:1; padding:12px 16px; border:2px solid #dde3ee; border-radius:10px; font-size:16px; font-family:monospace; }
-    .chat-input:focus { outline:none; border-color:#00a9e0; }
-    .chat-send { background:#00a9e0; color:#fff; border:none; padding:12px 20px; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; }
-    .chat-send:hover { background:#0090c0; }
-    .chat-hint { font-size:12px; color:#7f8c8d; margin-top:8px; line-height:1.6; }
-    .chat-preview { background:#f4f7fa; border-radius:10px; padding:12px; margin-top:10px; font-size:13px; display:none; }
-    .chat-preview.visible { display:block; }
-
-    /* ── SEMANA SELECTOR ── */
-    .semana-bar { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
-    .semana-bar label { font-size:13px; font-weight:600; color:#7f8c8d; }
-    .semana-bar input { padding:9px 12px; border:1px solid #dde3ee; border-radius:10px; font-size:14px; }
-    .semana-bar select { padding:9px 12px; border:1px solid #dde3ee; border-radius:10px; font-size:14px; background:#fff; }
-
-    /* ── MAQUINA CARD ── */
-    .maquina-card { background:#fff; border-radius:14px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,.06); overflow:hidden; }
-    .maquina-header { background:#1e2a44; color:#fff; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; }
-    .maquina-header h3 { font-size:1em; font-weight:700; }
-    .maquina-header .fila-info { font-size:12px; color:rgba(255,255,255,.7); }
-    .maquina-body { padding:14px 16px; }
-
-    /* ── TABLA LÍNEAS ── */
-    .lineas-tabla { width:100%; border-collapse:collapse; font-size:13px; }
-    .lineas-tabla th { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#7f8c8d; padding:6px 8px; border-bottom:2px solid #f4f7fa; text-align:left; }
-    .lineas-tabla td { padding:8px; border-bottom:1px solid #f4f7fa; vertical-align:middle; }
-    .lineas-tabla tr:last-child td { border-bottom:none; }
-
-    /* ── COLORES ── */
-    .color-dot { width:12px; height:12px; border-radius:50%; display:inline-block; margin-right:5px; vertical-align:middle; }
-    .color-rojo    { background:#e74c3c; }
-    .color-natural { background:#95a5a6; border:1px solid #bdc3c7; }
-    .color-amarillo{ background:#f39c12; }
-    .color-verde   { background:#27ae60; }
-    .color-azul    { background:#2980b9; }
-    .color-violeta { background:#8e44ad; }
-
-    /* ── PROGRESO ── */
-    .progreso-bar { height:6px; background:#f4f7fa; border-radius:3px; margin-top:4px; overflow:hidden; }
-    .progreso-fill { height:100%; background:#27ae60; border-radius:3px; transition:width .3s; }
-    .progreso-fill.parcial { background:#f39c12; }
-    .progreso-fill.inicio  { background:#e74c3c; }
-
-    .prog-input { width:55px; padding:5px 7px; border:1px solid #dde3ee; border-radius:7px; font-size:13px; text-align:center; }
-    .prog-input:focus { outline:none; border-color:#00a9e0; }
-
-    /* ── BOTONES ACCIÓN ── */
-    .btn-fab { background:#00a9e0; color:#fff; border:none; padding:14px 22px; border-radius:12px; font-size:16px; font-weight:600; cursor:pointer; margin-bottom:16px; box-shadow:0 3px 10px rgba(0,169,224,.3); display:flex; align-items:center; gap:8px; }
-    .btn-fab:hover { background:#0090c0; }
-    .btn-sm { padding:6px 12px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; }
-    .btn-del-linea { background:none; border:none; color:#e74c3c; font-size:16px; cursor:pointer; padding:4px; border-radius:6px; }
-    .btn-del-linea:hover { background:#fdecea; }
-
-    /* ── PRINT ── */
-    #print-area { display:none; }
-    @media print {
-      body > * { display:none !important; }
-      #print-area { display:block !important; }
-      @page { margin:8mm; size:A4; }
-    }
-
-    /* ── HOJA IMPRIMIBLE ── */
-    .hoja-print { font-family:Arial,sans-serif; font-size:10px; color:#000; width:100%; }
-    .hoja-print .hp-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6mm; padding-bottom:3mm; border-bottom:2px solid #000; }
-    .hoja-print .hp-titulo { font-size:14px; font-weight:bold; }
-    .hoja-print .hp-nota { font-size:9px; font-weight:bold; text-transform:uppercase; color:#e74c3c; }
-    .hoja-print .hp-maquina { margin-bottom:6mm; }
-    .hoja-print .hp-maq-titulo { font-size:12px; font-weight:bold; background:#1e2a44; color:#fff; padding:3mm 4mm; margin-bottom:2mm; }
-    .hoja-print .hp-tabla { width:100%; border-collapse:collapse; }
-    .hoja-print .hp-tabla th { font-size:9px; padding:3px 5px; border:1px solid #000; background:#f0f0f0; text-align:center; }
-    .hoja-print .hp-tabla td { font-size:10px; padding:3px 5px; border:1px solid #000; vertical-align:middle; }
-    .hoja-print .hp-casillas { display:flex; flex-wrap:wrap; gap:1mm; }
-    .hoja-print .hp-casilla { width:6mm; height:6mm; border:1px solid #000; display:inline-block; }
-
-    /* ── TOAST ── */
-    .toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(80px); background:#1e2a44; color:#fff; padding:13px 22px; border-radius:12px; font-weight:600; font-size:14px; box-shadow:0 8px 24px rgba(0,0,0,.25); z-index:999; transition:transform .3s ease; pointer-events:none; }
-    .toast.show { transform:translateX(-50%) translateY(0); }
-    .toast.ok  { background:#27ae60; }
-    .toast.err { background:#e74c3c; }
-
-    /* ── MODAL ── */
-    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; justify-content:center; align-items:flex-start; padding-top:60px; }
-    .modal-overlay.activo { display:flex; }
-    .modal-box { background:#fff; border-radius:16px; padding:24px; width:92%; max-width:500px; box-shadow:0 20px 60px rgba(0,0,0,.3); max-height:85vh; overflow-y:auto; }
-    .modal-box h3 { font-size:1.1em; color:#1e2a44; margin-bottom:16px; }
-    .form-group { display:flex; flex-direction:column; margin-bottom:12px; }
-    .form-group label { font-size:11px; font-weight:600; color:#7f8c8d; text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; }
-    .form-group input, .form-group select { padding:11px 13px; border:1px solid #dde3ee; border-radius:10px; font-size:15px; }
-    .form-group input:focus, .form-group select:focus { outline:none; border-color:#00a9e0; }
-    .modal-actions { display:flex; gap:10px; margin-top:16px; }
-    .modal-actions button { flex:1; padding:13px; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; }
-    .btn-confirm { background:#00a9e0; color:#fff; }
-    .btn-cancel  { background:#f4f7fa; color:#1e2a44; }
-
-    @media(max-width:600px) {
-      .chat-input-row { flex-direction:column; }
-      .semana-bar { flex-direction:column; align-items:flex-start; }
+    @media(max-width:600px){
+      .prod-tabla{font-size:11px;}
+      .prod-tabla th,.prod-tabla td{padding:3px 4px;}
     }
   </style>
 </head>
 <body>
-
 <div class="header">
   <button class="back-btn" onclick="location.href='inicio-ceraplast.html'">← Volver</button>
-  <h1>🏭 Producción — Ceraplast</h1>
+  <h1 style="color:white;font-size:1.1em">🏭 Producción — Ceraplast</h1>
   <div style="width:80px"></div>
 </div>
-
 <div id="print-area"></div>
+<div class="container">
+  <div class="tabs">
+    <button class="tab activo" onclick="setTab('prod')">📋 Producción</button>
+    <button class="tab" onclick="setTab('refs')">📦 Referencias</button>
+  </div>
 
-<!-- ══ VISTA PRINCIPAL ══ -->
-<div id="vista-main" class="vista activa">
-  <div class="container">
-
-    <!-- TABS -->
-    <div class="tabs">
-      <button class="tab activo" onclick="setTab('orden')">📋 Orden Semanal</button>
-      <button class="tab" onclick="setTab('historial')">📊 Historial</button>
-      <button class="tab" onclick="setTab('referencias')">📦 Referencias</button>
-    </div>
-
-    <!-- ══ TAB ORDEN ══ -->
-    <div id="tab-orden">
-
-      <!-- SEMANA -->
-      <div class="semana-bar">
-        <label>Semana:</label>
-        <input type="date" id="semanaFecha" onchange="cargarOrden()">
-        <select id="semanaSelector" onchange="cargarOrdenPorId()">
-          <option value="">— Órdenes guardadas —</option>
-        </select>
-        <button class="btn-fab" style="margin:0;padding:10px 16px;font-size:14px;" onclick="nuevaOrden()">＋ Nueva</button>
-        <button class="btn-fab" style="margin:0;padding:10px 16px;font-size:14px;background:#27ae60;" onclick="guardarOrden()">💾 Guardar</button>
-        <button class="btn-fab" style="margin:0;padding:10px 16px;font-size:14px;background:#f39c12;" onclick="imprimirOrden()">🖨️ Imprimir</button>
+  <!-- TAB PRODUCCIÓN -->
+  <div id="tab-prod">
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+      <div>
+        <label style="font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;display:block;margin-bottom:4px;">Fecha</label>
+        <input type="date" id="prodFecha" style="padding:9px 12px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;">
       </div>
-
-      <!-- CHAT ENTRADA RÁPIDA -->
-      <div class="chat-box">
-        <h3>⚡ Entrada rápida</h3>
-        <div class="chat-input-row">
-          <input type="text" class="chat-input" id="chatInput" placeholder="M1 165 = 2+3 lumar  ó  M2 V-77 = 5NT+4R luminica" onkeydown="if(event.key==='Enter')parsearChat()">
-          <button class="chat-send" onclick="parsearChat()">Añadir</button>
-        </div>
-        <div class="chat-hint">
-          Formato: <b>M[1-7] REFERENCIA = ROJO+NATURAL CLIENTE [cajas] [uds]</b><br>
-          Ejemplos: <code>M1 165 = 2+3 lumar</code> · <code>M2 V-77 = 5NT+4R luminica 9 264</code> · <code>M3 7D = 20NT fila12</code>
-        </div>
-        <div class="chat-preview" id="chatPreview"></div>
-      </div>
-
-      <!-- MÁQUINAS -->
-      <div id="maquinasContainer"></div>
-
-    </div><!-- /tab-orden -->
-
-    <!-- ══ TAB HISTORIAL ══ -->
-    <div id="tab-historial" style="display:none">
-      <div id="historialContainer">
-        <div class="empty-state"><div class="icon">📊</div><p>Cargando historial…</p></div>
+      <div style="margin-top:20px;display:flex;gap:8px;">
+        <button onclick="guardarProduccion()" style="background:#27ae60;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">💾 Guardar</button>
+        <button onclick="cargarUltima()" style="background:#1e2a44;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">📂 Cargar última</button>
+        <button onclick="imprimirProduccion()" style="background:#f39c12;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">🖨️ Imprimir</button>
+        <button onclick="nuevaOrden()" style="background:#00a9e0;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">＋ Nueva</button>
       </div>
     </div>
+    <div id="maquinasContainer"></div>
+  </div>
 
-    <!-- ══ TAB REFERENCIAS ══ -->
-    <div id="tab-referencias" style="display:none">
-      <div id="refsContainer"></div>
+  <!-- TAB REFERENCIAS -->
+  <div id="tab-refs" style="display:none">
+    <div style="margin-bottom:14px;">
+      <button onclick="abrirModalRef(null)" style="background:#00a9e0;color:#fff;border:none;padding:12px 20px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">＋ Nueva Referencia</button>
     </div>
-
+    <div id="refsContainer"></div>
   </div>
 </div>
 
-<!-- MODAL AÑADIR LÍNEA MANUAL -->
-<div class="modal-overlay" id="modalLinea">
+<!-- MODAL REFERENCIA -->
+<div class="modal-overlay" id="modalRef">
   <div class="modal-box">
-    <h3>➕ Añadir línea a <span id="modalMaqNombre"></span></h3>
-    <input type="hidden" id="modalMaqId">
-    <div class="form-group">
-      <label>Referencia</label>
-      <select id="mRef">
-        <option value="">— Selecciona —</option>
-      </select>
+    <h3 id="modalRefTitulo">＋ Nueva Referencia</h3>
+    <input type="hidden" id="refEditId">
+    <div style="display:flex;gap:8px;">
+      <div class="fg" style="flex:1"><label>Código</label><input type="text" id="refCod" placeholder="ej: V-77, 135…" style="text-transform:uppercase"></div>
+      <div class="fg" style="flex:1"><label>Medidas (mm)</label><input type="text" id="refMedidas" placeholder="ej: 185x53"></div>
     </div>
-    <div style="display:flex;gap:10px">
-      <div class="form-group" style="flex:1">
-        <label>Palets Rojo</label>
-        <input type="number" id="mRojo" min="0" value="0" placeholder="0">
-      </div>
-      <div class="form-group" style="flex:1">
-        <label>Palets Natural</label>
-        <input type="number" id="mNatural" min="0" value="0" placeholder="0">
-      </div>
-    </div>
-    <div style="display:flex;gap:10px">
-      <div class="form-group" style="flex:1">
-        <label>Amarillo</label>
-        <input type="number" id="mAmarillo" min="0" value="0">
-      </div>
-      <div class="form-group" style="flex:1">
-        <label>Verde</label>
-        <input type="number" id="mVerde" min="0" value="0">
-      </div>
-      <div class="form-group" style="flex:1">
-        <label>Azul</label>
-        <input type="number" id="mAzul" min="0" value="0">
-      </div>
-      <div class="form-group" style="flex:1">
-        <label>Violeta</label>
-        <input type="number" id="mVioleta" min="0" value="0">
-      </div>
-    </div>
-    <div style="display:flex;gap:10px">
-      <div class="form-group" style="flex:1">
-        <label>Cliente</label>
-        <input type="text" id="mCliente" placeholder="lumar / luminica…">
-      </div>
-      <div class="form-group" style="flex:1">
-        <label>Cajas/palet</label>
-        <input type="number" id="mCajas" placeholder="auto">
-      </div>
-      <div class="form-group" style="flex:1">
-        <label>Uds/caja</label>
-        <input type="number" id="mUds" placeholder="auto">
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Nota (fila, ubicación…)</label>
-      <input type="text" id="mNota" placeholder="FILA 3 Y FILA 6">
+    <div style="display:flex;gap:8px;">
+      <div class="fg" style="flex:1"><label>Uds/caja</label><input type="number" id="refUds" placeholder="ej: 264"></div>
+      <div class="fg" style="flex:1"><label>Peso (g)</label><input type="number" id="refPeso" placeholder="ej: 18"></div>
     </div>
     <div class="modal-actions">
-      <button class="btn-confirm" onclick="confirmarLinea()">✅ Añadir</button>
-      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-ok" onclick="guardarRef()">✅ Guardar</button>
+      <button class="btn-del-ref" id="btnDelRef" onclick="eliminarRef()" style="display:none">🗑️ Eliminar</button>
+      <button class="btn-cancel" onclick="cerrarModal('modalRef')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -285,585 +158,357 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════
-// BASE DE DATOS DE REFERENCIAS
-// ══════════════════════════════════════════
-const REFS = {
-  // ── NUMÉRICAS ──
-  '50x110':   { uds: 545,  medidas: '50x110',  peso: 11,   alias: [] },
-  '55x130':   { uds: 370,  medidas: '130x55',  peso: 12,   alias: ['130x55'] },
-  '61':       { uds: 272,  medidas: '165x61',  peso: 19,   alias: ['61x165'] },
-  '70':       { uds: 630,  medidas: '70x55',   peso: 10,   alias: [] },
-  '90':       { uds: 568,  medidas: '90x53',   peso: 10,   alias: [] },
-  '125':      { uds: 414,  medidas: '125x53',  peso: 13,   alias: [] },
-  '130x55':   { uds: 370,  medidas: '130x55',  peso: 12,   alias: ['55x130'] },
-  '135':      { uds: 374,  medidas: '135x53',  peso: 14,   alias: [] },
-  '135x50':   { uds: 444,  medidas: '135x50',  peso: 12,   alias: [] },
-  '145':      { uds: 345,  medidas: '145x55',  peso: 15,   alias: ['L6'] },
-  '150':      { uds: 331,  medidas: '150x53',  peso: 15,   alias: [] },
-  '158':      { uds: 321,  medidas: '160x55',  peso: 18,   alias: [] },
-  '165':      { uds: 306,  medidas: '165x53',  peso: 16,   alias: [] },
-  '165 SER':  { uds: 318,  medidas: '165x55',  peso: 17,   alias: ['165SER'] },
-  '270':      { uds: 198,  medidas: '270x55',  peso: 28,   alias: [] },
-  '7D':       { uds: 137,  medidas: '220x70',  peso: 32,   alias: [] },
-  // ── FAMILIA C ──
-  'C-1':      { uds: 720,  medidas: '55x55',   peso: 10,   alias: [] },
-  'C-5':      { uds: 366,  medidas: '150x50',  peso: 15,   alias: [] },
-  'C-8':      { uds: 306,  medidas: '165x50',  peso: 16,   alias: [] },
-  'C-10':     { uds: 276,  medidas: '185x50',  peso: 18,   alias: [] },
-  'C-11':     { uds: 224,  medidas: '220x50',  peso: 20,   alias: [] },
-  // ── ESPECIALES ──
-  'ELEGUA':   { uds: 20,   medidas: '158x55',  peso: 17,   alias: [],  cajasDefault: 150 },
-  'TP':       { uds: 20,   medidas: '165x55',  peso: 17,   alias: [],  cajasDefault: 150 },
-  // ── FAMILIA V ──
-  'V-1':      { uds: 1050, medidas: '65x45',   peso: 7,    alias: [] },
-  'V-2':      { uds: 730,  medidas: '65x50',   peso: 8,    alias: [] },
-  'V-3':      { uds: 568,  medidas: '90x55',   peso: 10,   alias: ['90(55)','V3'] },
-  'V-5':      { uds: 370,  medidas: '150',     peso: 14.5, alias: [] },
-  'V-6':      { uds: 272,  medidas: '165x61',  peso: 19,   alias: ['V-6 ANON','V6'] },
-  'V-7':      { uds: 276,  medidas: '185x55',  peso: 18,   alias: [] },
-  'V-11':     { uds: 24,   medidas: '270x53',  peso: 25,   alias: [] },
-  'V-77':     { uds: 264,  medidas: '185x53',  peso: 18,   alias: [] },
-  'V-88':     { uds: 224,  medidas: '220x53',  peso: 19,   alias: [] },
+// ══════════════════════════════
+// REFERENCIAS BD LOCAL + FIRESTORE
+// ══════════════════════════════
+const REFS_DEFAULT = {
+  '50x110':{'uds':545,'medidas':'50x110','peso':11},
+  '55x130':{'uds':370,'medidas':'130x55','peso':12},
+  '61':{'uds':272,'medidas':'165x61','peso':19},
+  '70':{'uds':630,'medidas':'70x55','peso':10},
+  '90':{'uds':568,'medidas':'90x53','peso':10},
+  '125':{'uds':414,'medidas':'125x53','peso':13},
+  '130x55':{'uds':370,'medidas':'130x55','peso':12},
+  '135':{'uds':374,'medidas':'135x53','peso':14},
+  '135x50':{'uds':444,'medidas':'135x50','peso':12},
+  '145':{'uds':345,'medidas':'145x55','peso':15},
+  '150':{'uds':331,'medidas':'150x53','peso':15},
+  '158':{'uds':321,'medidas':'160x55','peso':18},
+  '165':{'uds':306,'medidas':'165x53','peso':16},
+  '165 SER':{'uds':318,'medidas':'165x55','peso':17},
+  '270':{'uds':198,'medidas':'270x55','peso':28},
+  '7D':{'uds':137,'medidas':'220x70','peso':32},
+  'C-1':{'uds':720,'medidas':'55x55','peso':10},
+  'C-5':{'uds':366,'medidas':'150x50','peso':15},
+  'C-8':{'uds':306,'medidas':'165x50','peso':16},
+  'C-10':{'uds':276,'medidas':'185x50','peso':18},
+  'C-11':{'uds':224,'medidas':'220x50','peso':20},
+  'ELEGUA':{'uds':20,'medidas':'158x55','peso':17},
+  'TP':{'uds':20,'medidas':'165x55','peso':17},
+  'V-1':{'uds':1050,'medidas':'65x45','peso':7},
+  'V-2':{'uds':730,'medidas':'65x50','peso':8},
+  'V-3':{'uds':568,'medidas':'90x55','peso':10},
+  'V-5':{'uds':370,'medidas':'150','peso':14.5},
+  'V-6':{'uds':272,'medidas':'165x61','peso':19},
+  'V-7':{'uds':276,'medidas':'185x55','peso':18},
+  'V-11':{'uds':24,'medidas':'270x53','peso':25},
+  'V-77':{'uds':264,'medidas':'185x53','peso':18},
+  'V-88':{'uds':224,'medidas':'220x53','peso':19},
 };
 
-// Índice inverso de alias para el parser
-const ALIAS_MAP = {};
-Object.entries(REFS).forEach(([ref, d]) => {
-  ALIAS_MAP[ref.toUpperCase()] = ref;
-  (d.alias || []).forEach(a => { ALIAS_MAP[a.toUpperCase()] = ref; });
-});
-
-const CAJAS_DEFAULT = {
-  'luminica': 9,
-  'altillo':  11,
-};
-
-const COLORES = ['rojo','natural','amarillo','verde','azul','violeta'];
-const COLOR_LABELS = { rojo:'Rojo', natural:'NT', amarillo:'Amarillo', verde:'Verde', azul:'Azul', violeta:'Violeta' };
+let REFS = {...REFS_DEFAULT};
 const MAQUINAS = ['M1','M2','M3','M4','M5','M6','M7'];
+const COLORES = ['ROJO','NATURAL','AMARILLO','VERDE','AZUL','VIOLETA'];
 
-// ══════════════════════════════════════════
-// FIREBASE
-// ══════════════════════════════════════════
-const db  = null;
-let   col = null;
-let   ordenActual = { id: null, fecha: '', lineas: [], nota: 'REVISAR PESO CONSTANTEMENTE' };
+// Orden actual de producción
+let orden = {
+  fecha: new Date().toISOString().split('T')[0],
+  id: null,
+  maquinas: {}
+};
 
-firebase.auth().onAuthStateChanged(user => {
-  if (!user) { location.href = 'index.html'; return; }
-  window._db  = firebase.firestore();
-  window._col = window._db.collection('produccion_ceraplast');
+let db, colProd, colRefs;
+
+firebase.auth().onAuthStateChanged(u=>{
+  if(!u){ location.href='index.html'; return; }
+  db = firebase.firestore();
+  colProd = db.collection('produccion_ceraplast2');
+  colRefs = db.collection('refs_ceraplast');
   init();
 });
 
-function init() {
-  // Fecha de hoy como semana por defecto
-  const hoy = new Date().toISOString().split('T')[0];
-  document.getElementById('semanaFecha').value = hoy;
-  poblarRefs();
-  cargarSelectorOrdenes();
+async function init(){
+  document.getElementById('prodFecha').value = new Date().toISOString().split('T')[0];
+  await cargarRefs();
+  nuevaOrden();
+  cargarUltima();
+}
+
+// ══════════════════════════════
+// TABS
+// ══════════════════════════════
+function setTab(n){
+  ['prod','refs'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===n?'':'none';
+  });
+  document.querySelectorAll('.tab').forEach((el,i)=>{
+    el.classList.toggle('activo',['prod','refs'][i]===n);
+  });
+  if(n==='refs') renderRefs();
+}
+
+// ══════════════════════════════
+// NUEVA ORDEN
+// ══════════════════════════════
+function nuevaOrden(){
+  orden = { fecha: document.getElementById('prodFecha').value, id: null, maquinas:{} };
+  MAQUINAS.forEach(m=>{ orden.maquinas[m]={lineas:[], nota:''}; });
   renderMaquinas();
 }
 
-// ══════════════════════════════════════════
-// TABS
-// ══════════════════════════════════════════
-function setTab(nombre) {
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    const tabs = ['orden','historial','referencias'];
-    t.classList.toggle('activo', tabs[i] === nombre);
-  });
-  document.getElementById('tab-orden').style.display       = nombre === 'orden'       ? '' : 'none';
-  document.getElementById('tab-historial').style.display   = nombre === 'historial'   ? '' : 'none';
-  document.getElementById('tab-referencias').style.display = nombre === 'referencias' ? '' : 'none';
-  if (nombre === 'historial')   cargarHistorial();
-  if (nombre === 'referencias') renderReferencias();
-}
-
-// ══════════════════════════════════════════
-// ORDEN: estructura inicial
-// ══════════════════════════════════════════
-function ordenVacia(fecha) {
-  return {
-    id: null,
-    fecha,
-    nota: 'REVISAR PESO CONSTANTEMENTE',
-    maquinas: MAQUINAS.reduce((acc, m) => { acc[m] = { lineas: [] }; return acc; }, {})
-  };
-}
-
-// ══════════════════════════════════════════
+// ══════════════════════════════
 // RENDER MÁQUINAS
-// ══════════════════════════════════════════
-function renderMaquinas() {
+// ══════════════════════════════
+function renderMaquinas(){
   const cont = document.getElementById('maquinasContainer');
-  if (!ordenActual.maquinas) { cont.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Crea una nueva orden o selecciona una existente.</p></div>'; return; }
-
-  cont.innerHTML = MAQUINAS.map(m => {
-    const maq = ordenActual.maquinas[m] || { lineas: [] };
-    const lineas = maq.lineas || [];
-    const totalPalets = lineas.reduce((a, l) => a + totalLinea(l), 0);
-    const fabricados  = lineas.reduce((a, l) => a + (l.fabricados || 0), 0);
-    const pct = totalPalets > 0 ? Math.round(fabricados / totalPalets * 100) : 0;
-    const clsPct = pct >= 100 ? '' : pct >= 50 ? 'parcial' : 'inicio';
-
-    return `
-    <div class="maquina-card">
-      <div class="maquina-header">
+  cont.innerHTML = MAQUINAS.map(m=>{
+    const maq = orden.maquinas[m]||{lineas:[],nota:''};
+    return `<div class="maq-card" id="card-${m}">
+      <div class="maq-header">
         <h3>🏭 ${m}</h3>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:12px;color:rgba(255,255,255,.8)">${totalPalets} palets · ${pct}%</span>
-          <button class="back-btn" style="padding:5px 12px;font-size:12px;" onclick="abrirModal('${m}')">+ Línea</button>
-        </div>
+        <input class="maq-nota" value="${maq.nota||''}" placeholder="Nota: FILA 3, OTRA NAVE…"
+          onchange="orden.maquinas['${m}'].nota=this.value">
       </div>
-      <div class="maquina-body">
-        ${lineas.length === 0 ? '<p style="color:#aaa;font-size:13px;text-align:center;padding:8px">Sin líneas</p>' : `
-        <table class="lineas-tabla">
-          <thead><tr>
-            <th>Referencia</th>
-            <th style="text-align:center">Palets</th>
-            <th style="text-align:center">Cajas/p</th>
-            <th style="text-align:center">Uds/c</th>
-            <th>Cliente</th>
-            <th style="text-align:center">Fabricado</th>
-            <th style="text-align:center">%</th>
-            <th></th>
-          </tr></thead>
-          <tbody>
-            ${lineas.map((l, i) => renderLinea(m, l, i)).join('')}
-          </tbody>
-        </table>
-        ${maq.nota ? `<div style="font-size:11px;color:#e74c3c;font-weight:700;margin-top:8px">📌 ${maq.nota}</div>` : ''}
-        `}
-        <div class="progreso-bar" style="margin-top:8px"><div class="progreso-fill ${clsPct}" style="width:${pct}%"></div></div>
+      <div class="maq-body">
+        <div style="overflow-x:auto;">
+          <table class="prod-tabla" id="tabla-${m}">
+            <thead><tr>
+              <th>Referencia</th>
+              <th>Color</th>
+              <th>Cliente</th>
+              <th>Palets</th>
+              <th>Caj/p</th>
+              <th>Uds/c</th>
+              <th style="min-width:220px">Casillas (1-10)</th>
+              <th></th>
+            </tr></thead>
+            <tbody id="tbody-${m}">
+              ${renderLineas(m)}
+            </tbody>
+          </table>
+        </div>
+        <button class="btn-add-linea" onclick="addLinea('${m}')">＋ Añadir línea</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function renderLinea(maq, l, idx) {
-  const total = totalLinea(l);
-  const fab   = l.fabricados || 0;
-  const pct   = total > 0 ? Math.round(fab / total * 100) : 0;
-  const coloresStr = COLORES
-    .filter(c => l[c] > 0)
-    .map(c => `<span class="color-dot color-${c}"></span>${COLOR_LABELS[c]}: ${l[c]}`)
-    .join(' · ');
-
-  return `<tr>
-    <td><strong>${l.ref}</strong><br><small style="color:#aaa">${coloresStr}</small></td>
-    <td style="text-align:center;font-weight:700">${total}</td>
-    <td style="text-align:center">${l.cajas || '—'}</td>
-    <td style="text-align:center">${l.uds || '—'}</td>
-    <td style="font-size:12px">${l.cliente || '—'}</td>
-    <td style="text-align:center">
-      <input type="number" class="prog-input" value="${fab}" min="0" max="${total}"
-        onchange="updateFabricado('${maq}',${idx},this.value)">
-    </td>
-    <td style="text-align:center;font-size:12px;color:${pct>=100?'#27ae60':pct>=50?'#f39c12':'#e74c3c'}">${pct}%</td>
-    <td><button class="btn-del-linea" onclick="eliminarLinea('${maq}',${idx})">×</button></td>
-  </tr>`;
+function renderLineas(m){
+  const lineas = orden.maquinas[m]?.lineas||[];
+  if(!lineas.length) return `<tr><td colspan="8" style="text-align:center;color:#aaa;padding:10px">Sin líneas</td></tr>`;
+  return lineas.map((l,i)=>`
+    <tr>
+      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'ref',this.innerText.trim().toUpperCase())" style="min-width:60px;text-transform:uppercase">${l.ref||''}</div></td>
+      <td>
+        <select onchange="updateLinea('${m}',${i},'color',this.value)" style="border:none;background:transparent;font-size:13px;cursor:pointer;">
+          ${COLORES.map(c=>`<option value="${c}" ${l.color===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </td>
+      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'cliente',this.innerText.trim().toUpperCase())" style="min-width:60px;text-transform:uppercase">${l.cliente||''}</div></td>
+      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'palets',parseInt(this.innerText)||0)" style="min-width:30px;text-align:center">${l.palets||''}</div></td>
+      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'cajas',parseInt(this.innerText)||0)" style="min-width:30px;text-align:center">${l.cajas||''}</div></td>
+      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'uds',parseInt(this.innerText)||0)" style="min-width:30px;text-align:center">${l.uds||''}</div></td>
+      <td>
+        <div class="casillas">
+          ${Array.from({length:10},(_,k)=>`
+            <div class="casilla${(l.casillas||[])[k]?' tachada':''}"
+              onclick="toggleCasilla('${m}',${i},${k})">
+              ${(l.casillas||[])[k]?'✕':''}
+            </div>`).join('')}
+        </div>
+      </td>
+      <td><button class="btn-del" onclick="delLinea('${m}',${i})">×</button></td>
+    </tr>`).join('');
 }
 
-function totalLinea(l) {
-  return COLORES.reduce((a, c) => a + (parseInt(l[c]) || 0), 0);
+function addLinea(m){
+  if(!orden.maquinas[m]) orden.maquinas[m]={lineas:[],nota:''};
+  orden.maquinas[m].lineas.push({ref:'',color:'ROJO',cliente:'',palets:0,cajas:0,uds:0,casillas:[]});
+  document.getElementById('tbody-'+m).innerHTML = renderLineas(m);
 }
 
-// ══════════════════════════════════════════
-// PARSER CHAT
-// ══════════════════════════════════════════
-function parsearChat() {
-  const raw = document.getElementById('chatInput').value.trim();
-  if (!raw) return;
+function delLinea(m,i){
+  orden.maquinas[m].lineas.splice(i,1);
+  document.getElementById('tbody-'+m).innerHTML = renderLineas(m);
+}
 
-  try {
-    const linea = parseLinea(raw);
-    if (!linea) { toast('❌ No entiendo el formato. Ejemplo: M1 165 = 2+3 lumar', 'err'); return; }
-
-    // Mostrar preview
-    const prev = document.getElementById('chatPreview');
-    prev.classList.add('visible');
-    prev.innerHTML = `✅ <b>${linea.maq}</b> → ${linea.ref} | ${COLORES.filter(c=>linea[c]>0).map(c=>`${COLOR_LABELS[c]}: ${linea[c]}`).join(' + ')} | Cliente: ${linea.cliente||'—'} | Cajas: ${linea.cajas} | Uds: ${linea.uds}`;
-
-    // Añadir a la orden
-    if (!ordenActual.maquinas) { toast('⚠️ Crea primero una orden nueva', 'err'); return; }
-    if (!ordenActual.maquinas[linea.maq]) ordenActual.maquinas[linea.maq] = { lineas: [] };
-    ordenActual.maquinas[linea.maq].lineas.push(linea);
-    renderMaquinas();
-    document.getElementById('chatInput').value = '';
-    setTimeout(() => { prev.classList.remove('visible'); }, 3000);
-    toast('✅ Línea añadida a ' + linea.maq, 'ok');
-  } catch(e) {
-    toast('❌ Error: ' + e.message, 'err');
+function updateLinea(m,i,campo,val){
+  if(!orden.maquinas[m]?.lineas[i]) return;
+  orden.maquinas[m].lineas[i][campo]=val;
+  // Auto-rellenar uds si hay referencia en BD
+  if(campo==='ref' && REFS[val]){
+    orden.maquinas[m].lineas[i].uds = REFS[val].uds;
+    document.getElementById('tbody-'+m).innerHTML = renderLineas(m);
   }
 }
 
-function parseLinea(raw) {
-  // Formato: M1 165 = 2+3 lumar [cajas] [uds]
-  // o: M2 V-77 = 5NT+4R luminica
-  const upper = raw.toUpperCase().trim();
-
-  // Extraer máquina
-  const maqMatch = upper.match(/^(M[1-7])\s+/);
-  if (!maqMatch) return null;
-  const maq = maqMatch[1];
-  let resto = upper.slice(maqMatch[0].length);
-
-  // Extraer referencia
-  // Buscar referencia por nombre o alias (más largo primero)
-  const refKeys = Object.keys(ALIAS_MAP).sort((a,b) => b.length - a.length);
-  let ref = null;
-  for (const r of refKeys) {
-    if (resto.startsWith(r)) { ref = ALIAS_MAP[r]; resto = resto.slice(r.length).trim(); break; }
-  }
-  if (!ref) {
-    const rm = resto.match(/^([A-Z0-9x\-]+)/i);
-    if (rm) { ref = rm[1].toUpperCase(); resto = resto.slice(rm[0].length).trim(); }
-    else return null;
-  }
-
-  // Quitar el "="
-  if (resto.startsWith('=')) resto = resto.slice(1).trim();
-
-  // Parsear colores: 2+3 o 5NT+4R o 20NT
-  const cantidades = { rojo:0, natural:0, amarillo:0, verde:0, azul:0, violeta:0 };
-  // Separar por "+"
-  const partes = resto.split('+');
-  let idx = 0;
-  for (const parte of partes) {
-    const p = parte.trim();
-    // Buscar número + color opcional
-    const m = p.match(/^(\d+)\s*(R|ROJO|NT|NATURAL|N|AM|AMARILLO|VE|VERDE|AZ|AZUL|VI|VIOLETA)?/i);
-    if (!m) break;
-    const num = parseInt(m[1]);
-    const col = (m[2] || '').toUpperCase();
-    if (!col || col === 'R' || col === 'ROJO') {
-      if (idx === 0 && !col) cantidades.rojo = num; // primer número sin color = rojo
-      else cantidades.rojo = num;
-    } else if (col === 'NT' || col === 'NATURAL' || col === 'N') cantidades.natural = num;
-    else if (col === 'AM' || col === 'AMARILLO') cantidades.amarillo = num;
-    else if (col === 'VE' || col === 'VERDE') cantidades.verde = num;
-    else if (col === 'AZ' || col === 'AZUL') cantidades.azul = num;
-    else if (col === 'VI' || col === 'VIOLETA') cantidades.violeta = num;
-    else {
-      // Sin color → primero rojo, luego natural
-      if (idx === 0) cantidades.rojo = num;
-      else cantidades.natural = num;
-    }
-    resto = resto.slice(resto.indexOf('+') !== -1 ? resto.indexOf(p) + p.length : p.length).trim();
-    if (resto.startsWith('+')) resto = resto.slice(1).trim();
-    idx++;
-  }
-
-  // Re-parsear resto para cliente, cajas, uds
-  const tokens = resto.split(/\s+/).filter(Boolean);
-  let cliente = '', cajas = null, uds = null;
-  for (const t of tokens) {
-    if (/^\d+$/.test(t)) {
-      if (!cajas) cajas = parseInt(t);
-      else if (!uds) uds = parseInt(t);
-    } else if (t.length > 1) {
-      cliente = t.toLowerCase();
-    }
-  }
-
-  // Defaults de cajas
-  if (!cajas) cajas = CAJAS_DEFAULT[cliente] || (REFS[ref] && REFS[ref].cajasDefault) || null;
-  if (!uds && REFS[ref]) uds = REFS[ref].uds;
-
-  // Si formato simple 2+3: primero=rojo, segundo=natural
-  // Re-parsear si no se asignó bien
-  const rawPartes = raw.toUpperCase().replace(/^M[1-7]\s+[A-Z0-9-]+\s*=\s*/,'').split('+');
-  if (rawPartes.length >= 1 && cantidades.rojo === 0 && cantidades.natural === 0) {
-    const n0 = parseInt(rawPartes[0]);
-    if (!isNaN(n0)) cantidades.rojo = n0;
-    if (rawPartes.length >= 2) {
-      const n1 = parseInt(rawPartes[1]);
-      if (!isNaN(n1)) cantidades.natural = n1;
-    }
-  }
-
-  return { maq, ref, ...cantidades, cliente, cajas, uds, fabricados: 0 };
+function toggleCasilla(m,i,k){
+  if(!orden.maquinas[m]?.lineas[i]) return;
+  if(!orden.maquinas[m].lineas[i].casillas) orden.maquinas[m].lineas[i].casillas=[];
+  orden.maquinas[m].lineas[i].casillas[k] = !orden.maquinas[m].lineas[i].casillas[k];
+  document.getElementById('tbody-'+m).innerHTML = renderLineas(m);
 }
 
-// ══════════════════════════════════════════
-// NUEVA ORDEN
-// ══════════════════════════════════════════
-function nuevaOrden() {
-  const fecha = document.getElementById('semanaFecha').value || new Date().toISOString().split('T')[0];
-  ordenActual = ordenVacia(fecha);
-  renderMaquinas();
-  toast('📋 Nueva orden creada para ' + fechaES(fecha), 'ok');
-}
-
-// ══════════════════════════════════════════
-// GUARDAR ORDEN
-// ══════════════════════════════════════════
-async function guardarOrden() {
-  if (!ordenActual.maquinas) { toast('⚠️ Crea primero una orden', 'err'); return; }
+// ══════════════════════════════
+// GUARDAR / CARGAR
+// ══════════════════════════════
+async function guardarProduccion(){
   const datos = {
-    fecha: document.getElementById('semanaFecha').value,
-    nota: ordenActual.nota || '',
-    maquinas: ordenActual.maquinas,
+    fecha: document.getElementById('prodFecha').value,
+    maquinas: orden.maquinas,
     updatedAt: new Date().toISOString()
   };
-  try {
-    if (ordenActual.id) {
-      await window._col.doc(ordenActual.id).update(datos);
+  try{
+    if(orden.id){
+      await colProd.doc(orden.id).update(datos);
     } else {
       datos.createdAt = new Date().toISOString();
-      const ref = await window._col.add(datos);
-      ordenActual.id = ref.id;
+      const ref = await colProd.add(datos);
+      orden.id = ref.id;
     }
-    toast('✅ Orden guardada', 'ok');
-    cargarSelectorOrdenes();
-  } catch(e) { toast('❌ Error: ' + e.message, 'err'); }
+    toast('✅ Guardado','ok');
+  }catch(e){ toast('❌ '+e.message,'err'); }
 }
 
-// ══════════════════════════════════════════
-// CARGAR ÓRDENES
-// ══════════════════════════════════════════
-async function cargarSelectorOrdenes() {
-  try {
-    const snap = await window._col.orderBy('fecha','desc').limit(20).get();
-    const sel = document.getElementById('semanaSelector');
-    sel.innerHTML = '<option value="">— Órdenes guardadas —</option>';
-    snap.docs.forEach(d => {
-      const opt = document.createElement('option');
-      opt.value = d.id;
-      opt.textContent = fechaES(d.data().fecha) + (d.data().nota ? ' — ' + d.data().nota.slice(0,20) : '');
-      sel.appendChild(opt);
-    });
-  } catch(e) { console.log('Sin órdenes aún'); }
+async function cargarUltima(){
+  try{
+    const snap = await colProd.orderBy('createdAt','desc').limit(1).get();
+    if(snap.empty) return;
+    const doc = snap.docs[0];
+    orden = { id: doc.id, ...doc.data() };
+    document.getElementById('prodFecha').value = orden.fecha||'';
+    // Asegurarse que todas las máquinas existen
+    MAQUINAS.forEach(m=>{ if(!orden.maquinas[m]) orden.maquinas[m]={lineas:[],nota:''}; });
+    renderMaquinas();
+    toast('📂 Orden cargada','ok');
+  }catch(e){ console.log('Sin órdenes aún'); }
 }
 
-async function cargarOrdenPorId() {
-  const id = document.getElementById('semanaSelector').value;
-  if (!id) return;
-  try {
-    const doc = await window._col.doc(id).get();
-    if (doc.exists) {
-      ordenActual = { id: doc.id, ...doc.data() };
-      document.getElementById('semanaFecha').value = ordenActual.fecha;
-      renderMaquinas();
-      toast('📋 Orden cargada: ' + fechaES(ordenActual.fecha), 'ok');
-    }
-  } catch(e) { toast('❌ Error: ' + e.message, 'err'); }
-}
+// ══════════════════════════════
+// IMPRIMIR
+// ══════════════════════════════
+function imprimirProduccion(){
+  const fecha = document.getElementById('prodFecha').value;
+  const fechaStr = fechaES(fecha);
 
-function cargarOrden() { /* por fecha — opcional */ }
+  const maquinasHTML = MAQUINAS.map(m=>{
+    const maq = orden.maquinas[m]||{lineas:[],nota:''};
+    const lineas = maq.lineas.filter(l=>l.ref);
+    if(!lineas.length) return '';
 
-// ══════════════════════════════════════════
-// MODAL AÑADIR LÍNEA
-// ══════════════════════════════════════════
-function abrirModal(maq) {
-  document.getElementById('modalMaqNombre').textContent = maq;
-  document.getElementById('modalMaqId').value = maq;
-  ['mRojo','mNatural','mAmarillo','mVerde','mAzul','mVioleta'].forEach(id => document.getElementById(id).value = 0);
-  document.getElementById('mCliente').value = '';
-  document.getElementById('mCajas').value = '';
-  document.getElementById('mUds').value = '';
-  document.getElementById('mNota').value = '';
-  document.getElementById('modalLinea').classList.add('activo');
-}
-function cerrarModal() { document.getElementById('modalLinea').classList.remove('activo'); }
-
-function confirmarLinea() {
-  const maq = document.getElementById('modalMaqId').value;
-  const ref = document.getElementById('mRef').value;
-  if (!ref) { toast('❌ Selecciona una referencia', 'err'); return; }
-  const cliente = document.getElementById('mCliente').value.toLowerCase().trim();
-  const cajasInput = parseInt(document.getElementById('mCajas').value);
-  const udsInput   = parseInt(document.getElementById('mUds').value);
-  const linea = {
-    maq, ref,
-    rojo:     parseInt(document.getElementById('mRojo').value)    || 0,
-    natural:  parseInt(document.getElementById('mNatural').value) || 0,
-    amarillo: parseInt(document.getElementById('mAmarillo').value)|| 0,
-    verde:    parseInt(document.getElementById('mVerde').value)   || 0,
-    azul:     parseInt(document.getElementById('mAzul').value)    || 0,
-    violeta:  parseInt(document.getElementById('mVioleta').value) || 0,
-    cliente,
-    cajas: cajasInput || CAJAS_DEFAULT[cliente] || null,
-    uds:   udsInput   || (REFS[ref] ? REFS[ref].uds : null),
-    nota:  document.getElementById('mNota').value.trim(),
-    fabricados: 0
-  };
-  if (!ordenActual.maquinas) { toast('⚠️ Crea primero una orden', 'err'); return; }
-  ordenActual.maquinas[maq].lineas.push(linea);
-  renderMaquinas();
-  cerrarModal();
-  toast('✅ Línea añadida a ' + maq, 'ok');
-}
-
-// ══════════════════════════════════════════
-// EDITAR FABRICADO
-// ══════════════════════════════════════════
-function updateFabricado(maq, idx, val) {
-  if (!ordenActual.maquinas) return;
-  ordenActual.maquinas[maq].lineas[idx].fabricados = parseInt(val) || 0;
-}
-
-// ══════════════════════════════════════════
-// ELIMINAR LÍNEA
-// ══════════════════════════════════════════
-function eliminarLinea(maq, idx) {
-  if (!confirm('¿Eliminar esta línea?')) return;
-  ordenActual.maquinas[maq].lineas.splice(idx, 1);
-  renderMaquinas();
-}
-
-// ══════════════════════════════════════════
-// IMPRIMIR ORDEN
-// ══════════════════════════════════════════
-function imprimirOrden() {
-  if (!ordenActual.maquinas) { toast('⚠️ No hay orden cargada', 'err'); return; }
-
-  const fecha = fechaES(document.getElementById('semanaFecha').value);
-
-  const maquinasHTML = MAQUINAS.map(m => {
-    const maq = ordenActual.maquinas[m];
-    if (!maq || !maq.lineas.length) return '';
-
-    const filasHTML = maq.lineas.map(l => {
-      const total = totalLinea(l);
-      const colStr = COLORES.filter(c => l[c] > 0)
-        .map(c => `${COLOR_LABELS[c]}: ${l[c]}`).join(' + ');
-
-      // Casillas para tachar (10 por fila)
-      let casillas = '';
-      for (let i = 0; i < total; i++) {
-        if (i > 0 && i % 10 === 0) casillas += '<br>';
-        casillas += '<span class="hp-casilla"></span>';
-      }
-
+    const filasHTML = lineas.map(l=>{
+      const casillas = Array.from({length:10},(_,k)=>`
+        <span style="display:inline-block;width:6mm;height:6mm;border:1px solid #000;margin:0 0.5mm;text-align:center;line-height:6mm;font-size:9px;">
+          ${(l.casillas||[])[k]?'X':''}
+        </span>`).join('');
       return `<tr>
-        <td><b>${l.ref}</b><br><small>${colStr}</small>${l.cliente ? '<br><small style="color:#666">'+l.cliente+'</small>' : ''}</td>
-        <td style="text-align:center">${total}</td>
-        <td style="text-align:center">${l.cajas || '—'}</td>
-        <td style="text-align:center">${l.uds || '—'}</td>
-        <td><div class="hp-casillas">${casillas}</div></td>
+        <td style="padding:3px 6px;border:1px solid #aaa;font-size:10px">${l.ref} ${l.color} ${l.cliente||''}</td>
+        <td style="padding:3px 6px;border:1px solid #aaa;text-align:center;font-size:10px">${l.palets||''}</td>
+        <td style="padding:3px 6px;border:1px solid #aaa;text-align:center;font-size:10px">${l.cajas||''}</td>
+        <td style="padding:3px 6px;border:1px solid #aaa;text-align:center;font-size:10px">${l.uds||''}</td>
+        <td style="padding:3px 6px;border:1px solid #aaa">${casillas}</td>
       </tr>`;
     }).join('');
 
-    return `<div class="hp-maquina">
-      <div class="hp-maq-titulo">${m}${maq.nota ? ' — ' + maq.nota : ''}</div>
-      <table class="hp-tabla">
+    return `<div style="margin-bottom:6mm;page-break-inside:avoid;">
+      <div style="display:flex;justify-content:space-between;align-items:center;background:#1e2a44;color:#fff;padding:3px 8px;margin-bottom:0;">
+        <strong style="font-size:11px">${m} &nbsp; ${fechaStr}</strong>
+        ${maq.nota?`<span style="font-size:10px;color:rgba(255,255,255,.8)">${maq.nota}</span>`:''}
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
         <thead><tr>
-          <th style="text-align:left;width:120px">Referencia</th>
-          <th>Palets</th><th>Cajas/p</th><th>Uds/c</th>
-          <th style="text-align:left">Casillas</th>
+          <th style="padding:3px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:left">Referencia / Color / Cliente</th>
+          <th style="padding:3px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px">Palets</th>
+          <th style="padding:3px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px">Caj/p</th>
+          <th style="padding:3px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px">Uds/c</th>
+          <th style="padding:3px 6px;border:1px solid #aaa;background:#e0e0e0;font-size:9px;text-align:left">1&nbsp;&nbsp;2&nbsp;&nbsp;3&nbsp;&nbsp;4&nbsp;&nbsp;5&nbsp;&nbsp;6&nbsp;&nbsp;7&nbsp;&nbsp;8&nbsp;&nbsp;9&nbsp;&nbsp;10</th>
         </tr></thead>
         <tbody>${filasHTML}</tbody>
       </table>
     </div>`;
-  }).join('');
+  }).filter(Boolean).join('');
 
-  const html = `<div class="hoja-print">
-    <div class="hp-header">
-      <div>
-        <img src="logo-ceraplast.png" style="height:12mm;width:auto;vertical-align:middle;margin-right:4mm">
-        <span class="hp-titulo">ORDEN DE PRODUCCIÓN — ${fecha}</span>
-      </div>
-      <div class="hp-nota">${ordenActual.nota || ''}</div>
-    </div>
-    ${maquinasHTML}
-  </div>`;
-
-  document.getElementById('print-area').innerHTML = html;
-  window.print();
-  setTimeout(() => { document.getElementById('print-area').innerHTML = ''; }, 1500);
-}
-
-// ══════════════════════════════════════════
-// HISTORIAL
-// ══════════════════════════════════════════
-async function cargarHistorial() {
-  const cont = document.getElementById('historialContainer');
-  cont.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div>';
-  try {
-    const snap = await window._col.orderBy('fecha','desc').limit(20).get();
-    if (snap.empty) { cont.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>Sin historial aún.</p></div>'; return; }
-    cont.innerHTML = snap.docs.map(d => {
-      const o = d.data();
-      const totalPalets = Object.values(o.maquinas || {}).reduce((a, m) => a + (m.lineas||[]).reduce((b, l) => b + totalLinea(l), 0), 0);
-      const fabricados  = Object.values(o.maquinas || {}).reduce((a, m) => a + (m.lineas||[]).reduce((b, l) => b + (l.fabricados||0), 0), 0);
-      const pct = totalPalets > 0 ? Math.round(fabricados/totalPalets*100) : 0;
-      return `<div class="maquina-card" style="cursor:pointer" onclick="cargarDesdeHistorial('${d.id}')">
-        <div style="padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <div style="font-weight:700;color:#1e2a44">${fechaES(o.fecha)}</div>
-            <div style="font-size:12px;color:#7f8c8d">${totalPalets} palets totales</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:20px;font-weight:800;color:${pct>=100?'#27ae60':pct>=50?'#f39c12':'#e74c3c'}">${pct}%</div>
-            <div style="font-size:11px;color:#aaa">${fabricados}/${totalPalets} fabricados</div>
-          </div>
-        </div>
-        <div class="progreso-bar" style="margin:0 14px 12px"><div class="progreso-fill ${pct>=100?'':pct>=50?'parcial':'inicio'}" style="width:${pct}%"></div></div>
-      </div>`;
-    }).join('');
-  } catch(e) { cont.innerHTML = '<div class="empty-state"><div class="icon">❌</div><p>Error cargando historial.</p></div>'; }
-}
-
-async function cargarDesdeHistorial(id) {
-  try {
-    const doc = await window._col.doc(id).get();
-    if (doc.exists) {
-      ordenActual = { id: doc.id, ...doc.data() };
-      document.getElementById('semanaFecha').value = ordenActual.fecha;
-      setTab('orden');
-      renderMaquinas();
-      toast('📋 Orden cargada', 'ok');
-    }
-  } catch(e) { toast('❌ Error', 'err'); }
-}
-
-// ══════════════════════════════════════════
-// REFERENCIAS
-// ══════════════════════════════════════════
-function renderReferencias() {
-  const cont = document.getElementById('refsContainer');
-  cont.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
-      ${Object.entries(REFS).sort((a,b)=>a[0].localeCompare(b[0])).map(([ref, d]) => `
-        <div class="maquina-card" style="cursor:default">
-          <div style="background:#1e2a44;padding:10px 14px;color:#fff;font-weight:700;font-size:1.1em">${ref}</div>
-          <div style="padding:12px 14px;font-size:13px;line-height:1.8">
-            <div>📏 ${d.medidas} mm</div>
-            <div>⚖️ ${d.peso} g</div>
-            <div>📦 ${d.uds} uds/caja</div>
-          </div>
-        </div>`).join('')}
+  document.getElementById('print-area').innerHTML = `
+    <style>@page{margin:8mm;size:A4 portrait;}</style>
+    <div style="font-family:Arial,sans-serif;font-size:10px;">
+      <div style="text-align:right;font-size:10px;color:#555;margin-bottom:4mm;font-weight:bold;">REVISAR PESO CONSTANTEMENTE</div>
+      ${maquinasHTML}
     </div>`;
+  setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
 }
 
-function poblarRefs() {
-  const sel = document.getElementById('mRef');
-  Object.keys(REFS).sort().forEach(r => {
-    const opt = document.createElement('option');
-    opt.value = r; opt.textContent = r;
-    sel.appendChild(opt);
-  });
+// ══════════════════════════════
+// REFERENCIAS
+// ══════════════════════════════
+async function cargarRefs(){
+  try{
+    const snap = await colRefs.get();
+    if(!snap.empty){
+      snap.docs.forEach(d=>{ REFS[d.id]={...d.data()}; });
+    }
+  }catch(e){ console.log('Usando refs por defecto'); }
 }
 
-// ══════════════════════════════════════════
+function renderRefs(){
+  const cont = document.getElementById('refsContainer');
+  const keys = Object.keys(REFS).sort();
+  cont.innerHTML = `<div class="ref-grid">
+    ${keys.map(k=>`
+      <div class="ref-card" onclick="abrirModalRef('${k}')">
+        <h4>${k}</h4>
+        <p>📏 ${REFS[k].medidas||'—'} mm</p>
+        <p>⚖️ ${REFS[k].peso||'—'} g</p>
+        <p>📦 ${REFS[k].uds||'—'} uds/caja</p>
+      </div>`).join('')}
+  </div>`;
+}
+
+function abrirModalRef(cod){
+  const ref = cod ? REFS[cod] : null;
+  document.getElementById('refEditId').value = cod||'';
+  document.getElementById('modalRefTitulo').textContent = cod ? '✏️ Editar '+cod : '＋ Nueva Referencia';
+  document.getElementById('refCod').value = cod||'';
+  document.getElementById('refCod').disabled = !!cod;
+  document.getElementById('refMedidas').value = ref?.medidas||'';
+  document.getElementById('refUds').value = ref?.uds||'';
+  document.getElementById('refPeso').value = ref?.peso||'';
+  document.getElementById('btnDelRef').style.display = cod?'':'none';
+  document.getElementById('modalRef').classList.add('activo');
+}
+
+async function guardarRef(){
+  const cod = document.getElementById('refCod').value.trim().toUpperCase();
+  if(!cod){ toast('❌ El código es obligatorio','err'); return; }
+  const datos = {
+    medidas: document.getElementById('refMedidas').value.trim(),
+    uds: parseInt(document.getElementById('refUds').value)||0,
+    peso: parseFloat(document.getElementById('refPeso').value)||0,
+  };
+  try{
+    await colRefs.doc(cod).set(datos);
+    REFS[cod] = datos;
+    toast('✅ Referencia guardada','ok');
+    cerrarModal('modalRef');
+    renderRefs();
+  }catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+async function eliminarRef(){
+  const cod = document.getElementById('refEditId').value;
+  if(!cod||!confirm(`¿Eliminar referencia ${cod}?`)) return;
+  try{
+    await colRefs.doc(cod).delete();
+    delete REFS[cod];
+    toast('✅ Eliminada','ok');
+    cerrarModal('modalRef');
+    renderRefs();
+  }catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+// ══════════════════════════════
 // HELPERS
-// ══════════════════════════════════════════
-function fechaES(iso) {
-  if (!iso) return '';
-  const p = iso.split('-');
-  if (p.length !== 3) return iso;
+// ══════════════════════════════
+function cerrarModal(id){ document.getElementById(id).classList.remove('activo'); }
+function fechaES(iso){
+  if(!iso) return '';
+  const p=iso.split('-');
+  if(p.length!==3) return iso;
   return p[2]+'/'+p[1]+'/'+p[0];
 }
-
-function toast(msg, tipo='') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast ' + (tipo==='ok'?'ok':tipo==='err'?'err':'');
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3000);
+function toast(msg,tipo=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast '+(tipo==='ok'?'ok':tipo==='err'?'err':'');
+  el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),3500);
 }
 </script>
 </body>
