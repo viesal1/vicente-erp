@@ -256,8 +256,11 @@ function renderMaquinas(){
     return `<div class="maq-card" id="card-${m}">
       <div class="maq-header">
         <h3>🏭 ${m}</h3>
-        <input class="maq-nota" value="${maq.nota||''}" placeholder="Nota: FILA 3, OTRA NAVE…"
-          onchange="orden.maquinas['${m}'].nota=this.value">
+        <div contenteditable="true" class="maq-nota"
+          onblur="orden.maquinas['${m}'].nota=this.innerText.trim()"
+          style="min-width:150px;outline:none;cursor:text;"
+          >${maq.nota||''}</div>
+        <span style="font-size:10px;color:rgba(255,255,255,.5);margin-left:4px" onclick="this.previousElementSibling.focus()">✏️</span>
       </div>
       <div class="maq-body">
         <div style="overflow-x:auto;">
@@ -299,13 +302,21 @@ function renderLineas(m){
       <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'cajas',parseInt(this.innerText)||0)" style="min-width:30px;text-align:center">${l.cajas||''}</div></td>
       <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'uds',parseInt(this.innerText)||0)" style="min-width:30px;text-align:center">${l.uds||''}</div></td>
       <td>
-        <div class="casillas">
-          ${Array.from({length:10},(_,k)=>`
-            <div class="casilla${(l.casillas||[])[k]?' tachada':''}"
-              onclick="toggleCasilla('${m}',${i},${k})">
-              ${(l.casillas||[])[k]?'✕':''}
-            </div>`).join('')}
-        </div>
+        ${(()=>{
+          const n = parseInt(l.palets)||0;
+          if(!n) return '<span style="color:#aaa;font-size:11px">— palets —</span>';
+          const fila1 = Math.min(n,10);
+          const fila2 = n>10 ? n-10 : 0;
+          const buildFila = (desde,cant) => Array.from({length:cant},(_,k)=>{
+            const idx=desde+k;
+            return `<div class="casilla${(l.casillas||[])[idx]?' tachada':''}"
+              onclick="toggleCasilla('${m}',${i},${idx})">
+              ${(l.casillas||[])[idx]?'✕':''}
+            </div>`;
+          }).join('');
+          return `<div class="casillas">${buildFila(0,fila1)}</div>
+            ${fila2?`<div class="casillas" style="margin-top:2px">${buildFila(10,fila2)}</div>`:''}`;
+        })()}
       </td>
       <td><button class="btn-del" onclick="delLinea('${m}',${i})">×</button></td>
     </tr>`).join('');
@@ -328,6 +339,9 @@ function updateLinea(m,i,campo,val){
   // Auto-rellenar uds si hay referencia en BD
   if(campo==='ref' && REFS[val]){
     orden.maquinas[m].lineas[i].uds = REFS[val].uds;
+  }
+  // Re-renderizar siempre para actualizar casillas cuando cambian palets
+  if(campo==='ref'||campo==='palets'){
     document.getElementById('tbody-'+m).innerHTML = renderLineas(m);
   }
 }
