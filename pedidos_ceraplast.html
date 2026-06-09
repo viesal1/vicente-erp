@@ -150,13 +150,34 @@ let pedidoActual = null;
 let lineas = [];
 let asignaciones = {}; // {lineaIdx: maquina}
 
-firebase.auth().onAuthStateChanged(u=>{
+firebase.auth().onAuthStateChanged(async u=>{
   if(!u){ location.href='index.html'; return; }
   db = firebase.firestore();
   colPedidos = db.collection('pedidos_ceraplast');
   colProd = db.collection('produccion_ceraplast2');
+  await inicializarCajasEtiquetas();
   cargarPedidos();
 });
+
+async function inicializarCajasEtiquetas(){
+  // Crear tipos de caja y etiqueta por defecto si no existen
+  const CAJAS_DEFAULT = ['CAJA NEGRA','CAJA AZUL','GRANEL LUMAR','L-7','L-6','L-4','V-11','V-6','V-6 MOLLA','V-6 CS','ELEGUA','TP'];
+  const ET_DEFAULT = ['L-6','L-7','ELEGUA','V-6 MOLLA'];
+  try{
+    const cajasSnap = await db.collection('almacen_ceraplast_cajas').get();
+    if(cajasSnap.empty){
+      for(const nombre of CAJAS_DEFAULT){
+        await db.collection('almacen_ceraplast_cajas').add({nombre,stock:0,createdAt:new Date().toISOString()});
+      }
+    }
+    const etSnap = await db.collection('almacen_ceraplast_etiquetas').get();
+    if(etSnap.empty){
+      for(const nombre of ET_DEFAULT){
+        await db.collection('almacen_ceraplast_etiquetas').add({nombre,stock:0,createdAt:new Date().toISOString()});
+      }
+    }
+  }catch(e){ console.log('Error inicializando cajas/etiquetas',e); }
+}
 
 // ══════════════════════════════
 // CARGAR PEDIDOS
@@ -274,7 +295,7 @@ async function guardarPedido(){
   const datos={
     cliente, fecha:document.getElementById('pedFecha').value,
     obs:document.getElementById('pedObs').value.trim(),
-    lineas, estado:'pendiente', updatedAt:new Date().toISOString()
+    lineas, updatedAt:new Date().toISOString()
   };
   try{
     if(pedidoActual){
