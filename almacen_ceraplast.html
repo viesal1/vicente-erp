@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Almacén — Ceraplast</title>
+  <link rel="stylesheet" href="css/estilos_odoo.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:"AIzaSyBbO6Q2SPmeX0CD2nLXv5AwRfSFZ_3N7Ro",
+      authDomain:"etiquetadora-vespi.firebaseapp.com",
+      projectId:"etiquetadora-vespi",
+      storageBucket:"etiquetadora-vespi.firebasestorage.app",
+      messagingSenderId:"714344837885",
+      appId:"1:714344837885:web:d80abbd7a0898e1d1ec494"
+    });
+  </script>
+  <style>
+    .almacen-tabla { width:100%; border-collapse:collapse; font-size:14px; }
+    .almacen-tabla th { background:#1e2a44; color:#fff; padding:8px 12px; text-align:left; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+    .almacen-tabla td { padding:6px 10px; border:1px solid #dde3ee; vertical-align:middle; }
+    .almacen-tabla tr:hover td { background:#f9fafc; }
+    .fila-label { font-weight:700; color:#1e2a44; white-space:nowrap; width:60px; background:#f4f7fa !important; }
+    .celda-edit { outline:none; width:100%; min-height:24px; cursor:text; font-size:14px; }
+    .celda-edit:focus { background:#fffde7; border-radius:4px; }
+    .seccion-header { background:#e8ecf1 !important; }
+    .seccion-header td { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#7f8c8d; padding:4px 10px !important; }
+    #print-area { display:none; }
+    @media print {
+      *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+      body > *{ display:none !important; }
+      #print-area{ display:block !important; }
+      @page{ margin:8mm; size:A4 portrait; }
+    }
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e2a44;color:#fff;padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px;z-index:999;transition:transform .3s ease;pointer-events:none;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .toast.ok{background:#27ae60;}.toast.err{background:#e74c3c;}
+  </style>
+</head>
+<body>
+<div class="header">
+  <button class="back-btn" onclick="location.href='inicio-ceraplast.html'">← Volver</button>
+  <h1 style="color:white;font-size:1.1em">📦 Almacén — Ceraplast</h1>
+  <div style="width:80px"></div>
+</div>
+<div id="print-area"></div>
+<div class="container">
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+    <div>
+      <label style="font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;display:block;margin-bottom:4px;">Fecha</label>
+      <input type="datetime-local" id="fechaHora" style="padding:9px 12px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;">
+    </div>
+    <div style="margin-top:20px;display:flex;gap:8px;">
+      <button onclick="guardar()" style="background:#27ae60;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">💾 Guardar</button>
+      <button onclick="imprimir()" style="background:#f39c12;color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">🖨️ Imprimir</button>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="almacen-tabla">
+      <thead><tr>
+        <th style="width:70px">Fila</th>
+        <th>Contenido (ref = rojo+natural)</th>
+      </tr></thead>
+      <tbody id="tablaBody"></tbody>
+    </table>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// Estructura fija de filas
+const FILAS = [
+  // Nave 1
+  {id:'sep1', tipo:'sep', label:'NAVE 1 — PARED'},
+  {id:'f1',  tipo:'fila', label:'1'},
+  {id:'f2',  tipo:'fila', label:'2'},
+  {id:'f3',  tipo:'fila', label:'3'},
+  {id:'f4',  tipo:'fila', label:'4'},
+  {id:'f5',  tipo:'fila', label:'5'},
+  {id:'f6',  tipo:'fila', label:'6'},
+  {id:'f7',  tipo:'fila', label:'7'},
+  {id:'f8',  tipo:'fila', label:'8'},
+  {id:'f9',  tipo:'fila', label:'9'},
+  {id:'f10', tipo:'fila', label:'10'},
+  {id:'f11', tipo:'fila', label:'11'},
+  {id:'f12', tipo:'fila', label:'12'},
+  {id:'f13', tipo:'fila', label:'13'},
+  // Tapas
+  {id:'sep2', tipo:'sep', label:'TAPAS'},
+  {id:'a1',  tipo:'fila', label:'A1'},
+  {id:'a2',  tipo:'fila', label:'A2'},
+  {id:'b1',  tipo:'fila', label:'B1'},
+  {id:'b2',  tipo:'fila', label:'B2'},
+  {id:'c1',  tipo:'fila', label:'C-1'},
+  {id:'c2',  tipo:'fila', label:'C-2'},
+  {id:'d1',  tipo:'fila', label:'D-1'},
+  {id:'d2',  tipo:'fila', label:'D-2'},
+  {id:'d3',  tipo:'fila', label:'D-3'},
+  {id:'cort1',tipo:'fila', label:'CORT-1'},
+  {id:'cort2',tipo:'fila', label:'CORT-2'},
+  {id:'cort3',tipo:'fila', label:'CORT-3'},
+  {id:'cort4',tipo:'fila', label:'CORT-4'},
+  // Altillo
+  {id:'sep3', tipo:'sep', label:'ALTILLO'},
+  {id:'alt1', tipo:'fila', label:'ALT-1'},
+  {id:'alt2', tipo:'fila', label:'ALT-2'},
+  {id:'alt3', tipo:'fila', label:'ALT-3'},
+  {id:'alt4', tipo:'fila', label:'ALT-4'},
+  {id:'alt5', tipo:'fila', label:'ALT-5'},
+  {id:'alt6', tipo:'fila', label:'ALT-6'},
+];
+
+let db, colAlmacen;
+let datos = {}; // {id: contenido}
+
+firebase.auth().onAuthStateChanged(u=>{
+  if(!u){ location.href='index.html'; return; }
+  db = firebase.firestore();
+  colAlmacen = db.collection('almacen_ceraplast');
+  // Fecha y hora actuales
+  const ahora = new Date();
+  const local = new Date(ahora.getTime()-ahora.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  document.getElementById('fechaHora').value = local;
+  renderTabla();
+  cargar();
+});
+
+function renderTabla(){
+  const tbody = document.getElementById('tablaBody');
+  tbody.innerHTML = FILAS.map(f=>{
+    if(f.tipo==='sep'){
+      return `<tr class="seccion-header"><td colspan="2">${f.label}</td></tr>`;
+    }
+    return `<tr>
+      <td class="fila-label">${f.label}</td>
+      <td>
+        <div class="celda-edit" contenteditable="true" id="celda-${f.id}"
+          onblur="datos['${f.id}']=this.innerText.trim()"
+          >${datos[f.id]||''}</div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function cargar(){
+  try{
+    const snap = await colAlmacen.orderBy('createdAt','desc').limit(1).get();
+    if(snap.empty) return;
+    const doc = snap.docs[0].data();
+    datos = doc.datos||{};
+    if(doc.fecha) document.getElementById('fechaHora').value = doc.fecha;
+    // Rellenar celdas
+    FILAS.filter(f=>f.tipo==='fila').forEach(f=>{
+      const el = document.getElementById('celda-'+f.id);
+      if(el) el.innerText = datos[f.id]||'';
+    });
+  }catch(e){ console.log('Sin datos previos'); }
+}
+
+async function guardar(){
+  // Recoger todos los datos actuales
+  FILAS.filter(f=>f.tipo==='fila').forEach(f=>{
+    const el = document.getElementById('celda-'+f.id);
+    if(el) datos[f.id] = el.innerText.trim();
+  });
+  const registro = {
+    fecha: document.getElementById('fechaHora').value,
+    datos,
+    createdAt: new Date().toISOString()
+  };
+  try{
+    await colAlmacen.add(registro);
+    toast('✅ Guardado','ok');
+  }catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+function imprimir(){
+  // Recoger datos actuales
+  FILAS.filter(f=>f.tipo==='fila').forEach(f=>{
+    const el = document.getElementById('celda-'+f.id);
+    if(el) datos[f.id] = el.innerText.trim();
+  });
+
+  const fecha = document.getElementById('fechaHora').value.replace('T',' ');
+
+  const filasHTML = FILAS.map(f=>{
+    if(f.tipo==='sep'){
+      return `<tr><td colspan="2" style="padding:3px 8px;background:#1e2a44;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px">${f.label}</td></tr>`;
+    }
+    const contenido = datos[f.id]||'';
+    return `<tr>
+      <td style="padding:4px 8px;border:1px solid #aaa;font-weight:700;font-size:10px;white-space:nowrap;background:#f4f7fa;width:50px">${f.label}</td>
+      <td style="padding:4px 8px;border:1px solid #aaa;font-size:10px">${contenido}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('print-area').innerHTML = `
+    <style>@page{margin:8mm;size:A4 portrait;}</style>
+    <div style="font-family:Arial,sans-serif;font-size:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5mm;border-bottom:2px solid #000;padding-bottom:3mm;">
+        <div>
+          <div style="font-size:14px;font-weight:bold">ALMACÉN CERAPLAST</div>
+          <div style="font-size:10px;color:#555">nave 1 &nbsp;&nbsp; ${fecha}</div>
+        </div>
+        <img src="logo-ceraplast.png" style="height:14mm;width:auto;">
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        ${filasHTML}
+      </table>
+    </div>`;
+  setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
+}
+
+function toast(msg,tipo=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast '+(tipo==='ok'?'ok':tipo==='err'?'err':'');
+  el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),3500);
+}
+</script>
+</body>
+</html>
