@@ -35,6 +35,25 @@
       #print-area{ display:block !important; }
       @page{ margin:8mm; size:A4 portrait; }
     }
+    .tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+    .tab{padding:10px 18px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:#f4f7fa;color:#7f8c8d;transition:all .2s;}
+    .tab.activo{background:#1e2a44;color:#fff;}
+    .stock-card{background:#fff;border-radius:12px;padding:14px 18px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+    .stock-nombre{font-weight:700;color:#1e2a44;font-size:1em;}
+    .stock-cant{font-size:24px;font-weight:700;color:#1e2a44;}
+    .stock-uds{font-size:12px;color:#7f8c8d;}
+    .fg{display:flex;flex-direction:column;margin-bottom:10px;}
+    .fg label{font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+    .fg input{padding:10px 12px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;}
+    .fg input:focus{outline:none;border-color:#00a9e0;}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;justify-content:center;align-items:flex-start;padding-top:60px;}
+    .modal-overlay.activo{display:flex;}
+    .modal-box{background:#fff;border-radius:16px;padding:22px;width:92%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:88vh;overflow-y:auto;}
+    .modal-box h3{font-size:1.05em;color:#1e2a44;margin-bottom:14px;}
+    .btn-ok{background:#00a9e0;color:#fff;}
+    .btn-cancel{background:#f4f7fa;color:#1e2a44;}
+    .modal-actions{display:flex;gap:10px;margin-top:14px;}
+    .modal-actions button{flex:1;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;}
     .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e2a44;color:#fff;padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px;z-index:999;transition:transform .3s ease;pointer-events:none;}
     .toast.show{transform:translateX(-50%) translateY(0);}
     .toast.ok{background:#27ae60;}.toast.err{background:#e74c3c;}
@@ -48,6 +67,14 @@
 </div>
 <div id="print-area"></div>
 <div class="container">
+  <div class="tabs">
+    <button class="tab activo" onclick="setTab('nave')">🏭 Nave 1</button>
+    <button class="tab" onclick="setTab('cajas')">📦 Cajas</button>
+    <button class="tab" onclick="setTab('etiquetas')">🏷️ Etiquetas</button>
+  </div>
+
+  <!-- TAB NAVE 1 -->
+  <div id="tab-nave">
   <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
     <div>
       <label style="font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;display:block;margin-bottom:4px;">Fecha</label>
@@ -68,7 +95,59 @@
       <tbody id="tablaBody"></tbody>
     </table>
   </div>
+  </div><!-- fin tab-nave -->
+
+  <!-- TAB CAJAS -->
+  <div id="tab-cajas" style="display:none">
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <button onclick="abrirModalStock('cajas',null)" style="background:#00a9e0;color:#fff;border:none;padding:12px 20px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">＋ Nuevo tipo de caja</button>
+    </div>
+    <div id="cajasContainer"></div>
+  </div>
+
+  <!-- TAB ETIQUETAS -->
+  <div id="tab-etiquetas" style="display:none">
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <button onclick="abrirModalStock('etiquetas',null)" style="background:#00a9e0;color:#fff;border:none;padding:12px 20px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">＋ Nuevo tipo de etiqueta</button>
+    </div>
+    <div id="etiquetasContainer"></div>
+  </div>
 </div>
+
+<!-- MODAL STOCK -->
+<div class="modal-overlay" id="modalStock">
+  <div class="modal-box">
+    <h3 id="modalStockTitulo">＋ Nuevo tipo</h3>
+    <input type="hidden" id="stockTipo">
+    <input type="hidden" id="stockEditId">
+    <div class="fg"><label>Nombre</label><input type="text" id="stockNombre" placeholder="ej: CAJA NEGRA, V-11 LUMAR…" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div>
+    <div class="fg"><label>Stock actual (uds)</label><input type="number" id="stockCantidad" placeholder="0" min="0"></div>
+    <div class="modal-actions">
+      <button class="btn-ok" onclick="guardarStock()">✅ Guardar</button>
+      <button class="btn-cancel" onclick="cerrarModal('modalStock')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MOVIMIENTO -->
+<div class="modal-overlay" id="modalMov">
+  <div class="modal-box">
+    <h3 id="modalMovTitulo">Movimiento de stock</h3>
+    <input type="hidden" id="movTipo">
+    <input type="hidden" id="movId">
+    <div style="display:flex;gap:10px;margin-bottom:14px;">
+      <button id="btnEntrada" onclick="setMovTipo('entrada')" style="flex:1;padding:12px;border:2px solid #27ae60;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:#d1f5e0;color:#1a7a40;">📥 Entrada</button>
+      <button id="btnSalida" onclick="setMovTipo('salida')" style="flex:1;padding:12px;border:2px solid #e74c3c;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:#fff;color:#e74c3c;">📤 Salida</button>
+    </div>
+    <div class="fg"><label>Cantidad</label><input type="number" id="movCantidad" placeholder="0" min="1"></div>
+    <div class="fg"><label>Nota (opcional)</label><input type="text" id="movNota" placeholder="ej: Pedido ADISCO, Recepción..."></div>
+    <div class="modal-actions">
+      <button class="btn-ok" onclick="confirmarMov()">✅ Confirmar</button>
+      <button class="btn-cancel" onclick="cerrarModal('modalMov')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -234,6 +313,110 @@ function toast(msg,tipo=''){
   el.textContent=msg; el.className='toast '+(tipo==='ok'?'ok':tipo==='err'?'err':'');
   el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),3500);
 }
+
+// ── TABS ──
+function setTab(n){
+  ['nave','cajas','etiquetas'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===n?'':'none';
+  });
+  document.querySelectorAll('.tab').forEach((el,i)=>{
+    el.classList.toggle('activo',['nave','cajas','etiquetas'][i]===n);
+  });
+  if(n==='cajas') cargarStockTab('cajas');
+  if(n==='etiquetas') cargarStockTab('etiquetas');
+}
+
+// ── STOCK CAJAS Y ETIQUETAS ──
+let movTipoActual='entrada';
+
+async function cargarStockTab(tipo){
+  const cont=document.getElementById(tipo+'Container');
+  cont.innerHTML='<div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div>';
+  try{
+    const snap=await db.collection('almacen_ceraplast_'+tipo).get();
+    if(snap.empty){
+      cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin tipos. Añade uno.</p></div>';
+      return;
+    }
+    const items=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.nombre.localeCompare(b.nombre));
+    cont.innerHTML=items.map(item=>`
+      <div class="stock-card">
+        <div>
+          <div class="stock-nombre">${item.nombre}</div>
+          <div class="stock-uds">Stock actual</div>
+        </div>
+        <div style="text-align:center">
+          <div class="stock-cant ${item.stock<100?'style="color:#e74c3c"':''}">${item.stock||0}</div>
+          <div class="stock-uds">uds</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button onclick="abrirMov('${tipo}','${item.id}','${item.nombre}')" style="background:#d1f5e0;color:#1a7a40;border:none;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">📥📤 Movimiento</button>
+          <button onclick="abrirModalStock('${tipo}','${item.id}')" style="background:#f4f7fa;color:#1e2a44;border:none;padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;">✏️</button>
+        </div>
+      </div>`).join('');
+  }catch(e){ cont.innerHTML='<div class="empty-state"><div class="icon">❌</div><p>Error</p></div>'; }
+}
+
+function abrirModalStock(tipo, id){
+  document.getElementById('stockTipo').value=tipo;
+  document.getElementById('stockEditId').value=id||'';
+  document.getElementById('modalStockTitulo').textContent=id?'✏️ Editar':'＋ Nuevo tipo de '+(tipo==='cajas'?'caja':'etiqueta');
+  document.getElementById('stockNombre').value='';
+  document.getElementById('stockCantidad').value='0';
+  document.getElementById('modalStock').classList.add('activo');
+}
+
+async function guardarStock(){
+  const tipo=document.getElementById('stockTipo').value;
+  const id=document.getElementById('stockEditId').value;
+  const nombre=document.getElementById('stockNombre').value.trim();
+  const stock=parseInt(document.getElementById('stockCantidad').value)||0;
+  if(!nombre){ toast('❌ El nombre es obligatorio','err'); return; }
+  try{
+    const col=db.collection('almacen_ceraplast_'+tipo);
+    if(id) await col.doc(id).update({nombre,stock});
+    else await col.add({nombre,stock,createdAt:new Date().toISOString()});
+    toast('✅ Guardado','ok');
+    cerrarModal('modalStock');
+    cargarStockTab(tipo);
+  }catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+function abrirMov(tipo, id, nombre){
+  document.getElementById('movTipo').value=tipo;
+  document.getElementById('movId').value=id;
+  document.getElementById('modalMovTitulo').textContent='📦 '+nombre;
+  document.getElementById('movCantidad').value='';
+  document.getElementById('movNota').value='';
+  movTipoActual='entrada';
+  setMovTipo('entrada');
+  document.getElementById('modalMov').classList.add('activo');
+}
+
+function setMovTipo(t){
+  movTipoActual=t;
+  document.getElementById('btnEntrada').style.background=t==='entrada'?'#d1f5e0':'#fff';
+  document.getElementById('btnSalida').style.background=t==='salida'?'#fdecea':'#fff';
+}
+
+async function confirmarMov(){
+  const tipo=document.getElementById('movTipo').value;
+  const id=document.getElementById('movId').value;
+  const cant=parseInt(document.getElementById('movCantidad').value)||0;
+  if(!cant){ toast('❌ Introduce una cantidad','err'); return; }
+  try{
+    const ref=db.collection('almacen_ceraplast_'+tipo).doc(id);
+    const doc=await ref.get();
+    const stockActual=doc.data().stock||0;
+    const nuevoStock=movTipoActual==='entrada'?stockActual+cant:Math.max(0,stockActual-cant);
+    await ref.update({stock:nuevoStock,updatedAt:new Date().toISOString()});
+    toast(`✅ Stock actualizado: ${nuevoStock} uds`,'ok');
+    cerrarModal('modalMov');
+    cargarStockTab(tipo);
+  }catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+function cerrarModal(id){ document.getElementById(id).classList.remove('activo'); }
 </script>
 </body>
 </html>

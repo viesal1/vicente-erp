@@ -98,7 +98,7 @@
 
 <!-- MODAL PEDIDO -->
 <div class="modal-overlay" id="modalPedido">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width:700px;">
     <h3 id="modalTitulo">＋ Nuevo Pedido</h3>
     <input type="hidden" id="pedidoId">
     <div style="display:flex;gap:8px;">
@@ -107,22 +107,23 @@
     </div>
     <div class="fg"><label>Observaciones</label><textarea id="pedObs" rows="2" style="resize:vertical;padding:10px 12px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;"></textarea></div>
 
-    <!-- LÍNEAS -->
-    <div style="font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Líneas del pedido</div>
-    <table class="lineas-tabla">
-      <thead><tr>
-        <th>Referencia</th>
-        <th>Color</th>
-        <th>Cant. rojo</th>
-        <th>Cant. nat.</th>
-        <th></th>
-      </tr></thead>
-      <tbody id="lineasBody"></tbody>
-    </table>
-    <button onclick="addLinea()" style="background:none;border:1px dashed #00a9e0;color:#00a9e0;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;width:100%;margin-bottom:12px;">＋ Añadir línea</button>
+    <!-- TEXTO LIBRE -->
+    <div class="fg">
+      <label>Introduce el pedido en texto libre</label>
+      <textarea id="pedTextoLibre" rows="5" placeholder="V-7 CAJA NEGRA ADISCO = 10+5&#10;V-88 GRANEL LUMAR 2 AZULES&#10;165 L-7 MEDITERRANEA = 3+0"
+        style="resize:vertical;padding:10px 12px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;font-family:monospace;"
+        oninput="parsearLineas()"></textarea>
+    </div>
+
+    <!-- LÍNEAS PARSEADAS -->
+    <div style="font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">
+      Líneas generadas <span id="lineasCount" style="color:#00a9e0;font-size:12px;"></span>
+    </div>
+    <div id="lineasPreview" style="margin-bottom:12px;"></div>
 
     <div class="modal-actions">
       <button class="btn-ok" onclick="guardarPedido()">✅ Guardar</button>
+      <button style="flex:1;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:#e8f4fd;color:#00a9e0;" onclick="consultarStock()">📊 Ver stock</button>
       <button class="btn-cancel" onclick="cerrarModal('modalPedido')">Cancelar</button>
     </div>
   </div>
@@ -217,7 +218,9 @@ function abrirNuevo(){
   document.getElementById('pedCliente').value='';
   document.getElementById('pedFecha').value=new Date().toISOString().split('T')[0];
   document.getElementById('pedObs').value='';
-  renderLineas();
+  document.getElementById('pedTextoLibre').value='';
+  document.getElementById('lineasPreview').innerHTML='';
+  document.getElementById('lineasCount').textContent='';
   document.getElementById('modalPedido').classList.add('activo');
 }
 
@@ -230,7 +233,17 @@ async function abrirEditar(id){
   document.getElementById('pedCliente').value=p.cliente||'';
   document.getElementById('pedFecha').value=p.fecha||'';
   document.getElementById('pedObs').value=p.obs||'';
-  renderLineas();
+  // Reconstruir texto libre desde las líneas guardadas
+  const textoReconstruido = lineas.map(l=>{
+    let txt = l.ref;
+    if(l.caja) txt += ' '+l.caja;
+    if(l.cliente) txt += ' '+l.cliente;
+    if(l.rojo!==undefined && l.natural!==undefined && (l.rojo||l.natural)) txt += ' = '+l.rojo+'+'+l.natural;
+    if(l.cantidadColor && l.color) txt += ' '+l.cantidadColor+' '+l.color;
+    return txt;
+  }).join('\n');
+  document.getElementById('pedTextoLibre').value = textoReconstruido;
+  renderLineasPreview();
   document.getElementById('modalPedido').classList.add('activo');
 }
 
@@ -364,6 +377,72 @@ async function confirmarProduccion(){
     cerrarModal('modalProduccion');
     cargarPedidos();
   }catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+// ══════════════════════════════
+// CONSULTA STOCK AL PARSEAR
+// ══════════════════════════════
+async function consultarStock(){
+  if(!lineas.length) return;
+  // Cargar refs de Firestore
+  const refsSnap = await db.collection('refs_ceraplast').get();
+  const REFS_DB = {};
+  refsSnap.docs.forEach(d=>{ REFS_DB[d.id]={...d.data()}; });
+
+  // Cargar stock de cajas y etiquetas
+  const cajasSnap = await db.collection('almacen_ceraplast_cajas').get();
+  const etSnap = await db.collection('almacen_ceraplast_etiquetas').get();
+  const stockCajas={}, stockEt={};
+  cajasSnap.docs.forEach(d=>{ stockCajas[d.data().nombre]=d.data().stock||0; });
+  etSnap.docs.forEach(d=>{ stockEt[d.data().nombre]=d.data().stock||0; });
+
+  // Calcular necesidades por línea
+  const info = lineas.map(l=>{
+    const ref = REFS_DB[l.ref]||{};
+    const palets = (parseInt(l.rojo)||0)+(parseInt(l.natural)||0)+(parseInt(l.cantidadColor)||0);
+    const cajasPalet = ref.cajas||0;
+    const udsCaja = ref.uds||0;
+    const cajasNec = palets * cajasPalet;
+    const etNec = palets * cajasPalet * udsCaja;
+    const cajaNombre = l.caja||'';
+    const cajasStock = cajaNombre ? (stockCajas[cajaNombre]||0) : null;
+    const lleva = ref.etiqueta==='si';
+    // Buscar etiqueta por referencia
+    const etKey = Object.keys(stockEt).find(k=>k.toUpperCase().includes(l.ref.toUpperCase()));
+    const etStock = etKey ? stockEt[etKey] : null;
+    return {l, palets, cajasNec, etNec, cajaNombre, cajasStock, lleva, etStock, etKey};
+  });
+
+  // Mostrar resumen debajo de las líneas
+  const resumen = info.map(({l,palets,cajasNec,etNec,cajaNombre,cajasStock,lleva,etStock,etKey})=>{
+    if(!palets) return '';
+    let html=`<div style="background:#f0f7ff;border-radius:8px;padding:8px 12px;margin-bottom:4px;font-size:12px;">
+      <strong>${l.ref} ${l.caja||''}</strong> — ${palets} palets`;
+    if(cajasNec){
+      const ok=cajasStock!==null&&cajasStock>=cajasNec;
+      const color=cajasStock===null?'#555':ok?'#1a7a40':'#e74c3c';
+      html+=`<br>📦 Cajas necesarias: <strong>${cajasNec}</strong>`;
+      if(cajasStock!==null) html+=` | Stock ${cajaNombre}: <strong style="color:${color}">${cajasStock}</strong> ${ok?'✅':'⚠️ Faltan '+(cajasNec-cajasStock)}`;
+    }
+    if(lleva&&etNec){
+      const ok=etStock!==null&&etStock>=etNec;
+      const color=etStock===null?'#555':ok?'#1a7a40':'#e74c3c';
+      html+=`<br>🏷️ Etiquetas necesarias: <strong>${etNec.toLocaleString()}</strong>`;
+      if(etStock!==null) html+=` | Stock ${etKey}: <strong style="color:${color}">${etStock.toLocaleString()}</strong> ${ok?'✅':'⚠️ Faltan '+(etNec-etStock).toLocaleString()}`;
+      else html+=` | Sin stock registrado`;
+    }
+    html+=`</div>`;
+    return html;
+  }).join('');
+
+  // Insertar el resumen
+  let cont=document.getElementById('stockResumen');
+  if(!cont){
+    cont=document.createElement('div');
+    cont.id='stockResumen';
+    document.getElementById('lineasPreview').after(cont);
+  }
+  cont.innerHTML=resumen?`<div style="font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">📊 Necesidades del pedido</div>${resumen}`:'';
 }
 
 // ══════════════════════════════
