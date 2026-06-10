@@ -325,6 +325,9 @@ async function guardarPedido(){
     if(pedidoActual){
       await colPedidos.doc(pedidoActual).update(datos);
     } else {
+      const allSnap=await colPedidos.get();
+      const nums=allSnap.docs.map(d=>parseInt((d.data().numero||'CP_000').replace('CP_',''))||0);
+      datos.numero='CP_'+String((nums.length?Math.max(...nums):0)+1).padStart(3,'0');
       datos.createdAt=new Date().toISOString();
       await colPedidos.add(datos);
     }
@@ -348,7 +351,7 @@ async function abrirProduccion(id){
   document.getElementById('asignacionContainer').innerHTML = (p.lineas||[]).map((l,i)=>`
     <div style="background:#f9fafc;border-radius:10px;padding:12px;margin-bottom:10px;">
       <div style="font-weight:700;color:#1e2a44;margin-bottom:8px;">
-        ${l.ref} ${l.color} ${l.rojo?l.rojo+'R':''} ${l.natural?l.natural+'N':''}
+        ${l.ref} ${l.color} ${l.caja||''} ${l.cliente||''} — ${l.palets||0} palets
       </div>
       <div class="maq-grid">
         ${MAQUINAS.map(m=>`

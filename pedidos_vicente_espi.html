@@ -505,18 +505,18 @@ async function duplicarPedido(){
   if(!confirm('¿Duplicar el pedido '+actual.numero+'?')) return;
   try{
     // Obtener el siguiente número
-    const snap = await db.collection('pedidos_vespi').orderBy('numero','desc').limit(1).get();
+    const snap = await db.collection('pedidos_vespi').get();
     let sigNum = 'P_001';
     if(!snap.empty){
-      const last = snap.docs[0].data().numero||'P_000';
-      const n = parseInt(last.replace('P_',''))+1;
-      sigNum = 'P_'+String(n).padStart(3,'0');
+      const nums=snap.docs.map(d=>parseInt((d.data().numero||'P_000').replace('P_',''))||0);
+      sigNum = 'P_'+String(Math.max(...nums)+1).padStart(3,'0');
     }
     const nuevo = {
       ...actual,
       numero: sigNum,
       fecha: new Date().toISOString().split('T')[0],
       finalizado: false,
+      fechaCreacion: new Date().toISOString(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
