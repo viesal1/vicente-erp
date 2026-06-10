@@ -569,22 +569,18 @@ async function imprimirVisor(){
     setTimeout(()=>{
       const pag1 = printArea.querySelector('.pag1');
       if(pag1){
-        const maxH = 1122; // 297mm a 96dpi
-        // Solo eliminar secciones vacías si no cabe
-        if(pag1.scrollHeight > maxH){
-          const bloques = pag1.querySelectorAll('div');
-          bloques.forEach(bloque=>{
-            const rows = bloque.querySelectorAll('tbody tr');
-            if(!rows.length) return;
-            let tieneData = false;
-            rows.forEach(row=>{
-              row.querySelectorAll('td').forEach(td=>{
-                if(td.innerText.trim()) tieneData=true;
-              });
+        // Eliminar secciones sin datos
+        pag1.querySelectorAll('div').forEach(bloque=>{
+          const rows = bloque.querySelectorAll('tbody tr');
+          if(!rows.length) return;
+          let tieneData = false;
+          rows.forEach(row=>{
+            row.querySelectorAll('td').forEach(td=>{
+              if(td.innerText.trim()) tieneData=true;
             });
-            if(!tieneData) bloque.style.display='none';
           });
-        }
+          if(!tieneData) bloque.style.display='none';
+        });
       }
       window.print();
       setTimeout(()=>{ printArea.innerHTML=''; }, 1500);
