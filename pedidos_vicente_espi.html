@@ -569,18 +569,23 @@ async function imprimirVisor(){
     setTimeout(()=>{
       const pag1 = printArea.querySelector('.pag1');
       if(pag1){
-        const altoPx = pag1.scrollHeight;
-        const maxPx = 1050;
-        if(altoPx > maxPx){
-          const escala = maxPx / altoPx;
-          pag1.style.transform = 'scale('+escala+')';
-          pag1.style.transformOrigin = 'top left';
-          pag1.style.marginBottom = '-'+Math.round(altoPx*(1-escala))+'px';
+        // Reducir font-size progresivamente hasta que quepa en 297mm
+        const maxH = 1122; // 297mm a 96dpi
+        let fs = 11;
+        pag1.style.fontSize = fs+'px';
+        while(pag1.scrollHeight > maxH && fs > 7){
+          fs -= 0.5;
+          pag1.style.fontSize = fs+'px';
+          pag1.style.padding = Math.max(3, 8*(fs/11))+'mm';
         }
+        // Forzar que no se desborde
+        pag1.style.maxHeight = '297mm';
+        pag1.style.overflow = 'hidden';
+        pag1.style.pageBreakAfter = 'always';
       }
       window.print();
       setTimeout(()=>{ printArea.innerHTML=''; }, 1500);
-    }, 150);
+    }, 200);
     return;
   }
 
