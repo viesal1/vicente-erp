@@ -564,11 +564,22 @@ async function imprimirVisor(){
                   || window.matchMedia('(display-mode: standalone)').matches;
 
   if(!esMovil){
-    // ORDENADOR → imprimir directamente
-    document.getElementById('print-area').innerHTML = document.getElementById('visorContenido').innerHTML;
+    const printArea = document.getElementById('print-area');
+    printArea.innerHTML = document.getElementById('visorContenido').innerHTML;
     setTimeout(()=>{
+      const pag1 = printArea.querySelector('.pag1');
+      if(pag1){
+        const altoPx = pag1.scrollHeight;
+        const maxPx = 1050;
+        if(altoPx > maxPx){
+          const escala = maxPx / altoPx;
+          pag1.style.transform = 'scale('+escala+')';
+          pag1.style.transformOrigin = 'top left';
+          pag1.style.marginBottom = '-'+Math.round(altoPx*(1-escala))+'px';
+        }
+      }
       window.print();
-      setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; }, 1500);
+      setTimeout(()=>{ printArea.innerHTML=''; }, 1500);
     }, 150);
     return;
   }
