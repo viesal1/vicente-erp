@@ -147,6 +147,7 @@
 <script>
 let db, colPedidos, colProd;
 let lineas = [];
+const COLOR_BADGE = {'ROJO':'#e74c3c','NATURAL':'#7f8c8d','VERDE':'#27ae60','AZUL':'#2980b9','AMARILLO':'#f39c12','VIOLETA':'#8e44ad'};
 
 firebase.auth().onAuthStateChanged(u=>{
   if(!u){ location.href='index.html'; return; }
@@ -238,8 +239,9 @@ async function abrirEditar(id){
     let t=l.ref;
     if(l.caja) t+=' '+l.caja;
     if(l.cliente) t+=' '+l.cliente;
-    if((l.rojo!==undefined||l.natural!==undefined)&&(l.rojo||l.natural)) t+=' = '+(l.rojo||0)+'+'+(l.natural||0);
-    if(l.cantidadColor&&l.color) t+=' '+l.cantidadColor+' '+l.color;
+    if(l.palets&&l.color==='ROJO') t+=' = '+l.palets+'+0';
+    else if(l.palets&&l.color==='NATURAL') t+=' = 0+'+l.palets;
+    else if(l.palets&&l.color) t+=' '+l.palets+' '+l.color;
     return t;
   }).join('\n');
   document.getElementById('pedTexto').value=texto;
@@ -253,24 +255,59 @@ async function abrirEditar(id){
 function parsear(){
   const texto = document.getElementById('pedTexto').value;
   lineas = [];
-  texto.split('\n').map(l=>l.trim()).filter(l=>l).forEach(linea=>{
-    // Formato 1: REF CAJA CLIENTE = R+N
-    const m1 = linea.match(/^(\S+)\s+(.*?)\s+(\S+)\s*=\s*(\d+)\s*\+\s*(\d+)$/);
-    // Formato 2: REF CAJA CLIENTE X COLORES (ej: 2 AZULES)
-    const m2 = linea.match(/^(\S+)\s+(.*?)\s+(\S+)\s+(\d+)\s+(\w+)$/);
-    // Formato 3: REF CAJA = R+N (sin cliente)
-    const m3 = linea.match(/^(\S+)\s+(.*?)\s*=\s*(\d+)\s*\+\s*(\d+)$/);
 
-    if(m1){
-      lineas.push({ref:m1[1].toUpperCase(), caja:m1[2].toUpperCase(), cliente:m1[3].toUpperCase(), rojo:m1[4], natural:m1[5], color:'', cantidadColor:'', maquina:''});
-    } else if(m2){
-      let color = m2[5].toUpperCase().replace(/S$/, ''); // quitar plural
-      lineas.push({ref:m2[1].toUpperCase(), caja:m2[2].toUpperCase(), cliente:m2[3].toUpperCase(), rojo:'', natural:'', color, cantidadColor:m2[4], maquina:''});
-    } else if(m3){
-      lineas.push({ref:m3[1].toUpperCase(), caja:m3[2].toUpperCase(), cliente:'', rojo:m3[3], natural:m3[4], color:'', cantidadColor:'', maquina:''});
+  const COLORES_MAP = {
+    'ROJO':'ROJO','ROJOS':'ROJO',
+    'NATURAL':'NATURAL','NATURALES':'NATURAL','NT':'NATURAL',
+    'VERDE':'VERDE','VERDES':'VERDE',
+    'AZUL':'AZUL','AZULES':'AZUL',
+    'AMARILLO':'AMARILLO','AMARILLOS':'AMARILLO',
+    'VIOLETA':'VIOLETA','VIOLETAS':'VIOLETA'
+  };
+
+  texto.split('\n').map(l=>l.trim()).filter(l=>l).forEach(linea=>{
+    const palabras = linea.split(/\s+/);
+    const ref = palabras[0].toUpperCase();
+
+    // Detectar si hay = R+N al final
+    const matchRN = linea.match(/=\s*(\d+)\s*\+\s*(\d+)/);
+    // Detectar si hay N COLOR al final (ej: 2 AZULES, 1 VERDE)
+    const matchColor = linea.match(/(\d+)\s+([A-ZÁÉÍÓÚÑ]+)\s*$/i);
+
+    // Extraer caja y cliente del medio
+    // Formato: REF [CAJA...] [CLIENTE] = R+N
+    // o:       REF [CAJA...] [CLIENTE] N COLOR
+    let resto = linea.replace(/^\S+\s+/, ''); // quitar ref
+    let caja = '', cliente = '';
+
+    if(matchRN){
+      // Quitar el = R+N del final
+      resto = resto.replace(/=\s*\d+\s*\+\s*\d+/, '').trim();
+      const partes = resto.split(/\s+/).filter(Boolean);
+      if(partes.length >= 2){ cliente = partes[partes.length-1]; caja = partes.slice(0,-1).join(' '); }
+      else if(partes.length === 1){ caja = partes[0]; }
+
+      const rojo = parseInt(matchRN[1])||0;
+      const natural = parseInt(matchRN[2])||0;
+      // Generar línea ROJO si rojo > 0
+      if(rojo > 0) lineas.push({ref, caja:caja.toUpperCase(), cliente:cliente.toUpperCase(), color:'ROJO', palets:rojo, maquina:''});
+      // Generar línea NATURAL si natural > 0
+      if(natural > 0) lineas.push({ref, caja:caja.toUpperCase(), cliente:cliente.toUpperCase(), color:'NATURAL', palets:natural, maquina:''});
+
+    } else if(matchColor){
+      const colorRaw = matchColor[2].toUpperCase();
+      const color = COLORES_MAP[colorRaw] || colorRaw;
+      const palets = parseInt(matchColor[1])||1;
+      // Quitar cantidad+color del final
+      resto = resto.replace(/(\d+)\s+[A-ZÁÉÍÓÚÑ]+\s*$/i, '').trim();
+      const partes = resto.split(/\s+/).filter(Boolean);
+      if(partes.length >= 2){ cliente = partes[partes.length-1]; caja = partes.slice(0,-1).join(' '); }
+      else if(partes.length === 1){ caja = partes[0]; }
+      lineas.push({ref, caja:caja.toUpperCase(), cliente:cliente.toUpperCase(), color, palets, maquina:''});
+
     } else {
-      // Línea libre — guardar tal cual como nota
-      lineas.push({ref:linea, caja:'', cliente:'', rojo:'', natural:'', color:'', cantidadColor:'', maquina:''});
+      // Línea libre
+      lineas.push({ref, caja:'', cliente:'', color:'', palets:0, maquina:''});
     }
   });
   renderLineas();
@@ -278,20 +315,25 @@ function parsear(){
 
 const MAQUINAS=['M1','M2','M3','M4','M5','M6','M7'];
 
+const COLOR_BADGE = {
+  'ROJO':'#e74c3c','NATURAL':'#7f8c8d','VERDE':'#27ae60',
+  'AZUL':'#2980b9','AMARILLO':'#f39c12','VIOLETA':'#8e44ad'
+};
+
 function renderLineas(){
   const wrap = document.getElementById('lineasWrap');
   const cont = document.getElementById('lineasGen');
   if(!lineas.length){ wrap.style.display='none'; return; }
   wrap.style.display='';
   cont.innerHTML = lineas.map((l,i)=>{
-    const cantStr = l.rojo||l.natural ? `${l.rojo||0}R + ${l.natural||0}N` :
-                    l.cantidadColor ? `${l.cantidadColor} ${l.color}` : '';
+    const colorStyle = COLOR_BADGE[l.color]||'#555';
     return `<div class="linea-gen">
       <div class="linea-gen-top">
         <span class="linea-gen-ref">${l.ref}</span>
         ${l.caja?`<span class="linea-gen-caja">${l.caja}</span>`:''}
         ${l.cliente?`<span class="linea-gen-cliente">${l.cliente}</span>`:''}
-        ${cantStr?`<span class="linea-gen-cant">${cantStr}</span>`:''}
+        ${l.color?`<span style="background:${colorStyle};color:#fff;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:700">${l.color}</span>`:''}
+        ${l.palets?`<span class="linea-gen-cant">${l.palets} palet${l.palets>1?'s':''}</span>`:''}
         <button onclick="lineas.splice(${i},1);renderLineas();" style="background:none;border:none;color:#e74c3c;font-size:16px;cursor:pointer;margin-left:auto;">×</button>
       </div>
       <div class="maq-grid">
@@ -360,10 +402,9 @@ async function guardarYProduccion(){
     MAQUINAS.forEach(m=>{ if(!prodData.maquinas[m]) prodData.maquinas[m]={lineas:[],nota:''}; });
 
     lineasConMaq.forEach(l=>{
-      const palets=(parseInt(l.rojo)||0)+(parseInt(l.natural)||0)+(parseInt(l.cantidadColor)||0);
       prodData.maquinas[l.maquina].lineas.push({
-        ref:l.ref, color:l.color||l.rojo&&'ROJO'||'', cliente:l.cliente||cliente,
-        palets, cajas:0, uds:0, casillas:[], caja:l.caja||''
+        ref:l.ref, color:l.color||'', cliente:l.cliente||cliente,
+        palets:l.palets||0, cajas:0, uds:0, casillas:[], caja:l.caja||''
       });
     });
 
