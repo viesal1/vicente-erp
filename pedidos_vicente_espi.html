@@ -523,7 +523,7 @@ async function duplicarPedido(){
     delete nuevo.id;
     await db.collection('pedidos_vespi').add(nuevo);
     toast('✅ Pedido duplicado como '+sigNum,'ok');
-    cargarPedidos();
+    cargar();
   }catch(e){ toast('❌ '+e.message,'err'); }
 }
 

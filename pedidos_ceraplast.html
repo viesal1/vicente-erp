@@ -196,7 +196,7 @@ async function cargarPedidos(){
       return `<div class="pedido-card ${p.estado||'pendiente'}">
         <div class="pedido-header" onclick="togglePedido('body-${p.id}')">
           <div>
-            <div class="pedido-cliente">${p.cliente}</div>
+            <div class="pedido-cliente">${p.numero?'<span style="font-size:11px;color:#aaa;margin-right:6px">'+p.numero+'</span>':''}${p.cliente}</div>
             <div class="pedido-fecha">${fechaES(p.fecha)} ${p.obs?'· '+p.obs:''}</div>
           </div>
           <span class="badge ${p.estado||'pendiente'}">${p.estado==='finalizado'?'✅ Finalizado':p.estado==='en_produccion'?'🏭 En producción':'⏳ Pendiente'}</span>
@@ -399,16 +399,25 @@ async function confirmarProduccion(){
       MAQUINAS.forEach(m=>{ prodData.maquinas[m]={lineas:[],nota:''}; });
     }
 
+    // Cargar referencias para obtener uds/caja y cajas/palet
+    const refsSnap = await db.collection('refs_ceraplast').get();
+    const REFS = {};
+    refsSnap.docs.forEach(d=>{ REFS[d.id]={...d.data()}; });
+
     // Añadir cada línea a su máquina
     lineasActualizadas.forEach(l=>{
       if(!l.maquina) return;
       if(!prodData.maquinas[l.maquina]) prodData.maquinas[l.maquina]={lineas:[],nota:''};
+      const ref = REFS[l.ref]||{};
       prodData.maquinas[l.maquina].lineas.push({
         ref: l.ref,
-        color: l.color,
-        cliente: p.cliente,
-        palets: parseInt(l.rojo||0)+parseInt(l.natural||0),
-        cajas: 0, uds: 0, casillas: []
+        color: l.color||'',
+        cliente: l.cliente||p.cliente,
+        caja: l.caja||'',
+        palets: l.palets||0,
+        cajas: ref.cajas||0,
+        uds: ref.uds||0,
+        casillas: []
       });
     });
 
