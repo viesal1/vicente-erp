@@ -564,27 +564,40 @@ async function imprimirVisor(){
                   || window.matchMedia('(display-mode: standalone)').matches;
 
   if(!esMovil){
-    const printArea = document.getElementById('print-area');
-    printArea.innerHTML = document.getElementById('visorContenido').innerHTML;
-    setTimeout(()=>{
-      const pag1 = printArea.querySelector('.pag1');
-      if(pag1){
-        // Eliminar secciones sin datos
-        pag1.querySelectorAll('div').forEach(bloque=>{
-          const rows = bloque.querySelectorAll('tbody tr');
-          if(!rows.length) return;
-          let tieneData = false;
-          rows.forEach(row=>{
-            row.querySelectorAll('td').forEach(td=>{
-              if(td.innerText.trim()) tieneData=true;
-            });
-          });
-          if(!tieneData) bloque.style.display='none';
-        });
+    const { jsPDF } = window.jspdf;
+    const contenido = document.getElementById('visorContenido');
+    const titulo = document.getElementById('visorTitulo').textContent;
+    const btn = document.querySelector('#modalVisor button[onclick="imprimirVisor()"]');
+    if(btn){ btn.textContent='⏳ Generando...'; btn.disabled=true; }
+    try{
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:794px;min-width:794px;background:#fff;z-index:-1;';
+      wrapper.innerHTML = contenido.innerHTML;
+      document.body.appendChild(wrapper);
+      await new Promise(r=>setTimeout(r,300));
+      const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      const A4W=210, A4H=297;
+      const paginas = wrapper.querySelectorAll('.cert-page,.pag1,.pag2');
+      const elementos = paginas.length>0 ? Array.from(paginas) : [wrapper];
+      for(let i=0;i<elementos.length;i++){
+        if(i>0) pdf.addPage();
+        const canvas = await html2canvas(elementos[i],{scale:2,useCORS:true,backgroundColor:'#ffffff',width:794,windowWidth:794});
+        const imgData = canvas.toDataURL('image/jpeg',0.95);
+        const ratio = Math.min(A4W/(canvas.width/2), A4H/(canvas.height/2));
+        const iW=(canvas.width/2)*ratio, iH=(canvas.height/2)*ratio;
+        pdf.addImage(imgData,'JPEG',(A4W-iW)/2,0,iW,iH);
       }
-      window.print();
-      setTimeout(()=>{ printArea.innerHTML=''; }, 1500);
-    }, 200);
+      document.body.removeChild(wrapper);
+      // Abrir en nueva pestaña para imprimir directamente
+      const blob = pdf.output('blob');
+      const url = URL.createObjectURL(blob);
+      const win = window.open(url,'_blank');
+      if(win) setTimeout(()=>win.print(), 1000);
+    }catch(e){
+      toast('❌ Error: '+e.message,'err');
+    }finally{
+      if(btn){ btn.textContent='🖨️ Imprimir'; btn.disabled=false; }
+    }
     return;
   }
 
