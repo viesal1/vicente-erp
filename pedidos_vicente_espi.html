@@ -570,9 +570,20 @@ async function imprimirVisor(){
       const pag1 = printArea.querySelector('.pag1');
       if(pag1){
         const maxH = 1122; // 297mm a 96dpi
+        // Solo eliminar secciones vacías si no cabe
         if(pag1.scrollHeight > maxH){
-          const zoom = maxH / pag1.scrollHeight;
-          pag1.style.zoom = zoom;
+          const bloques = pag1.querySelectorAll('div');
+          bloques.forEach(bloque=>{
+            const rows = bloque.querySelectorAll('tbody tr');
+            if(!rows.length) return;
+            let tieneData = false;
+            rows.forEach(row=>{
+              row.querySelectorAll('td').forEach(td=>{
+                if(td.innerText.trim()) tieneData=true;
+              });
+            });
+            if(!tieneData) bloque.style.display='none';
+          });
         }
       }
       window.print();
