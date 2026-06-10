@@ -165,8 +165,8 @@ async function cargarPedidos(){
   cont.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div>';
   const filtro = document.getElementById('filtroEstado').value;
   try{
-    const snap = await colPedidos.orderBy('createdAt','desc').get();
-    let docs = snap.docs.map(d=>({id:d.id,...d.data()}));
+    const snap = await colPedidos.get();
+    let docs = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
     if(filtro) docs = docs.filter(d=>d.estado===filtro);
     if(!docs.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin pedidos.</p></div>'; return; }
     cont.innerHTML = docs.map(p=>{
