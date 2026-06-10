@@ -269,6 +269,7 @@
       <button class="btn" id="btn-cert" onclick="generarCertificados()" style="background:#6f42c1;color:#fff;display:none">📋 Certificados</button>
       <button class="btn btn-success"   id="btn-fin" onclick="toggleFin()">✅ Finalizar</button>
       <button class="btn btn-secondary" onclick="editarActual()">✏️ Editar</button>
+      <button class="btn btn-secondary" onclick="duplicarPedido()">📋 Duplicar</button>
       <button class="btn btn-danger"    onclick="eliminar()">🗑️ Eliminar</button>
     </div>
   </div>
@@ -499,6 +500,33 @@ function editarActual(){
 }
 
 // ── ELIMINAR ──
+async function duplicarPedido(){
+  if(!actual) return;
+  if(!confirm('¿Duplicar el pedido '+actual.numero+'?')) return;
+  try{
+    // Obtener el siguiente número
+    const snap = await db.collection('pedidos_vespi').orderBy('numero','desc').limit(1).get();
+    let sigNum = 'P_001';
+    if(!snap.empty){
+      const last = snap.docs[0].data().numero||'P_000';
+      const n = parseInt(last.replace('P_',''))+1;
+      sigNum = 'P_'+String(n).padStart(3,'0');
+    }
+    const nuevo = {
+      ...actual,
+      numero: sigNum,
+      fecha: new Date().toISOString().split('T')[0],
+      finalizado: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    delete nuevo.id;
+    await db.collection('pedidos_vespi').add(nuevo);
+    toast('✅ Pedido duplicado como '+sigNum,'ok');
+    cargarPedidos();
+  }catch(e){ toast('❌ '+e.message,'err'); }
+}
+
 async function eliminar(){
   if(!actualId)return;
   if(!confirm(`¿Eliminar ${actual?.numero}? No se puede deshacer.`))return;

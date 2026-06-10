@@ -107,14 +107,27 @@
     </div>
     <div class="fg"><label>Observaciones</label><textarea id="pedObs" rows="2" style="resize:vertical;padding:10px 12px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;"></textarea></div>
 
+    <!-- TEXTO LIBRE -->
+    <div class="fg">
+      <label>Texto libre → genera líneas automáticamente</label>
+      <textarea id="pedTextoLibre" rows="4"
+        placeholder="V-7 CAJA NEGRA ADISCO = 10+10&#10;V-7 CAJA NEGRA ADISCO 1 VERDE&#10;V-88 GRANEL LUMAR 2 AZULES"
+        style="font-family:monospace;font-size:13px;resize:vertical;"
+        oninput="parsearTextoLibre()"></textarea>
+      <div style="font-size:11px;color:#aaa;margin-top:3px;">
+        REF CAJA CLIENTE = rojo+natural &nbsp;|&nbsp; REF CAJA CLIENTE N COLOR
+      </div>
+    </div>
+
     <!-- LÍNEAS -->
     <div style="font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Líneas del pedido</div>
     <table class="lineas-tabla">
       <thead><tr>
         <th>Referencia</th>
+        <th>Caja</th>
+        <th>Cliente</th>
         <th>Color</th>
-        <th>Cant. rojo</th>
-        <th>Cant. nat.</th>
+        <th>Palets</th>
         <th></th>
       </tr></thead>
       <tbody id="lineasBody"></tbody>
@@ -174,9 +187,10 @@ async function cargarPedidos(){
       const lineasHTML = (p.lineas||[]).map((l,i)=>`
         <div class="linea-pedido">
           <span class="linea-ref">${l.ref}</span>
-          <span style="font-size:12px;color:#555">${l.color||''}</span>
-          <span style="font-size:12px;color:#e74c3c">${l.rojo?l.rojo+'R':''}</span>
-          <span style="font-size:12px;color:#555">${l.natural?l.natural+'N':''}</span>
+          ${l.caja?`<span style="font-size:11px;background:#e8ecf1;padding:1px 6px;border-radius:5px">${l.caja}</span>`:''}
+          ${l.cliente?`<span style="font-size:12px;color:#555">${l.cliente}</span>`:''}
+          ${l.color?`<span style="font-size:11px;font-weight:700;color:${COLOR_BADGE[l.color]||'#555'}">${l.color}</span>`:''}
+          ${l.palets?`<span style="font-size:12px;font-weight:600">${l.palets} palets</span>`:''}
           ${l.maquina?`<span class="linea-maq">${l.maquina}</span>`:`<span class="linea-maq sin">Sin máquina</span>`}
         </div>`).join('');
       return `<div class="pedido-card ${p.estado||'pendiente'}">
@@ -194,6 +208,7 @@ async function cargarPedidos(){
             <button class="btn-sm" style="background:#e8f7ed;color:#27ae60;" onclick="abrirProduccion('${p.id}')">🏭 → Producción</button>
             ${p.estado!=='finalizado'?`<button class="btn-sm" style="background:#d1f5e0;color:#1a7a40;" onclick="marcarFinalizado('${p.id}')">✅ Finalizar</button>`:''}
             <button class="btn-sm" style="background:#f39c12;color:#fff;" onclick="imprimirPedido('${p.id}')">🖨️ Imprimir</button>
+            <button class="btn-sm" style="background:#fdecea;color:#e74c3c;" onclick="duplicarPedido('${p.id}')">📋 Duplicar</button>
             <button class="btn-sm" style="background:#fdecea;color:#e74c3c;" onclick="eliminarPedido('${p.id}')">🗑️ Eliminar</button>
           </div>
         </div>
@@ -212,6 +227,7 @@ function togglePedido(id){
 // ══════════════════════════════
 function abrirNuevo(){
   pedidoActual=null; lineas=[];
+  const tl=document.getElementById('pedTextoLibre'); if(tl) tl.value='';
   document.getElementById('pedidoId').value='';
   document.getElementById('modalTitulo').textContent='＋ Nuevo Pedido';
   document.getElementById('pedCliente').value='';
@@ -235,24 +251,66 @@ async function abrirEditar(id){
 }
 
 function addLinea(){
-  lineas.push({ref:'',color:'ROJO',rojo:'',natural:''});
+  lineas.push({ref:'',caja:'',cliente:'',color:'ROJO',palets:0,maquina:''});
   renderLineas();
 }
 
+const COLOR_BADGE={'ROJO':'#e74c3c','NATURAL':'#7f8c8d','VERDE':'#27ae60','AZUL':'#2980b9','AMARILLO':'#f39c12','VIOLETA':'#8e44ad'};
+const COLORES=['ROJO','NATURAL','AMARILLO','VERDE','AZUL','VIOLETA'];
+
 function renderLineas(){
-  const COLORES=['ROJO','NATURAL','AMARILLO','VERDE','AZUL','VIOLETA'];
   document.getElementById('lineasBody').innerHTML = lineas.map((l,i)=>`
     <tr>
-      <td><input type="text" value="${l.ref||''}" onchange="lineas[${i}].ref=this.value.toUpperCase()" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:80px;text-transform:uppercase"></td>
+      <td><input type="text" value="${l.ref||''}" onchange="lineas[${i}].ref=this.value.toUpperCase()" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:70px;text-transform:uppercase"></td>
+      <td><input type="text" value="${l.caja||''}" onchange="lineas[${i}].caja=this.value.toUpperCase()" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:90px;text-transform:uppercase" placeholder="CAJA NEGRA"></td>
+      <td><input type="text" value="${l.cliente||''}" onchange="lineas[${i}].cliente=this.value.toUpperCase()" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:80px;text-transform:uppercase" placeholder="ADISCO"></td>
       <td>
-        <select onchange="lineas[${i}].color=this.value" style="border:1px solid #dde3ee;border-radius:6px;padding:5px;font-size:13px;">
+        <select onchange="lineas[${i}].color=this.value" style="border:1px solid #dde3ee;border-radius:6px;padding:5px;font-size:13px;background:${COLOR_BADGE[l.color]||'#fff'};color:${COLOR_BADGE[l.color]?'#fff':'#000'}">
           ${COLORES.map(c=>`<option value="${c}" ${l.color===c?'selected':''}>${c}</option>`).join('')}
         </select>
       </td>
-      <td><input type="text" value="${l.rojo||''}" placeholder="rojo" onchange="lineas[${i}].rojo=this.value" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:60px;"></td>
-      <td><input type="text" value="${l.natural||''}" placeholder="nat." onchange="lineas[${i}].natural=this.value" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:60px;"></td>
+      <td><input type="number" value="${l.palets||''}" placeholder="0" onchange="lineas[${i}].palets=parseInt(this.value)||0" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:55px;"></td>
       <td><button onclick="lineas.splice(${i},1);renderLineas();" style="background:none;border:none;color:#e74c3c;font-size:16px;cursor:pointer;">×</button></td>
     </tr>`).join('');
+}
+
+// ── PARSER TEXTO LIBRE ──
+function parsearTextoLibre(){
+  const texto = document.getElementById('pedTextoLibre').value;
+  lineas = [];
+  const COLORES_MAP = {'ROJO':'ROJO','ROJOS':'ROJO','NATURAL':'NATURAL','NATURALES':'NATURAL','NT':'NATURAL',
+    'VERDE':'VERDE','VERDES':'VERDE','AZUL':'AZUL','AZULES':'AZUL',
+    'AMARILLO':'AMARILLO','AMARILLOS':'AMARILLO','VIOLETA':'VIOLETA','VIOLETAS':'VIOLETA'};
+
+  texto.split('\n').map(l=>l.trim()).filter(l=>l).forEach(linea=>{
+    const ref = linea.split(/\s+/)[0].toUpperCase();
+    const matchRN = linea.match(/=\s*(\d+)\s*\+\s*(\d+)/);
+    const matchColor = linea.match(/(\d+)\s+([A-ZÁÉÍÓÚÑ]+)\s*$/i);
+
+    let resto = linea.replace(/^\S+\s+/, '');
+    let caja='', cliente='';
+
+    if(matchRN){
+      resto = resto.replace(/=\s*\d+\s*\+\s*\d+/, '').trim();
+      const p = resto.split(/\s+/).filter(Boolean);
+      if(p.length>=2){ cliente=p[p.length-1]; caja=p.slice(0,-1).join(' '); }
+      else if(p.length===1){ caja=p[0]; }
+      const rojo=parseInt(matchRN[1])||0, natural=parseInt(matchRN[2])||0;
+      if(rojo>0)    lineas.push({ref, caja:caja.toUpperCase(), cliente:cliente.toUpperCase(), color:'ROJO',    palets:rojo,    maquina:''});
+      if(natural>0) lineas.push({ref, caja:caja.toUpperCase(), cliente:cliente.toUpperCase(), color:'NATURAL', palets:natural, maquina:''});
+    } else if(matchColor){
+      const color = COLORES_MAP[matchColor[2].toUpperCase()]||matchColor[2].toUpperCase();
+      const palets = parseInt(matchColor[1])||1;
+      resto = resto.replace(/(\d+)\s+[A-ZÁÉÍÓÚÑ]+\s*$/i,'').trim();
+      const p = resto.split(/\s+/).filter(Boolean);
+      if(p.length>=2){ cliente=p[p.length-1]; caja=p.slice(0,-1).join(' '); }
+      else if(p.length===1){ caja=p[0]; }
+      lineas.push({ref, caja:caja.toUpperCase(), cliente:cliente.toUpperCase(), color, palets, maquina:''});
+    } else {
+      lineas.push({ref, caja:'', cliente:'', color:'ROJO', palets:0, maquina:''});
+    }
+  });
+  renderLineas();
 }
 
 async function guardarPedido(){
