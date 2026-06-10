@@ -182,23 +182,24 @@ async function cargarPedidos(){
 
       const estado = p.estado||'pendiente';
       const badgeText = estado==='finalizado'?'✅ Finalizado':estado==='en_produccion'?'🏭 En producción':'⏳ Pendiente';
-      const btnFinalizar = estado!=='finalizado' ? '<button class="btn-sm" style="background:#d1f5e0;color:#1a7a40;" onclick="marcarFinalizado(''+p.id+'')">✅ Finalizar</button>' : '';
-      const btnDuplicar = '<button class="btn-sm" style="background:#f4f7fa;color:#1e2a44;" onclick="duplicarPedido(''+p.id+'')">📋 Duplicar</button>';
+      const id = p.id;
+      const btnFinalizar = estado!=='finalizado' ? '<button class="btn-sm" style="background:#d1f5e0;color:#1a7a40;" onclick="marcarFinalizado(\'' + id + '\')">✅ Finalizar</button>' : '';
+      const btnDuplicar = '<button class="btn-sm" style="background:#f4f7fa;color:#1e2a44;" onclick="duplicarPedido(\'' + id + '\')">📋 Duplicar</button>';
 
-      return '<div class="pedido-card '+estado+'">'
-        +'<div class="pedido-header" onclick="toggleBody('body-'+p.id+'')">'
-        +'<div><div class="pedido-cliente">'+p.cliente+'</div>'
-        +'<div class="pedido-fecha">'+fechaES(p.fecha)+(p.obs?' · '+p.obs:'')+'</div></div>'
-        +'<span class="badge '+estado+'">'+badgeText+'</span></div>'
-        +'<div class="pedido-body" id="body-'+p.id+'" style="display:none;">'
-        +'<div style="margin:8px 0;">'+lineasHTML+'</div>'
-        +'<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">'
-        +'<button class="btn-sm" style="background:#e8f4fd;color:#00a9e0;" onclick="abrirEditar(''+p.id+'')">✏️ Editar</button>'
-        +btnFinalizar
-        +btnDuplicar
-        +'<button class="btn-sm" style="background:#f39c12;color:#fff;" onclick="imprimirPedido(''+p.id+'')">🖨️ Imprimir</button>'
-        +'<button class="btn-sm btn-red" onclick="eliminarPedido(''+p.id+'')">🗑️ Eliminar</button>'
-        +'</div></div></div>';
+      return '<div class="pedido-card ' + estado + '">'
+        + '<div class="pedido-header" onclick="toggleBody(\'body-' + id + '\')">'
+        + '<div><div class="pedido-cliente">' + p.cliente + '</div>'
+        + '<div class="pedido-fecha">' + fechaES(p.fecha) + (p.obs?' · '+p.obs:'') + '</div></div>'
+        + '<span class="badge ' + estado + '">' + badgeText + '</span></div>'
+        + '<div class="pedido-body" id="body-' + id + '" style="display:none;">'
+        + '<div style="margin:8px 0;">' + lineasHTML + '</div>'
+        + '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">'
+        + '<button class="btn-sm" style="background:#e8f4fd;color:#00a9e0;" onclick="abrirEditar(\'' + id + '\')">✏️ Editar</button>'
+        + btnFinalizar
+        + btnDuplicar
+        + '<button class="btn-sm" style="background:#f39c12;color:#fff;" onclick="imprimirPedido(\'' + id + '\')">🖨️ Imprimir</button>'
+        + '<button class="btn-sm btn-red" onclick="eliminarPedido(\'' + id + '\')">🗑️ Eliminar</button>'
+        + '</div></div></div>';
     }).join('');
   }catch(e){ cont.innerHTML='<div class="empty-state"><div class="icon">❌</div><p>Error: '+e.message+'</p></div>'; }
 }
