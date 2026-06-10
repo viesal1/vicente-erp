@@ -86,10 +86,8 @@ async function imprimirEt(){
     const imgData = canvas.toDataURL('image/jpeg',0.95);
     pdf.addImage(imgData,'JPEG',0,0,210,297);
     document.body.removeChild(wrapper);
-    const blob = pdf.output('blob');
-    const url = URL.createObjectURL(blob);
-    const win = window.open(url,'_blank');
-    if(win) setTimeout(()=>win.print(),1000);
+    // Descargar directamente en móvil
+    pdf.save('etiquetas-ceraplast.pdf');
   }catch(e){
     alert('Error: '+e.message);
   }finally{
