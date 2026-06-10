@@ -394,16 +394,18 @@ async function confirmarProduccion(){
     });
 
     // 2. Añadir a la orden de producción actual
-    const prodSnap = await colProd.orderBy('createdAt','desc').limit(1).get();
+    const prodSnap = await colProd.get();
     let prodId = null, prodData = null;
+    const MAQUINAS=['M1','M2','M3','M4','M5','M6','M7'];
     if(!prodSnap.empty){
-      prodId = prodSnap.docs[0].id;
-      prodData = prodSnap.docs[0].data();
+      const docs = prodSnap.docs.sort((a,b)=>(b.data().createdAt||'').localeCompare(a.data().createdAt||''));
+      prodId = docs[0].id;
+      prodData = docs[0].data();
     } else {
       prodData = { fecha: new Date().toISOString().split('T')[0], maquinas:{}, createdAt: new Date().toISOString() };
-      const MAQUINAS=['M1','M2','M3','M4','M5','M6','M7'];
-      MAQUINAS.forEach(m=>{ prodData.maquinas[m]={lineas:[],nota:''}; });
     }
+    if(!prodData.maquinas) prodData.maquinas={};
+    MAQUINAS.forEach(m=>{ if(!prodData.maquinas[m]) prodData.maquinas[m]={lineas:[],nota:''}; });
 
     // Cargar referencias para obtener uds/caja y cajas/palet
     const refsSnap = await db.collection('refs_ceraplast').get();
