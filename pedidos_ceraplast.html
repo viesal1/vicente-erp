@@ -178,12 +178,15 @@ async function cargarPedidos(){
   cont.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div>';
   const filtro = document.getElementById('filtroEstado').value;
   try{
-    let q = colPedidos.orderBy('fecha','desc');
-    if(filtro) q = colPedidos.where('estado','==',filtro).orderBy('fecha','desc');
-    const snap = await q.get();
+    const snap = await colPedidos.get();
     if(snap.empty){ cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin pedidos.</p></div>'; return; }
-    cont.innerHTML = snap.docs.map(d=>{
-      const p = {id:d.id,...d.data()};
+    let docs = snap.docs.map(d=>({id:d.id,...d.data()}));
+    // Ordenar por createdAt más nuevo primero
+    docs.sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+    // Filtrar por estado si hay filtro
+    if(filtro) docs = docs.filter(d=>d.estado===filtro);
+    if(!docs.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin pedidos.</p></div>'; return; }
+    cont.innerHTML = docs.map(p=>{
       const lineasHTML = (p.lineas||[]).map((l,i)=>`
         <div class="linea-pedido">
           <span class="linea-ref">${l.ref}</span>
