@@ -22,7 +22,7 @@
     .pedido-card{background:#fff;border-radius:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;border-left:4px solid #dde3ee;}
     .pedido-card.pendiente{border-left-color:#f39c12;}
     .pedido-card.en_produccion{border-left-color:#00a9e0;}
-    .pedido-card.finalizado{border-left-color:#27ae60;opacity:.7;}
+    .pedido-card.finalizado{border-left-color:#27ae60;opacity:.75;}
     .pedido-header{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
     .pedido-cliente{font-weight:700;color:#1e2a44;font-size:1em;}
     .pedido-fecha{font-size:12px;color:#aaa;}
@@ -31,38 +31,38 @@
     .badge.en_produccion{background:#d1ecf1;color:#0c5460;}
     .badge.finalizado{background:#d1f5e0;color:#1a7a40;}
     .pedido-body{padding:0 18px 14px;border-top:1px solid #f4f7fa;}
-    .linea-pedido{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f9fafc;flex-wrap:wrap;}
+    .linea-pedido{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f9fafc;flex-wrap:wrap;font-size:13px;}
     .linea-pedido:last-child{border-bottom:none;}
-    .linea-ref{font-weight:700;color:#1e2a44;min-width:60px;}
+    .linea-ref{font-weight:700;color:#1e2a44;}
     .linea-maq{background:#1e2a44;color:#fff;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;}
     .linea-maq.sin{background:#f4f7fa;color:#aaa;}
     .btn-sm{padding:5px 10px;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;}
     /* Modal */
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;justify-content:center;align-items:flex-start;padding-top:40px;overflow-y:auto;}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;justify-content:center;align-items:flex-start;padding-top:30px;overflow-y:auto;}
     .modal-overlay.activo{display:flex;}
-    .modal-box{background:#fff;border-radius:16px;padding:22px;width:92%;max-width:600px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto;margin-bottom:20px;}
+    .modal-box{background:#fff;border-radius:16px;padding:22px;width:92%;max-width:650px;box-shadow:0 20px 60px rgba(0,0,0,.3);margin-bottom:20px;}
     .modal-box h3{font-size:1.1em;color:#1e2a44;margin-bottom:14px;}
     .fg{display:flex;flex-direction:column;margin-bottom:10px;}
     .fg label{font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
     .fg input,.fg select,.fg textarea{padding:10px 12px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;font-family:inherit;}
-    .fg input:focus,.fg select:focus{outline:none;border-color:#00a9e0;}
+    .fg input:focus,.fg textarea:focus{outline:none;border-color:#00a9e0;}
     .modal-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
     .modal-actions button{flex:1;min-width:100px;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;}
     .btn-ok{background:#00a9e0;color:#fff;}
     .btn-green{background:#27ae60;color:#fff;}
-    .btn-orange{background:#f39c12;color:#fff;}
-    .btn-red{background:#fdecea;color:#e74c3c;}
     .btn-cancel{background:#f4f7fa;color:#1e2a44;}
-    /* Tabla líneas */
-    .lineas-tabla{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px;}
-    .lineas-tabla th{background:#f4f7fa;padding:6px 8px;font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;border-bottom:2px solid #dde3ee;}
-    .lineas-tabla td{padding:6px 8px;border-bottom:1px solid #f4f7fa;vertical-align:middle;}
-    /* Maquinas display */
-    .maq-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
-    @media(max-width:400px){.maq-grid{grid-template-columns:repeat(3,1fr);}}
-    .maq-btn{padding:10px;border:2px solid #dde3ee;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;background:#fff;color:#1e2a44;text-align:center;transition:all .15s;}
+    .btn-red{background:#fdecea;color:#e74c3c;}
+    /* Líneas generadas */
+    .linea-gen{background:#f9fafc;border-radius:8px;padding:10px 14px;margin-bottom:8px;border:1px solid #dde3ee;}
+    .linea-gen-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
+    .linea-gen-ref{font-weight:700;color:#1e2a44;font-size:14px;}
+    .linea-gen-caja{background:#e8ecf1;color:#1e2a44;padding:2px 8px;border-radius:6px;font-size:12px;}
+    .linea-gen-cliente{font-size:13px;color:#555;}
+    .linea-gen-cant{font-size:13px;font-weight:600;}
+    /* Máquinas */
+    .maq-grid{display:flex;gap:6px;flex-wrap:wrap;}
+    .maq-btn{padding:7px 12px;border:2px solid #dde3ee;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:#fff;color:#1e2a44;transition:all .15s;}
     .maq-btn.sel{background:#1e2a44;color:#fff;border-color:#1e2a44;}
-    .maq-btn:hover{border-color:#00a9e0;}
     /* Print */
     #print-area{display:none;}
     @media print{
@@ -85,7 +85,7 @@
 <div id="print-area"></div>
 <div class="container">
   <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
-    <button onclick="abrirNuevo()" style="background:#00a9e0;color:#fff;border:none;padding:12px 20px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 3px 10px rgba(0,169,224,.3);">＋ Nuevo Pedido</button>
+    <button onclick="abrirNuevo()" style="background:#00a9e0;color:#fff;border:none;padding:12px 20px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">＋ Nuevo Pedido</button>
     <select id="filtroEstado" onchange="cargarPedidos()" style="padding:10px 14px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;background:#fff;">
       <option value="">Todos</option>
       <option value="pendiente">Pendientes</option>
@@ -98,46 +98,46 @@
 
 <!-- MODAL PEDIDO -->
 <div class="modal-overlay" id="modalPedido">
-  <div class="modal-box" style="max-width:700px;">
+  <div class="modal-box">
     <h3 id="modalTitulo">＋ Nuevo Pedido</h3>
     <input type="hidden" id="pedidoId">
     <div style="display:flex;gap:8px;">
-      <div class="fg" style="flex:2"><label>Cliente</label><input type="text" id="pedCliente" placeholder="ej: ADISCO, LUMAR…" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div>
-      <div class="fg" style="flex:1"><label>Fecha</label><input type="date" id="pedFecha"></div>
+      <div class="fg" style="flex:2">
+        <label>Cliente</label>
+        <input type="text" id="pedCliente" placeholder="ej: ADISCO, LUMAR…" oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div class="fg" style="flex:1">
+        <label>Fecha</label>
+        <input type="date" id="pedFecha">
+      </div>
     </div>
-    <div class="fg"><label>Observaciones</label><textarea id="pedObs" rows="2" style="resize:vertical;padding:10px 12px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;"></textarea></div>
-
-    <!-- TEXTO LIBRE -->
     <div class="fg">
-      <label>Introduce el pedido en texto libre</label>
-      <textarea id="pedTextoLibre" rows="5" placeholder="V-7 CAJA NEGRA ADISCO = 10+5&#10;V-88 GRANEL LUMAR 2 AZULES&#10;165 L-7 MEDITERRANEA = 3+0"
-        style="resize:vertical;padding:10px 12px;border:1px solid #dde3ee;border-radius:10px;font-size:14px;font-family:monospace;"
-        oninput="parsearLineas()"></textarea>
+      <label>Observaciones</label>
+      <input type="text" id="pedObs" placeholder="opcional">
+    </div>
+    <div class="fg">
+      <label>Escribe el pedido — se generan las líneas automáticamente</label>
+      <textarea id="pedTexto" rows="5"
+        placeholder="V-7 CAJA NEGRA ADISCO = 10+5&#10;V-88 GRANEL LUMAR 2 AZULES&#10;165 L-7 MEDITERRANEA = 3+0"
+        style="font-family:monospace;font-size:14px;resize:vertical;"
+        oninput="parsear()"></textarea>
+      <div style="font-size:11px;color:#aaa;margin-top:4px;">
+        Formato: REF CAJA CLIENTE = rojo+natural &nbsp;|&nbsp; REF CAJA CLIENTE X COLOR
+      </div>
     </div>
 
-    <!-- LÍNEAS PARSEADAS -->
-    <div style="font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">
-      Líneas generadas <span id="lineasCount" style="color:#00a9e0;font-size:12px;"></span>
+    <!-- LÍNEAS GENERADAS CON SELECTOR DE MÁQUINA -->
+    <div id="lineasWrap" style="display:none;">
+      <div style="font-size:11px;font-weight:700;color:#7f8c8d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">
+        Líneas generadas — asigna máquina para enviar a producción
+      </div>
+      <div id="lineasGen"></div>
     </div>
-    <div id="lineasPreview" style="margin-bottom:12px;"></div>
 
     <div class="modal-actions">
-      <button class="btn-ok" onclick="guardarPedido()">✅ Guardar</button>
-      <button style="flex:1;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:#e8f4fd;color:#00a9e0;" onclick="consultarStock()">📊 Ver stock</button>
+      <button class="btn-ok" onclick="guardarPedido()">💾 Guardar pedido</button>
+      <button class="btn-green" onclick="guardarYProduccion()">🏭 Guardar + Producción</button>
       <button class="btn-cancel" onclick="cerrarModal('modalPedido')">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL ENVIAR A PRODUCCIÓN -->
-<div class="modal-overlay" id="modalProduccion">
-  <div class="modal-box">
-    <h3>📋 Enviar a Producción</h3>
-    <p style="font-size:13px;color:#7f8c8d;margin-bottom:14px;">Asigna cada línea a una máquina. Puedes dejar líneas sin asignar para más tarde.</p>
-    <div id="asignacionContainer"></div>
-    <div class="modal-actions">
-      <button class="btn-green" onclick="confirmarProduccion()">✅ Enviar a Producción</button>
-      <button class="btn-cancel" onclick="cerrarModal('modalProduccion')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -146,38 +146,15 @@
 
 <script>
 let db, colPedidos, colProd;
-let pedidoActual = null;
 let lineas = [];
-let asignaciones = {}; // {lineaIdx: maquina}
 
-firebase.auth().onAuthStateChanged(async u=>{
+firebase.auth().onAuthStateChanged(u=>{
   if(!u){ location.href='index.html'; return; }
   db = firebase.firestore();
   colPedidos = db.collection('pedidos_ceraplast');
   colProd = db.collection('produccion_ceraplast2');
-  await inicializarCajasEtiquetas();
   cargarPedidos();
 });
-
-async function inicializarCajasEtiquetas(){
-  // Crear tipos de caja y etiqueta por defecto si no existen
-  const CAJAS_DEFAULT = ['CAJA NEGRA','CAJA AZUL','GRANEL LUMAR','L-7','L-6','L-4','V-11','V-6','V-6 MOLLA','V-6 CS','ELEGUA','TP'];
-  const ET_DEFAULT = ['L-6','L-7','ELEGUA','V-6 MOLLA'];
-  try{
-    const cajasSnap = await db.collection('almacen_ceraplast_cajas').get();
-    if(cajasSnap.empty){
-      for(const nombre of CAJAS_DEFAULT){
-        await db.collection('almacen_ceraplast_cajas').add({nombre,stock:0,createdAt:new Date().toISOString()});
-      }
-    }
-    const etSnap = await db.collection('almacen_ceraplast_etiquetas').get();
-    if(etSnap.empty){
-      for(const nombre of ET_DEFAULT){
-        await db.collection('almacen_ceraplast_etiquetas').add({nombre,stock:0,createdAt:new Date().toISOString()});
-      }
-    }
-  }catch(e){ console.log('Error inicializando cajas/etiquetas',e); }
-}
 
 // ══════════════════════════════
 // CARGAR PEDIDOS
@@ -187,121 +164,163 @@ async function cargarPedidos(){
   cont.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div>';
   const filtro = document.getElementById('filtroEstado').value;
   try{
-    let q = colPedidos.orderBy('fecha','desc');
-    if(filtro) q = colPedidos.where('estado','==',filtro).orderBy('fecha','desc');
-    const snap = await q.get();
-    if(snap.empty){ cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin pedidos.</p></div>'; return; }
-    cont.innerHTML = snap.docs.map(d=>{
-      const p = {id:d.id,...d.data()};
-      const lineasHTML = (p.lineas||[]).map((l,i)=>`
+    const snap = await colPedidos.orderBy('createdAt','desc').get();
+    let docs = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(filtro) docs = docs.filter(d=>d.estado===filtro);
+    if(!docs.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin pedidos.</p></div>'; return; }
+    cont.innerHTML = docs.map(p=>{
+      const lineasHTML = (p.lineas||[]).map(l=>`
         <div class="linea-pedido">
           <span class="linea-ref">${l.ref}</span>
-          <span style="font-size:12px;color:#555">${l.color||''}</span>
-          <span style="font-size:12px;color:#e74c3c">${l.rojo?l.rojo+'R':''}</span>
-          <span style="font-size:12px;color:#555">${l.natural?l.natural+'N':''}</span>
+          ${l.caja?`<span style="background:#e8ecf1;padding:1px 6px;border-radius:5px;font-size:11px">${l.caja}</span>`:''}
+          ${l.cliente?`<span style="color:#555">${l.cliente}</span>`:''}
+          ${l.rojo||l.natural?`<span style="color:#e74c3c;font-weight:600">${l.rojo||0}R+${l.natural||0}N</span>`:''}
+          ${l.cantidadColor&&l.color?`<span style="color:#8e44ad;font-weight:600">${l.cantidadColor} ${l.color}</span>`:''}
           ${l.maquina?`<span class="linea-maq">${l.maquina}</span>`:`<span class="linea-maq sin">Sin máquina</span>`}
         </div>`).join('');
       return `<div class="pedido-card ${p.estado||'pendiente'}">
-        <div class="pedido-header" onclick="togglePedido('body-${p.id}')">
+        <div class="pedido-header" onclick="toggleBody('body-${p.id}')">
           <div>
             <div class="pedido-cliente">${p.cliente}</div>
             <div class="pedido-fecha">${fechaES(p.fecha)} ${p.obs?'· '+p.obs:''}</div>
           </div>
-          <span class="badge ${p.estado||'pendiente'}">${p.estado==='finalizado'?'✅ Finalizado':p.estado==='en_produccion'?'🏭 En producción':'⏳ Pendiente'}</span>
+          <span class="badge ${p.estado||'pendiente'}">${
+            p.estado==='finalizado'?'✅ Finalizado':
+            p.estado==='en_produccion'?'🏭 En producción':'⏳ Pendiente'
+          }</span>
         </div>
         <div class="pedido-body" id="body-${p.id}" style="display:none;">
-          ${lineasHTML}
-          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+          <div style="margin:8px 0;">${lineasHTML}</div>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
             <button class="btn-sm" style="background:#e8f4fd;color:#00a9e0;" onclick="abrirEditar('${p.id}')">✏️ Editar</button>
-            <button class="btn-sm" style="background:#e8f7ed;color:#27ae60;" onclick="abrirProduccion('${p.id}')">🏭 → Producción</button>
             ${p.estado!=='finalizado'?`<button class="btn-sm" style="background:#d1f5e0;color:#1a7a40;" onclick="marcarFinalizado('${p.id}')">✅ Finalizar</button>`:''}
             <button class="btn-sm" style="background:#f39c12;color:#fff;" onclick="imprimirPedido('${p.id}')">🖨️ Imprimir</button>
-            <button class="btn-sm" style="background:#fdecea;color:#e74c3c;" onclick="eliminarPedido('${p.id}')">🗑️ Eliminar</button>
+            <button class="btn-sm btn-red" onclick="eliminarPedido('${p.id}')">🗑️ Eliminar</button>
           </div>
         </div>
       </div>`;
     }).join('');
-  }catch(e){ cont.innerHTML='<div class="empty-state"><div class="icon">❌</div><p>Error: '+e.message+'</p></div>'; }
+  }catch(e){ cont.innerHTML='<div class="empty-state"><div class="icon">❌</div><p>Error cargando.</p></div>'; }
 }
 
-function togglePedido(id){
+function toggleBody(id){
   const el=document.getElementById(id);
   if(el) el.style.display=el.style.display==='none'?'':'none';
 }
 
 // ══════════════════════════════
-// NUEVO / EDITAR PEDIDO
+// NUEVO / EDITAR
 // ══════════════════════════════
 function abrirNuevo(){
-  pedidoActual=null; lineas=[];
+  lineas=[];
   document.getElementById('pedidoId').value='';
   document.getElementById('modalTitulo').textContent='＋ Nuevo Pedido';
   document.getElementById('pedCliente').value='';
   document.getElementById('pedFecha').value=new Date().toISOString().split('T')[0];
   document.getElementById('pedObs').value='';
-  document.getElementById('pedTextoLibre').value='';
-  document.getElementById('lineasPreview').innerHTML='';
-  document.getElementById('lineasCount').textContent='';
+  document.getElementById('pedTexto').value='';
+  document.getElementById('lineasWrap').style.display='none';
+  document.getElementById('lineasGen').innerHTML='';
   document.getElementById('modalPedido').classList.add('activo');
 }
 
 async function abrirEditar(id){
   const doc = await colPedidos.doc(id).get();
   const p = {id:doc.id,...doc.data()};
-  pedidoActual=id; lineas=[...(p.lineas||[])];
+  lineas = [...(p.lineas||[])];
   document.getElementById('pedidoId').value=id;
   document.getElementById('modalTitulo').textContent='✏️ Editar Pedido';
   document.getElementById('pedCliente').value=p.cliente||'';
   document.getElementById('pedFecha').value=p.fecha||'';
   document.getElementById('pedObs').value=p.obs||'';
-  // Reconstruir texto libre desde las líneas guardadas
-  const textoReconstruido = lineas.map(l=>{
-    let txt = l.ref;
-    if(l.caja) txt += ' '+l.caja;
-    if(l.cliente) txt += ' '+l.cliente;
-    if(l.rojo!==undefined && l.natural!==undefined && (l.rojo||l.natural)) txt += ' = '+l.rojo+'+'+l.natural;
-    if(l.cantidadColor && l.color) txt += ' '+l.cantidadColor+' '+l.color;
-    return txt;
+  // Reconstruir texto desde líneas
+  const texto = lineas.map(l=>{
+    let t=l.ref;
+    if(l.caja) t+=' '+l.caja;
+    if(l.cliente) t+=' '+l.cliente;
+    if((l.rojo!==undefined||l.natural!==undefined)&&(l.rojo||l.natural)) t+=' = '+(l.rojo||0)+'+'+(l.natural||0);
+    if(l.cantidadColor&&l.color) t+=' '+l.cantidadColor+' '+l.color;
+    return t;
   }).join('\n');
-  document.getElementById('pedTextoLibre').value = textoReconstruido;
-  renderLineasPreview();
+  document.getElementById('pedTexto').value=texto;
+  renderLineas();
   document.getElementById('modalPedido').classList.add('activo');
 }
 
-function addLinea(){
-  lineas.push({ref:'',color:'ROJO',rojo:'',natural:''});
+// ══════════════════════════════
+// PARSER
+// ══════════════════════════════
+function parsear(){
+  const texto = document.getElementById('pedTexto').value;
+  lineas = [];
+  texto.split('\n').map(l=>l.trim()).filter(l=>l).forEach(linea=>{
+    // Formato 1: REF CAJA CLIENTE = R+N
+    const m1 = linea.match(/^(\S+)\s+(.*?)\s+(\S+)\s*=\s*(\d+)\s*\+\s*(\d+)$/);
+    // Formato 2: REF CAJA CLIENTE X COLORES (ej: 2 AZULES)
+    const m2 = linea.match(/^(\S+)\s+(.*?)\s+(\S+)\s+(\d+)\s+(\w+)$/);
+    // Formato 3: REF CAJA = R+N (sin cliente)
+    const m3 = linea.match(/^(\S+)\s+(.*?)\s*=\s*(\d+)\s*\+\s*(\d+)$/);
+
+    if(m1){
+      lineas.push({ref:m1[1].toUpperCase(), caja:m1[2].toUpperCase(), cliente:m1[3].toUpperCase(), rojo:m1[4], natural:m1[5], color:'', cantidadColor:'', maquina:''});
+    } else if(m2){
+      let color = m2[5].toUpperCase().replace(/S$/, ''); // quitar plural
+      lineas.push({ref:m2[1].toUpperCase(), caja:m2[2].toUpperCase(), cliente:m2[3].toUpperCase(), rojo:'', natural:'', color, cantidadColor:m2[4], maquina:''});
+    } else if(m3){
+      lineas.push({ref:m3[1].toUpperCase(), caja:m3[2].toUpperCase(), cliente:'', rojo:m3[3], natural:m3[4], color:'', cantidadColor:'', maquina:''});
+    } else {
+      // Línea libre — guardar tal cual como nota
+      lineas.push({ref:linea, caja:'', cliente:'', rojo:'', natural:'', color:'', cantidadColor:'', maquina:''});
+    }
+  });
   renderLineas();
 }
 
+const MAQUINAS=['M1','M2','M3','M4','M5','M6','M7'];
+
 function renderLineas(){
-  const COLORES=['ROJO','NATURAL','AMARILLO','VERDE','AZUL','VIOLETA'];
-  document.getElementById('lineasBody').innerHTML = lineas.map((l,i)=>`
-    <tr>
-      <td><input type="text" value="${l.ref||''}" onchange="lineas[${i}].ref=this.value.toUpperCase()" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:80px;text-transform:uppercase"></td>
-      <td>
-        <select onchange="lineas[${i}].color=this.value" style="border:1px solid #dde3ee;border-radius:6px;padding:5px;font-size:13px;">
-          ${COLORES.map(c=>`<option value="${c}" ${l.color===c?'selected':''}>${c}</option>`).join('')}
-        </select>
-      </td>
-      <td><input type="text" value="${l.rojo||''}" placeholder="rojo" onchange="lineas[${i}].rojo=this.value" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:60px;"></td>
-      <td><input type="text" value="${l.natural||''}" placeholder="nat." onchange="lineas[${i}].natural=this.value" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:60px;"></td>
-      <td><button onclick="lineas.splice(${i},1);renderLineas();" style="background:none;border:none;color:#e74c3c;font-size:16px;cursor:pointer;">×</button></td>
-    </tr>`).join('');
+  const wrap = document.getElementById('lineasWrap');
+  const cont = document.getElementById('lineasGen');
+  if(!lineas.length){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  cont.innerHTML = lineas.map((l,i)=>{
+    const cantStr = l.rojo||l.natural ? `${l.rojo||0}R + ${l.natural||0}N` :
+                    l.cantidadColor ? `${l.cantidadColor} ${l.color}` : '';
+    return `<div class="linea-gen">
+      <div class="linea-gen-top">
+        <span class="linea-gen-ref">${l.ref}</span>
+        ${l.caja?`<span class="linea-gen-caja">${l.caja}</span>`:''}
+        ${l.cliente?`<span class="linea-gen-cliente">${l.cliente}</span>`:''}
+        ${cantStr?`<span class="linea-gen-cant">${cantStr}</span>`:''}
+        <button onclick="lineas.splice(${i},1);renderLineas();" style="background:none;border:none;color:#e74c3c;font-size:16px;cursor:pointer;margin-left:auto;">×</button>
+      </div>
+      <div class="maq-grid">
+        ${MAQUINAS.map(m=>`<button class="maq-btn ${l.maquina===m?'sel':''}"
+          onclick="lineas[${i}].maquina='${m}';renderLineas();">${m}</button>`).join('')}
+        <button class="maq-btn ${!l.maquina?'sel':''}"
+          onclick="lineas[${i}].maquina='';renderLineas();" style="color:#aaa;">—</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
+// ══════════════════════════════
+// GUARDAR
+// ══════════════════════════════
 async function guardarPedido(){
   const cliente=document.getElementById('pedCliente').value.trim();
-  if(!cliente){ toast('❌ El cliente es obligatorio','err'); return; }
+  if(!cliente){ toast('❌ Cliente obligatorio','err'); return; }
+  const id=document.getElementById('pedidoId').value;
   const datos={
     cliente, fecha:document.getElementById('pedFecha').value,
     obs:document.getElementById('pedObs').value.trim(),
     lineas, updatedAt:new Date().toISOString()
   };
   try{
-    if(pedidoActual){
-      await colPedidos.doc(pedidoActual).update(datos);
+    if(id){
+      await colPedidos.doc(id).update(datos);
     } else {
-      datos.createdAt=new Date().toISOString();
+      datos.estado='pendiente'; datos.createdAt=new Date().toISOString();
       await colPedidos.add(datos);
     }
     toast('✅ Pedido guardado','ok');
@@ -310,170 +329,61 @@ async function guardarPedido(){
   }catch(e){ toast('❌ '+e.message,'err'); }
 }
 
-// ══════════════════════════════
-// ENVIAR A PRODUCCIÓN
-// ══════════════════════════════
-async function abrirProduccion(id){
-  const doc = await colPedidos.doc(id).get();
-  const p = {id:doc.id,...doc.data()};
-  pedidoActual=id; asignaciones={};
-  // Pre-cargar asignaciones existentes
-  (p.lineas||[]).forEach((l,i)=>{ if(l.maquina) asignaciones[i]=l.maquina; });
+async function guardarYProduccion(){
+  const cliente=document.getElementById('pedCliente').value.trim();
+  if(!cliente){ toast('❌ Cliente obligatorio','err'); return; }
+  const lineasConMaq = lineas.filter(l=>l.maquina);
+  if(!lineasConMaq.length){ toast('⚠️ Asigna al menos una máquina','err'); return; }
 
-  const MAQUINAS=['M1','M2','M3','M4','M5','M6','M7'];
-  document.getElementById('asignacionContainer').innerHTML = (p.lineas||[]).map((l,i)=>`
-    <div style="background:#f9fafc;border-radius:10px;padding:12px;margin-bottom:10px;">
-      <div style="font-weight:700;color:#1e2a44;margin-bottom:8px;">
-        ${l.ref} ${l.color} ${l.rojo?l.rojo+'R':''} ${l.natural?l.natural+'N':''}
-      </div>
-      <div class="maq-grid">
-        ${MAQUINAS.map(m=>`
-          <button class="maq-btn ${asignaciones[i]===m?'sel':''}" onclick="selMaq(${i},'${m}',this)">
-            ${m}
-          </button>`).join('')}
-        <button class="maq-btn ${!asignaciones[i]?'sel':''}" onclick="selMaq(${i},'',this)" style="grid-column:span 1;">
-          —
-        </button>
-      </div>
-    </div>`).join('');
-
-  document.getElementById('modalProduccion').classList.add('activo');
-}
-
-function selMaq(lineaIdx, maq, btn){
-  asignaciones[lineaIdx] = maq;
-  // Actualizar visual
-  const grid = btn.closest('.maq-grid');
-  grid.querySelectorAll('.maq-btn').forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');
-}
-
-async function confirmarProduccion(){
-  if(!pedidoActual) return;
+  const id=document.getElementById('pedidoId').value;
+  const datos={
+    cliente, fecha:document.getElementById('pedFecha').value,
+    obs:document.getElementById('pedObs').value.trim(),
+    lineas, estado:'en_produccion', updatedAt:new Date().toISOString()
+  };
   try{
-    // 1. Actualizar maquinas en el pedido
-    const doc = await colPedidos.doc(pedidoActual).get();
-    const p = doc.data();
-    const lineasActualizadas = (p.lineas||[]).map((l,i)=>({
-      ...l, maquina: asignaciones[i]||''
-    }));
-    await colPedidos.doc(pedidoActual).update({
-      lineas: lineasActualizadas,
-      estado: 'en_produccion',
-      updatedAt: new Date().toISOString()
-    });
-
-    // 2. Añadir a la orden de producción actual
-    const prodSnap = await colProd.orderBy('createdAt','desc').limit(1).get();
-    let prodId = null, prodData = null;
-    if(!prodSnap.empty){
-      prodId = prodSnap.docs[0].id;
-      prodData = prodSnap.docs[0].data();
+    // Guardar/actualizar pedido
+    let pedidoId = id;
+    if(id){
+      await colPedidos.doc(id).update(datos);
     } else {
-      prodData = { fecha: new Date().toISOString().split('T')[0], maquinas:{}, createdAt: new Date().toISOString() };
-      const MAQUINAS=['M1','M2','M3','M4','M5','M6','M7'];
-      MAQUINAS.forEach(m=>{ prodData.maquinas[m]={lineas:[],nota:''}; });
+      datos.createdAt=new Date().toISOString();
+      const ref=await colPedidos.add(datos);
+      pedidoId=ref.id;
     }
 
-    // Añadir cada línea a su máquina
-    lineasActualizadas.forEach(l=>{
-      if(!l.maquina) return;
-      if(!prodData.maquinas[l.maquina]) prodData.maquinas[l.maquina]={lineas:[],nota:''};
+    // Añadir a producción
+    const prodSnap=await colProd.orderBy('createdAt','desc').limit(1).get();
+    let prodData={fecha:new Date().toISOString().split('T')[0],maquinas:{},createdAt:new Date().toISOString()};
+    let prodId=null;
+    if(!prodSnap.empty){ prodId=prodSnap.docs[0].id; prodData={...prodSnap.docs[0].data()}; }
+    MAQUINAS.forEach(m=>{ if(!prodData.maquinas[m]) prodData.maquinas[m]={lineas:[],nota:''}; });
+
+    lineasConMaq.forEach(l=>{
+      const palets=(parseInt(l.rojo)||0)+(parseInt(l.natural)||0)+(parseInt(l.cantidadColor)||0);
       prodData.maquinas[l.maquina].lineas.push({
-        ref: l.ref,
-        color: l.color,
-        cliente: p.cliente,
-        palets: parseInt(l.rojo||0)+parseInt(l.natural||0),
-        cajas: 0, uds: 0, casillas: []
+        ref:l.ref, color:l.color||l.rojo&&'ROJO'||'', cliente:l.cliente||cliente,
+        palets, cajas:0, uds:0, casillas:[], caja:l.caja||''
       });
     });
 
-    if(prodId){
-      await colProd.doc(prodId).update({ maquinas: prodData.maquinas, updatedAt: new Date().toISOString() });
-    } else {
-      await colProd.add(prodData);
-    }
+    if(prodId) await colProd.doc(prodId).update({maquinas:prodData.maquinas,updatedAt:new Date().toISOString()});
+    else await colProd.add(prodData);
 
-    toast('✅ Enviado a producción','ok');
-    cerrarModal('modalProduccion');
+    toast('✅ Guardado y enviado a producción','ok');
+    cerrarModal('modalPedido');
     cargarPedidos();
   }catch(e){ toast('❌ '+e.message,'err'); }
-}
-
-// ══════════════════════════════
-// CONSULTA STOCK AL PARSEAR
-// ══════════════════════════════
-async function consultarStock(){
-  if(!lineas.length) return;
-  // Cargar refs de Firestore
-  const refsSnap = await db.collection('refs_ceraplast').get();
-  const REFS_DB = {};
-  refsSnap.docs.forEach(d=>{ REFS_DB[d.id]={...d.data()}; });
-
-  // Cargar stock de cajas y etiquetas
-  const cajasSnap = await db.collection('almacen_ceraplast_cajas').get();
-  const etSnap = await db.collection('almacen_ceraplast_etiquetas').get();
-  const stockCajas={}, stockEt={};
-  cajasSnap.docs.forEach(d=>{ stockCajas[d.data().nombre]=d.data().stock||0; });
-  etSnap.docs.forEach(d=>{ stockEt[d.data().nombre]=d.data().stock||0; });
-
-  // Calcular necesidades por línea
-  const info = lineas.map(l=>{
-    const ref = REFS_DB[l.ref]||{};
-    const palets = (parseInt(l.rojo)||0)+(parseInt(l.natural)||0)+(parseInt(l.cantidadColor)||0);
-    const cajasPalet = ref.cajas||0;
-    const udsCaja = ref.uds||0;
-    const cajasNec = palets * cajasPalet;
-    const etNec = palets * cajasPalet * udsCaja;
-    const cajaNombre = l.caja||'';
-    const cajasStock = cajaNombre ? (stockCajas[cajaNombre]||0) : null;
-    const lleva = ref.etiqueta==='si';
-    // Buscar etiqueta por referencia
-    const etKey = Object.keys(stockEt).find(k=>k.toUpperCase().includes(l.ref.toUpperCase()));
-    const etStock = etKey ? stockEt[etKey] : null;
-    return {l, palets, cajasNec, etNec, cajaNombre, cajasStock, lleva, etStock, etKey};
-  });
-
-  // Mostrar resumen debajo de las líneas
-  const resumen = info.map(({l,palets,cajasNec,etNec,cajaNombre,cajasStock,lleva,etStock,etKey})=>{
-    if(!palets) return '';
-    let html=`<div style="background:#f0f7ff;border-radius:8px;padding:8px 12px;margin-bottom:4px;font-size:12px;">
-      <strong>${l.ref} ${l.caja||''}</strong> — ${palets} palets`;
-    if(cajasNec){
-      const ok=cajasStock!==null&&cajasStock>=cajasNec;
-      const color=cajasStock===null?'#555':ok?'#1a7a40':'#e74c3c';
-      html+=`<br>📦 Cajas necesarias: <strong>${cajasNec}</strong>`;
-      if(cajasStock!==null) html+=` | Stock ${cajaNombre}: <strong style="color:${color}">${cajasStock}</strong> ${ok?'✅':'⚠️ Faltan '+(cajasNec-cajasStock)}`;
-    }
-    if(lleva&&etNec){
-      const ok=etStock!==null&&etStock>=etNec;
-      const color=etStock===null?'#555':ok?'#1a7a40':'#e74c3c';
-      html+=`<br>🏷️ Etiquetas necesarias: <strong>${etNec.toLocaleString()}</strong>`;
-      if(etStock!==null) html+=` | Stock ${etKey}: <strong style="color:${color}">${etStock.toLocaleString()}</strong> ${ok?'✅':'⚠️ Faltan '+(etNec-etStock).toLocaleString()}`;
-      else html+=` | Sin stock registrado`;
-    }
-    html+=`</div>`;
-    return html;
-  }).join('');
-
-  // Insertar el resumen
-  let cont=document.getElementById('stockResumen');
-  if(!cont){
-    cont=document.createElement('div');
-    cont.id='stockResumen';
-    document.getElementById('lineasPreview').after(cont);
-  }
-  cont.innerHTML=resumen?`<div style="font-size:11px;font-weight:600;color:#7f8c8d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">📊 Necesidades del pedido</div>${resumen}`:'';
 }
 
 // ══════════════════════════════
 // ACCIONES
 // ══════════════════════════════
 async function marcarFinalizado(id){
-  if(!confirm('¿Marcar este pedido como finalizado?')) return;
+  if(!confirm('¿Marcar como finalizado?')) return;
   try{
     await colPedidos.doc(id).update({estado:'finalizado',updatedAt:new Date().toISOString()});
-    toast('✅ Pedido finalizado','ok'); cargarPedidos();
+    toast('✅ Finalizado','ok'); cargarPedidos();
   }catch(e){ toast('❌ '+e.message,'err'); }
 }
 
@@ -485,40 +395,37 @@ async function eliminarPedido(id){
   }catch(e){ toast('❌ '+e.message,'err'); }
 }
 
-// ══════════════════════════════
-// IMPRIMIR
-// ══════════════════════════════
 async function imprimirPedido(id){
-  const doc = await colPedidos.doc(id).get();
-  const p = {id:doc.id,...doc.data()};
-  const lineasHTML = (p.lineas||[]).map(l=>`
-    <tr>
-      <td style="padding:6px 10px;border:1px solid #aaa;font-weight:600">${l.ref}</td>
-      <td style="padding:6px 10px;border:1px solid #aaa">${l.color||''}</td>
-      <td style="padding:6px 10px;border:1px solid #aaa;text-align:center">${l.rojo||''}</td>
-      <td style="padding:6px 10px;border:1px solid #aaa;text-align:center">${l.natural||''}</td>
-      <td style="padding:6px 10px;border:1px solid #aaa;text-align:center">${l.maquina||'—'}</td>
-    </tr>`).join('');
-
+  const doc=await colPedidos.doc(id).get();
+  const p={id:doc.id,...doc.data()};
+  const filasHTML=(p.lineas||[]).map(l=>`<tr>
+    <td style="padding:6px 10px;border:1px solid #aaa;font-weight:600">${l.ref}</td>
+    <td style="padding:6px 10px;border:1px solid #aaa">${l.caja||''}</td>
+    <td style="padding:6px 10px;border:1px solid #aaa">${l.cliente||''}</td>
+    <td style="padding:6px 10px;border:1px solid #aaa;text-align:center">${l.rojo||l.cantidadColor||''}</td>
+    <td style="padding:6px 10px;border:1px solid #aaa;text-align:center">${l.natural||''}</td>
+    <td style="padding:6px 10px;border:1px solid #aaa;text-align:center">${l.color||''}</td>
+    <td style="padding:6px 10px;border:1px solid #aaa;text-align:center">${l.maquina||'—'}</td>
+  </tr>`).join('');
   document.getElementById('print-area').innerHTML=`
     <style>@page{margin:10mm;size:A4 portrait;}</style>
-    <div style="font-family:Arial,sans-serif;font-size:11px;">
+    <div style="font-family:Arial,sans-serif;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6mm;border-bottom:2px solid #000;padding-bottom:4mm;">
-        <div>
-          <div style="font-size:18px;font-weight:bold">PEDIDO — ${p.cliente}</div>
-          <div style="font-size:11px;color:#555;margin-top:2px">${fechaES(p.fecha)} ${p.obs?'· '+p.obs:''}</div>
-        </div>
+        <div><div style="font-size:18px;font-weight:bold">PEDIDO — ${p.cliente}</div>
+        <div style="font-size:11px;color:#555">${fechaES(p.fecha)}${p.obs?' · '+p.obs:''}</div></div>
         <img src="logo-ceraplast.png" style="height:16mm;width:auto;">
       </div>
-      <table style="width:100%;border-collapse:collapse;">
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <thead><tr>
-          <th style="padding:6px 10px;border:1px solid #aaa;background:#e0e0e0;text-align:left">Referencia</th>
-          <th style="padding:6px 10px;border:1px solid #aaa;background:#e0e0e0;text-align:left">Color</th>
+          <th style="padding:6px 10px;border:1px solid #aaa;background:#e0e0e0;text-align:left">Ref</th>
+          <th style="padding:6px 10px;border:1px solid #aaa;background:#e0e0e0;text-align:left">Caja</th>
+          <th style="padding:6px 10px;border:1px solid #aaa;background:#e0e0e0;text-align:left">Cliente</th>
           <th style="padding:6px 10px;border:1px solid #aaa;background:#e0e0e0;text-align:center">Rojo</th>
           <th style="padding:6px 10px;border:1px solid #aaa;background:#e0e0e0;text-align:center">Natural</th>
+          <th style="padding:6px 10px;border:1px solid #aaa;background:#e0e0e0;text-align:center">Color</th>
           <th style="padding:6px 10px;border:1px solid #aaa;background:#e0e0e0;text-align:center">Máquina</th>
         </tr></thead>
-        <tbody>${lineasHTML}</tbody>
+        <tbody>${filasHTML}</tbody>
       </table>
     </div>`;
   setTimeout(()=>{ window.print(); setTimeout(()=>{ document.getElementById('print-area').innerHTML=''; },1500); },200);
