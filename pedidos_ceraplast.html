@@ -246,6 +246,8 @@ async function abrirEditar(id){
   document.getElementById('pedCliente').value=p.cliente||'';
   document.getElementById('pedFecha').value=p.fecha||'';
   document.getElementById('pedObs').value=p.obs||'';
+  const tl=document.getElementById('pedTextoLibre');
+  if(tl) tl.value=p.textoLibre||'';
   renderLineas();
   document.getElementById('modalPedido').classList.add('activo');
 }
@@ -316,10 +318,11 @@ function parsearTextoLibre(){
 async function guardarPedido(){
   const cliente=document.getElementById('pedCliente').value.trim();
   if(!cliente){ toast('❌ El cliente es obligatorio','err'); return; }
+  const textoLibre = document.getElementById('pedTextoLibre')?.value||'';
   const datos={
     cliente, fecha:document.getElementById('pedFecha').value,
     obs:document.getElementById('pedObs').value.trim(),
-    lineas, estado:'pendiente', updatedAt:new Date().toISOString()
+    textoLibre, lineas, estado:'pendiente', updatedAt:new Date().toISOString()
   };
   try{
     if(pedidoActual){
@@ -432,6 +435,26 @@ async function confirmarProduccion(){
 
     toast('✅ Enviado a producción','ok');
     cerrarModal('modalProduccion');
+    cargarPedidos();
+  }catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+// ══════════════════════════════
+// DUPLICAR
+// ══════════════════════════════
+async function duplicarPedido(id){
+  if(!confirm('¿Duplicar este pedido?')) return;
+  try{
+    const doc = await colPedidos.doc(id).get();
+    const p = doc.data();
+    const allSnap = await colPedidos.get();
+    const nums = allSnap.docs.map(d=>parseInt((d.data().numero||'CP_000').replace('CP_',''))||0);
+    const sigNum = 'CP_'+String((nums.length?Math.max(...nums):0)+1).padStart(3,'0');
+    const nuevo = {...p, numero:sigNum, fecha:new Date().toISOString().split('T')[0],
+      estado:'pendiente', createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
+    delete nuevo.id;
+    await colPedidos.add(nuevo);
+    toast('✅ Duplicado como '+sigNum,'ok');
     cargarPedidos();
   }catch(e){ toast('❌ '+e.message,'err'); }
 }
