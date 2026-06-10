@@ -170,15 +170,15 @@ async function cargarPedidos(){
     if(filtro) docs = docs.filter(d=>d.estado===filtro);
     if(!docs.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin pedidos.</p></div>'; return; }
     cont.innerHTML = docs.map(p=>{
-      const lineasHTML = (p.lineas||[]).map(l=>`
-        <div class="linea-pedido">
-          <span class="linea-ref">${l.ref}</span>
-          ${l.caja?`<span style="background:#e8ecf1;padding:1px 6px;border-radius:5px;font-size:11px">${l.caja}</span>`:''}
-          ${l.cliente?`<span style="color:#555">${l.cliente}</span>`:''}
-          ${l.rojo||l.natural?`<span style="color:#e74c3c;font-weight:600">${l.rojo||0}R+${l.natural||0}N</span>`:''}
-          ${l.cantidadColor&&l.color?`<span style="color:#8e44ad;font-weight:600">${l.cantidadColor} ${l.color}</span>`:''}
-          ${l.maquina?`<span class="linea-maq">${l.maquina}</span>`:`<span class="linea-maq sin">Sin máquina</span>`}
-        </div>`).join('');
+      const lineasHTML = (p.lineas||[]).map(l=>{
+        const col = COLOR_BADGE[l.color]||'#555';
+        const colorBadge = l.color ? '<span style="background:'+col+';color:#fff;padding:1px 8px;border-radius:10px;font-size:11px;font-weight:700">'+l.color+'</span>' : '';
+        const paletsStr = l.palets ? '<span style="font-weight:600">'+l.palets+' palets</span>' : '';
+        const cajaBadge = l.caja ? '<span style="background:#e8ecf1;padding:1px 6px;border-radius:5px;font-size:11px">'+l.caja+'</span>' : '';
+        const clienteStr = l.cliente ? '<span style="color:#555">'+l.cliente+'</span>' : '';
+        const maqBadge = l.maquina ? '<span class="linea-maq">'+l.maquina+'</span>' : '<span class="linea-maq sin">Sin máquina</span>';
+        return '<div class="linea-pedido"><span class="linea-ref">'+(l.ref||'')+'</span>'+cajaBadge+clienteStr+colorBadge+paletsStr+maqBadge+'</div>';
+      }).join('');
       return `<div class="pedido-card ${p.estado||'pendiente'}">
         <div class="pedido-header" onclick="toggleBody('body-${p.id}')">
           <div>
