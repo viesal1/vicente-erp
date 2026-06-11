@@ -577,7 +577,7 @@ async function imprimirVisor(){
       await new Promise(r=>setTimeout(r,300));
       const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
       const A4W=210, A4H=297;
-      const paginas = wrapper.querySelectorAll('.cert-page,.pag1,.pag2');
+      const paginas = wrapper.querySelectorAll('.cert-page,.pag1,.pag2,.et-sheet');
       const elementos = paginas.length>0 ? Array.from(paginas) : [wrapper];
       for(let i=0;i<elementos.length;i++){
         if(i>0) pdf.addPage();
@@ -622,7 +622,7 @@ async function imprimirVisor(){
     const A4W = 210, A4H = 297;
 
     // Buscar páginas dentro del wrapper
-    const paginas = wrapper.querySelectorAll('.cert-page, .pag1, .pag2');
+    const paginas = wrapper.querySelectorAll('.cert-page, .pag1, .pag2, .et-sheet');
     const elementos = paginas.length > 0 ? Array.from(paginas) : [wrapper];
 
     for(let i=0; i<elementos.length; i++){

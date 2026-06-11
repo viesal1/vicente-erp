@@ -160,13 +160,20 @@
 let db, colPedidos, colProd;
 let pedidoActual = null;
 let lineas = [];
-let asignaciones = {}; // {lineaIdx: maquina}
+let asignaciones = {};
+let tiposCaja = []; // {lineaIdx: maquina}
 
 firebase.auth().onAuthStateChanged(u=>{
   if(!u){ location.href='index.html'; return; }
   db = firebase.firestore();
   colPedidos = db.collection('pedidos_ceraplast');
   colProd = db.collection('produccion_ceraplast2');
+  // Cargar tipos de caja
+  db.collection('almacen_ceraplast_cajas').get().then(snap=>{
+    tiposCaja = snap.docs.map(d=>d.data().nombre).sort();
+    // Añadir tipos por defecto si no hay ninguno
+    if(!tiposCaja.length) tiposCaja = ['CAJA NEGRA','CAJA AZUL','GRANEL LUMAR','L-7','L-6','L-4','V-11','V-6','V-6 MOLLA','V-6 CS','ELEGUA','TP'];
+  });
   cargarPedidos();
 });
 
@@ -178,15 +185,12 @@ async function cargarPedidos(){
   cont.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><p>Cargando…</p></div>';
   const filtro = document.getElementById('filtroEstado').value;
   try{
-    const snap = await colPedidos.get();
+    let q = colPedidos.orderBy('fecha','desc');
+    if(filtro) q = colPedidos.where('estado','==',filtro).orderBy('fecha','desc');
+    const snap = await q.get();
     if(snap.empty){ cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin pedidos.</p></div>'; return; }
-    let docs = snap.docs.map(d=>({id:d.id,...d.data()}));
-    // Ordenar por createdAt más nuevo primero
-    docs.sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
-    // Filtrar por estado si hay filtro
-    if(filtro) docs = docs.filter(d=>d.estado===filtro);
-    if(!docs.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Sin pedidos.</p></div>'; return; }
-    cont.innerHTML = docs.map(p=>{
+    cont.innerHTML = snap.docs.map(d=>{
+      const p = {id:d.id,...d.data()};
       const lineasHTML = (p.lineas||[]).map((l,i)=>`
         <div class="linea-pedido">
           <span class="linea-ref">${l.ref}</span>
@@ -267,7 +271,12 @@ function renderLineas(){
   document.getElementById('lineasBody').innerHTML = lineas.map((l,i)=>`
     <tr>
       <td><input type="text" value="${l.ref||''}" onchange="lineas[${i}].ref=this.value.toUpperCase()" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:70px;text-transform:uppercase"></td>
-      <td><input type="text" value="${l.caja||''}" onchange="lineas[${i}].caja=this.value.toUpperCase()" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:90px;text-transform:uppercase" placeholder="CAJA NEGRA"></td>
+      <td>
+        <select onchange="lineas[${i}].caja=this.value" style="border:1px solid #dde3ee;border-radius:6px;padding:5px;font-size:12px;max-width:120px;">
+          <option value="">— Caja —</option>
+          ${tiposCaja.map(c=>`<option value="${c}" ${l.caja===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </td>
       <td><input type="text" value="${l.cliente||''}" onchange="lineas[${i}].cliente=this.value.toUpperCase()" style="border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:13px;width:80px;text-transform:uppercase" placeholder="ADISCO"></td>
       <td>
         <select onchange="lineas[${i}].color=this.value" style="border:1px solid #dde3ee;border-radius:6px;padding:5px;font-size:13px;background:${COLOR_BADGE[l.color]||'#fff'};color:${COLOR_BADGE[l.color]?'#fff':'#000'}">
@@ -397,18 +406,16 @@ async function confirmarProduccion(){
     });
 
     // 2. Añadir a la orden de producción actual
-    const prodSnap = await colProd.get();
+    const prodSnap = await colProd.orderBy('createdAt','desc').limit(1).get();
     let prodId = null, prodData = null;
-    const MAQUINAS=['M1','M2','M3','M4','M5','M6','M7'];
     if(!prodSnap.empty){
-      const docs = prodSnap.docs.sort((a,b)=>(b.data().createdAt||'').localeCompare(a.data().createdAt||''));
-      prodId = docs[0].id;
-      prodData = docs[0].data();
+      prodId = prodSnap.docs[0].id;
+      prodData = prodSnap.docs[0].data();
     } else {
       prodData = { fecha: new Date().toISOString().split('T')[0], maquinas:{}, createdAt: new Date().toISOString() };
+      const MAQUINAS=['M1','M2','M3','M4','M5','M6','M7'];
+      MAQUINAS.forEach(m=>{ prodData.maquinas[m]={lineas:[],nota:''}; });
     }
-    if(!prodData.maquinas) prodData.maquinas={};
-    MAQUINAS.forEach(m=>{ if(!prodData.maquinas[m]) prodData.maquinas[m]={lineas:[],nota:''}; });
 
     // Cargar referencias para obtener uds/caja y cajas/palet
     const refsSnap = await db.collection('refs_ceraplast').get();
