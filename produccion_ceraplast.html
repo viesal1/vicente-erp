@@ -302,7 +302,7 @@ function renderMaquinas(){
 
 function renderLineas(m){
   const lineas = orden.maquinas[m]?.lineas||[];
-  if(!lineas.length) return `<tr><td colspan="8" style="text-align:center;color:#aaa;padding:10px">Sin líneas</td></tr>`;
+  if(!lineas.length) return `<tr><td colspan="9" style="text-align:center;color:#aaa;padding:10px">Sin líneas</td></tr>`;
   return lineas.map((l,i)=>`
     <tr>
       <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'ref',this.innerText.trim().toUpperCase())" style="min-width:60px;text-transform:uppercase">${l.ref||''}</div></td>
@@ -312,6 +312,7 @@ function renderLineas(m){
         </select>
       </td>
       <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'cliente',this.innerText.trim().toUpperCase())" style="min-width:60px;text-transform:uppercase">${l.cliente||''}</div></td>
+      <td><div style="font-size:11px;font-weight:700;color:#1e2a44;background:#e8ecf1;padding:2px 6px;border-radius:6px;white-space:nowrap;min-width:50px;">${l.caja||'—'}</div></td>
       <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'palets',parseInt(this.innerText)||0)" style="min-width:30px;text-align:center">${l.palets||''}</div></td>
       <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'cajas',parseInt(this.innerText)||0)" style="min-width:30px;text-align:center">${l.cajas||''}</div></td>
       <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'uds',parseInt(this.innerText)||0)" style="min-width:30px;text-align:center">${l.uds||''}</div></td>
@@ -347,7 +348,7 @@ function renderLineas(m){
 
 function addLinea(m){
   if(!orden.maquinas[m]) orden.maquinas[m]={lineas:[],nota:''};
-  orden.maquinas[m].lineas.push({ref:'',color:'ROJO',cliente:'',palets:0,cajas:0,uds:0,casillas:[]});
+  orden.maquinas[m].lineas.push({ref:'',color:'ROJO',cliente:'',caja:'',palets:0,cajas:0,uds:0,casillas:[]});
   document.getElementById('tbody-'+m).innerHTML = renderLineas(m);
 }
 
@@ -441,7 +442,7 @@ function imprimirProduccion(){
         ? buildPrintFila(0) + '<div style="height:2mm"></div>' + buildPrintFila(10)
         : buildPrintFila(0);
       return `<tr>
-        <td style="padding:3px 6px;border:1px solid #aaa;font-size:10px">${l.ref} ${l.color} ${l.cliente||''}</td>
+        <td style="padding:3px 6px;border:1px solid #aaa;font-size:10px">${l.ref} ${l.color} ${l.cliente||''} ${l.caja?'<span style="background:#e8ecf1;padding:1px 4px;border-radius:4px;font-size:9px">'+l.caja+'</span>':''}</td>
         <td style="padding:3px 6px;border:1px solid #aaa;text-align:center;font-size:10px">${l.palets||''}</td>
         <td style="padding:3px 6px;border:1px solid #aaa;text-align:center;font-size:10px">${l.cajas||''}</td>
         <td style="padding:3px 6px;border:1px solid #aaa;text-align:center;font-size:10px">${l.uds||''}</td>
