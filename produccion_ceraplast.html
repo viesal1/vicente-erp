@@ -25,9 +25,9 @@
     .tab.activo{background:#1e2a44;color:#fff;}
 
     /* TABLA PRODUCCIÓN */
-    .prod-tabla{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;}
-    .prod-tabla th{background:#1e2a44;color:#fff;padding:6px 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
-    .prod-tabla td{padding:4px 6px;border:1px solid #dde3ee;vertical-align:middle;}
+    .prod-tabla{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;}
+    .prod-tabla th{background:#1e2a44;color:#fff;padding:4px 5px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0;white-space:nowrap;}
+    .prod-tabla td{padding:2px 4px;border:1px solid #dde3ee;vertical-align:middle;}
     .prod-tabla tr:hover td{background:#f9fafc;}
     .prod-tabla [contenteditable]{outline:none;min-width:30px;cursor:text;}
     .prod-tabla [contenteditable]:focus{background:#fffde7;border-radius:4px;}
@@ -305,17 +305,17 @@ function renderLineas(m){
   if(!lineas.length) return `<tr><td colspan="9" style="text-align:center;color:#aaa;padding:10px">Sin líneas</td></tr>`;
   return lineas.map((l,i)=>`
     <tr>
-      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'ref',this.innerText.trim().toUpperCase())" style="min-width:60px;text-transform:uppercase">${l.ref||''}</div></td>
+      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'ref',this.innerText.trim().toUpperCase())" style="min-width:40px;text-transform:uppercase">${l.ref||''}</div></td>
       <td>
         <select onchange="updateLinea('${m}',${i},'color',this.value)" style="border:none;background:transparent;font-size:13px;cursor:pointer;">
           ${COLORES.map(c=>`<option value="${c}" ${l.color===c?'selected':''}>${c}</option>`).join('')}
         </select>
       </td>
-      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'cliente',this.innerText.trim().toUpperCase())" style="min-width:60px;text-transform:uppercase">${l.cliente||''}</div></td>
-      <td><div style="font-size:11px;font-weight:700;color:#1e2a44;background:#e8ecf1;padding:2px 6px;border-radius:6px;white-space:nowrap;min-width:50px;">${l.caja||'—'}</div></td>
-      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'palets',parseInt(this.innerText)||0)" style="min-width:30px;text-align:center">${l.palets||''}</div></td>
-      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'cajas',parseInt(this.innerText)||0)" style="min-width:30px;text-align:center">${l.cajas||''}</div></td>
-      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'uds',parseInt(this.innerText)||0)" style="min-width:30px;text-align:center">${l.uds||''}</div></td>
+      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'cliente',this.innerText.trim().toUpperCase())" style="min-width:50px;text-transform:uppercase">${l.cliente||''}</div></td>
+      <td style="max-width:80px;overflow:hidden;"><div style="font-size:10px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.caja||'—'}</div></td>
+      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'palets',parseInt(this.innerText)||0)" style="min-width:25px;text-align:center">${l.palets||''}</div></td>
+      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'cajas',parseInt(this.innerText)||0)" style="min-width:25px;text-align:center">${l.cajas||''}</div></td>
+      <td><div contenteditable="true" onblur="updateLinea('${m}',${i},'uds',parseInt(this.innerText)||0)" style="min-width:25px;text-align:center">${l.uds||''}</div></td>
       <td>
         ${(()=>{
           const n = parseInt(l.palets)||0;
@@ -323,7 +323,7 @@ function renderLineas(m){
           const filas = [];
           for(let f=0;f<total;f+=10){
             const nums = '<div style="display:flex;gap:2px;margin-bottom:1px;">' +
-              Array.from({length:10},(_,k)=>`<div style="width:18px;text-align:center;font-size:8px;color:#aaa">${f+k+1}</div>`).join('') +
+              Array.from({length:10},(_,k)=>`<div style="width:20px;text-align:center;font-size:8px;color:#aaa;font-weight:600">${f+k+1}</div>`).join('') +
               '</div>';
             const cas = '<div class="casillas">' +
               Array.from({length:10},(_,k)=>{
@@ -331,7 +331,7 @@ function renderLineas(m){
                 const activa = idx < n;
                 const tachada = (l.casillas||[])[idx];
                 return `<div class="casilla${tachada?' tachada':''}"
-                  style="opacity:${activa?1:0.25};"
+                  style="opacity:${activa?1:0.25};width:20px;height:20px;"
                   onclick="${activa?`toggleCasilla('${m}',${i},${idx})`:''}">
                   ${tachada?'✕':''}
                 </div>`;
@@ -453,7 +453,7 @@ function imprimirProduccion(){
     return `<div style="margin-bottom:6mm;page-break-inside:avoid;">
       <div style="display:flex;justify-content:space-between;align-items:center;background:#1e2a44;color:#fff;padding:3px 8px;margin-bottom:0;">
         <strong style="font-size:11px">${m} &nbsp; ${fechaStr}</strong>
-        ${maq.nota?`<span style="font-size:10px;color:rgba(255,255,255,.8)">${maq.nota}</span>`:''}
+        <span style="font-size:10px;color:rgba(255,255,255,.8)">${maq.nota||''}</span>
       </div>
       <table style="width:100%;border-collapse:collapse;">
         <thead><tr>
