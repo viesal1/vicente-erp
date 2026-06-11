@@ -270,24 +270,25 @@ function renderMaquinas(){
     return `<div class="maq-card" id="card-${m}">
       <div class="maq-header">
         <h3>🏭 ${m}</h3>
-        <div contenteditable="true" class="maq-nota"
+        <div contenteditable="true"
           onblur="orden.maquinas['${m}'].nota=this.innerText.trim()"
-          style="min-width:150px;outline:none;cursor:text;"
+          style="font-size:15px;font-weight:700;color:#f39c12;outline:none;cursor:text;flex:1;margin-left:12px;letter-spacing:.5px;"
+          placeholder="Nota..."
           >${maq.nota||''}</div>
-        <span style="font-size:10px;color:rgba(255,255,255,.5);margin-left:4px" onclick="this.previousElementSibling.focus()">✏️</span>
+        <span style="font-size:10px;color:rgba(255,255,255,.4);margin-left:4px" onclick="this.previousElementSibling.focus()">✏️</span>
       </div>
       <div class="maq-body">
         <div style="overflow-x:auto;">
           <table class="prod-tabla" id="tabla-${m}">
             <thead><tr>
               <th style="width:8%">Ref</th>
-              <th style="width:10%">Color</th>
+              <th style="width:12%">Color</th>
               <th style="width:9%">Cliente</th>
-              <th style="width:11%">Caja</th>
+              <th style="width:13%">Caja</th>
               <th style="width:5%">Pal</th>
               <th style="width:5%">Cj/p</th>
               <th style="width:5%">Ud/c</th>
-              <th style="width:45%">Casillas (1-10)</th>
+              <th style="width:35%">1&nbsp;&nbsp;2&nbsp;&nbsp;3&nbsp;&nbsp;4&nbsp;&nbsp;5&nbsp;&nbsp;6&nbsp;&nbsp;7&nbsp;&nbsp;8&nbsp;&nbsp;9&nbsp;&nbsp;10</th>
               <th style="width:2%"></th>
             </tr></thead>
             <tbody id="tbody-${m}">
@@ -324,7 +325,7 @@ function renderLineas(m){
           const filas = [];
           for(let f=0;f<total;f+=10){
             const nums = '<div style="display:flex;gap:2px;margin-bottom:1px;">' +
-              Array.from({length:10},(_,k)=>`<div style="flex:1;text-align:center;font-size:7px;color:#aaa;">${f+k+1}</div>`).join('') +
+              Array.from({length:10},(_,k)=>`<div style="flex:1;text-align:center;font-size:7px;color:#666;font-weight:600;">${f+k+1}</div>`).join('') +
               '</div>';
             const cas = '<div class="casillas">' +
               Array.from({length:10},(_,k)=>{
@@ -452,9 +453,9 @@ function imprimirProduccion(){
     }).join('');
 
     return `<div style="margin-bottom:6mm;page-break-inside:avoid;">
-      <div style="display:flex;justify-content:space-between;align-items:center;background:#1e2a44;color:#fff;padding:3px 8px;margin-bottom:0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;background:#1e2a44;color:#fff;padding:4px 8px;margin-bottom:0;">
         <strong style="font-size:11px">${m} &nbsp; ${fechaStr}</strong>
-        <span style="font-size:10px;color:rgba(255,255,255,.8)">${maq.nota||''}</span>
+        <span style="font-size:13px;font-weight:900;text-transform:uppercase;text-decoration:underline;color:#fff;letter-spacing:1px;">${maq.nota||''}</span>
       </div>
       <table style="width:100%;border-collapse:collapse;">
         <thead><tr>
