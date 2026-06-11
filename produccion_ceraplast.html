@@ -40,7 +40,7 @@
     .maq-body{padding:12px;}
 
     /* CASILLAS */
-    .casillas{display:flex;gap:1px;}
+    .casillas{display:flex;gap:1px;width:100%;}
     .casilla{width:14px;height:14px;border:1px solid #aaa;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;}
     .casilla.tachada{background:#1e2a44;color:#fff;}
 
@@ -280,14 +280,15 @@ function renderMaquinas(){
         <div style="overflow-x:auto;">
           <table class="prod-tabla" id="tabla-${m}">
             <thead><tr>
-              <th>Referencia</th>
-              <th>Color</th>
-              <th>Cliente</th>
-              <th>Palets</th>
-              <th>Caj/p</th>
-              <th>Uds/c</th>
-              <th style="min-width:220px">Casillas (1-10)</th>
-              <th></th>
+              <th style="width:8%">Ref</th>
+              <th style="width:10%">Color</th>
+              <th style="width:9%">Cliente</th>
+              <th style="width:11%">Caja</th>
+              <th style="width:5%">Pal</th>
+              <th style="width:5%">Cj/p</th>
+              <th style="width:5%">Ud/c</th>
+              <th style="width:45%">Casillas (1-10)</th>
+              <th style="width:2%"></th>
             </tr></thead>
             <tbody id="tbody-${m}">
               ${renderLineas(m)}
@@ -323,7 +324,7 @@ function renderLineas(m){
           const filas = [];
           for(let f=0;f<total;f+=10){
             const nums = '<div style="display:flex;gap:2px;margin-bottom:1px;">' +
-              Array.from({length:10},(_,k)=>`<div style="width:14px;text-align:center;font-size:7px;color:#aaa;">${f+k+1}</div>`).join('') +
+              Array.from({length:10},(_,k)=>`<div style="flex:1;text-align:center;font-size:7px;color:#aaa;">${f+k+1}</div>`).join('') +
               '</div>';
             const cas = '<div class="casillas">' +
               Array.from({length:10},(_,k)=>{
@@ -331,7 +332,7 @@ function renderLineas(m){
                 const activa = idx < n;
                 const tachada = (l.casillas||[])[idx];
                 return `<div class="casilla${tachada?' tachada':''}"
-                  style="opacity:${activa?1:0.25};width:14px;height:14px;"
+                  style="opacity:${activa?1:0.25};flex:1;height:16px;"
                   onclick="${activa?`toggleCasilla('${m}',${i},${idx})`:''}">
                   ${tachada?'✕':''}
                 </div>`;
