@@ -40,7 +40,7 @@
     .maq-body{padding:12px;}
 
     /* CASILLAS */
-    .casillas{display:flex;gap:1px;width:100%;}
+    .casillas{display:flex;gap:1px;}
     .casilla{width:14px;height:14px;border:1px solid #aaa;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;}
     .casilla.tachada{background:#1e2a44;color:#fff;}
 
@@ -281,15 +281,15 @@ function renderMaquinas(){
         <div style="overflow-x:auto;">
           <table class="prod-tabla" id="tabla-${m}">
             <thead><tr>
-              <th style="width:8%">Ref</th>
-              <th style="width:12%">Color</th>
-              <th style="width:9%">Cliente</th>
-              <th style="width:13%">Caja</th>
-              <th style="width:5%">Pal</th>
-              <th style="width:5%">Cj/p</th>
-              <th style="width:5%">Ud/c</th>
-              <th style="width:35%">1&nbsp;&nbsp;2&nbsp;&nbsp;3&nbsp;&nbsp;4&nbsp;&nbsp;5&nbsp;&nbsp;6&nbsp;&nbsp;7&nbsp;&nbsp;8&nbsp;&nbsp;9&nbsp;&nbsp;10</th>
-              <th style="width:2%"></th>
+              <th style="white-space:nowrap">Ref</th>
+              <th style="white-space:nowrap">Color</th>
+              <th style="white-space:nowrap">Cliente</th>
+              <th style="white-space:nowrap">Caja</th>
+              <th style="white-space:nowrap">Pal</th>
+              <th style="white-space:nowrap">Cj/p</th>
+              <th style="white-space:nowrap">Ud/c</th>
+              <th style="width:99%">Casillas</th>
+              <th></th>
             </tr></thead>
             <tbody id="tbody-${m}">
               ${renderLineas(m)}
@@ -307,14 +307,14 @@ function renderLineas(m){
   if(!lineas.length) return `<tr><td colspan="9" style="text-align:center;color:#aaa;padding:10px">Sin líneas</td></tr>`;
   return lineas.map((l,i)=>`
     <tr>
-      <td style="width:55px"><div contenteditable="true" onblur="updateLinea('${m}',${i},'ref',this.innerText.trim().toUpperCase())" style="text-transform:uppercase">${l.ref||''}</div></td>
+      <td style="width:55px"><div contenteditable="true" onblur="updateLinea('${m}',${i},'ref',this.innerText.trim().toUpperCase())" style="text-transform:uppercase;white-space:nowrap">${l.ref||''}</div></td>
       <td style="width:90px">
         <select onchange="updateLinea('${m}',${i},'color',this.value)" style="border:none;background:transparent;font-size:12px;cursor:pointer;width:100%;">
           ${COLORES.map(c=>`<option value="${c}" ${l.color===c?'selected':''}>${c}</option>`).join('')}
         </select>
       </td>
-      <td style="width:65px"><div contenteditable="true" onblur="updateLinea('${m}',${i},'cliente',this.innerText.trim().toUpperCase())" style="text-transform:uppercase">${l.cliente||''}</div></td>
-      <td style="width:80px"><div style="font-size:11px;color:#1e2a44;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.caja||'—'}</div></td>
+      <td style="width:65px"><div contenteditable="true" onblur="updateLinea('${m}',${i},'cliente',this.innerText.trim().toUpperCase())" style="text-transform:uppercase;white-space:nowrap">${l.cliente||''}</div></td>
+      <td style="width:80px"><div style="font-size:11px;color:#1e2a44;font-weight:600;white-space:nowrap;">${l.caja||'—'}</div></td>
       <td style="width:42px;text-align:center"><div contenteditable="true" onblur="updateLinea('${m}',${i},'palets',parseInt(this.innerText)||0)">${l.palets||''}</div></td>
       <td style="width:38px;text-align:center"><div contenteditable="true" onblur="updateLinea('${m}',${i},'cajas',parseInt(this.innerText)||0)">${l.cajas||''}</div></td>
       <td style="width:38px;text-align:center"><div contenteditable="true" onblur="updateLinea('${m}',${i},'uds',parseInt(this.innerText)||0)">${l.uds||''}</div></td>
@@ -325,7 +325,7 @@ function renderLineas(m){
           const filas = [];
           for(let f=0;f<total;f+=10){
             const nums = '<div style="display:flex;gap:2px;margin-bottom:1px;">' +
-              Array.from({length:10},(_,k)=>`<div style="flex:1;text-align:center;font-size:7px;color:#666;font-weight:600;">${f+k+1}</div>`).join('') +
+              Array.from({length:10},(_,k)=>`<div style="width:18px;text-align:center;font-size:7px;color:#666;font-weight:600;flex-shrink:0;">${f+k+1}</div>`).join('') +
               '</div>';
             const cas = '<div class="casillas">' +
               Array.from({length:10},(_,k)=>{
@@ -333,7 +333,7 @@ function renderLineas(m){
                 const activa = idx < n;
                 const tachada = (l.casillas||[])[idx];
                 return `<div class="casilla${tachada?' tachada':''}"
-                  style="opacity:${activa?1:0.25};flex:1;height:16px;"
+                  style="opacity:${activa?1:0.25};width:18px;height:18px;flex-shrink:0;"
                   onclick="${activa?`toggleCasilla('${m}',${i},${idx})`:''}">
                   ${tachada?'✕':''}
                 </div>`;
