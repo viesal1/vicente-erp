@@ -25,7 +25,7 @@
     .tab.activo{background:#1e2a44;color:#fff;}
 
     /* TABLA PRODUCCIÓN */
-    .prod-tabla{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;table-layout:fixed;}
+    .prod-tabla{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;table-layout:auto;}
     .prod-tabla th{background:#1e2a44;color:#fff;padding:4px 5px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0;white-space:nowrap;}
     .prod-tabla td{padding:2px 4px;border:1px solid #dde3ee;vertical-align:middle;}
     .prod-tabla tr:hover td{background:#f9fafc;}
@@ -41,7 +41,7 @@
 
     /* CASILLAS */
     .casillas{display:flex;gap:1px;}
-    .casilla{width:14px;height:14px;border:1px solid #aaa;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;}
+    .casilla{width:16px;height:16px;border:1px solid #aaa;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;}
     .casilla.tachada{background:#1e2a44;color:#fff;}
 
     /* BOTONES */
@@ -288,7 +288,8 @@ function renderMaquinas(){
               <th style="white-space:nowrap">Pal</th>
               <th style="white-space:nowrap">Cj/p</th>
               <th style="white-space:nowrap">Ud/c</th>
-              <th style="width:99%">Casillas</th>
+              <th>Casillas</th>
+             <th style="width:99%">Casillas</th>
               <th></th>
             </tr></thead>
             <tbody id="tbody-${m}">
@@ -325,7 +326,7 @@ function renderLineas(m){
           const filas = [];
           for(let f=0;f<total;f+=10){
             const nums = '<div style="display:flex;gap:2px;margin-bottom:1px;">' +
-              Array.from({length:10},(_,k)=>`<div style="width:18px;text-align:center;font-size:7px;color:#666;font-weight:600;flex-shrink:0;">${f+k+1}</div>`).join('') +
+              Array.from({length:10},(_,k)=>`<div style="width:16px;text-align:center;font-size:7px;color:#666;font-weight:600;flex-shrink:0;">${f+k+1}</div>`).join('') +
               '</div>';
             const cas = '<div class="casillas">' +
               Array.from({length:10},(_,k)=>{
@@ -333,7 +334,7 @@ function renderLineas(m){
                 const activa = idx < n;
                 const tachada = (l.casillas||[])[idx];
                 return `<div class="casilla${tachada?' tachada':''}"
-                  style="opacity:${activa?1:0.25};width:18px;height:18px;flex-shrink:0;"
+                  style="opacity:${activa?1:0.25};"
                   onclick="${activa?`toggleCasilla('${m}',${i},${idx})`:''}">
                   ${tachada?'✕':''}
                 </div>`;
