@@ -309,7 +309,7 @@ function renderLineas(m){
   return lineas.map((l,i)=>`
     <tr>
       <td style="width:55px"><div contenteditable="true" onblur="updateLinea('${m}',${i},'ref',this.innerText.trim().toUpperCase())" style="text-transform:uppercase;white-space:nowrap">${l.ref||''}</div></td>
-      <td style="white-space:nowrap;"><span style="font-size:11px;font-weight:700;color:${COLOR_BADGE[l.color]||'#555'}">${l.color||''}</span></td>
+      <td style="white-space:nowrap;font-size:11px;">${l.color||''}</td>
       <td style="width:65px"><div contenteditable="true" onblur="updateLinea('${m}',${i},'cliente',this.innerText.trim().toUpperCase())" style="text-transform:uppercase;white-space:nowrap">${l.cliente||''}</div></td>
       <td style="width:80px"><div style="font-size:11px;color:#1e2a44;font-weight:600;white-space:nowrap;">${l.caja||'—'}</div></td>
       <td style="width:42px;text-align:center"><div contenteditable="true" onblur="updateLinea('${m}',${i},'palets',parseInt(this.innerText)||0)">${l.palets||''}</div></td>
